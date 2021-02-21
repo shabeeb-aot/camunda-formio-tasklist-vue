@@ -1,4 +1,4 @@
-<template v-slot:button-content>
+<template>
 
   <b-container>
     <b-row class="text-left" align-v="start">
