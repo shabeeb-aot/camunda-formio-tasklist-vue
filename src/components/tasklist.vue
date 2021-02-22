@@ -117,8 +117,6 @@ import 'vue-loading-overlay/dist/vue-loading.css';
   }
 })
 export default class Tasklist extends Vue {
-    @Watch('$route')
-    fetchData: () => void
 
     private tasks: Array<object> = []
     private getProcessDefinitions: Record<string, any> = []
@@ -165,7 +163,7 @@ export default class Tasklist extends Vue {
     }
 
   onClaim() {
-    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task.id, {userId: this.username}).then((result)=> 
+    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task?.id?.name, {userId: this.username}).then((result)=> 
     console.log(result.data)
     )
     .catch((error) => {
@@ -183,6 +181,7 @@ export default class Tasklist extends Vue {
   }
 
 
+  @Watch('$route')
   fetchData() {
         CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {
           this.tasks = result.data;

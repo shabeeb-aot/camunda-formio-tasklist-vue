@@ -19,7 +19,6 @@ const initOptions = {
   url: process.env.VUE_APP_KEYCLOAK_URL,
   realm: process.env.VUE_APP_KEYCLOAK_REALM ,
   clientId: process.env.VUE_APP_KEYCLOAK_CLIENT_ID ,
-  onLoad: 'login-required',
 }
 const STAFF_REVIEWER_ID = process.env.VUE_APP_REVIEWER_ROLE_ID
 const STAFF_REVIEWER = process.env.VUE_APP_REVIEWER_ROLE
@@ -33,7 +32,7 @@ const ROLES = [
 ];
 
 const keycloak = Keycloak(initOptions);
-keycloak.init({onLoad: initOptions.onLoad}).then((auth) =>{
+keycloak.init({onLoad: 'login-required'}).then((auth) =>{
     console.log("got in")
     if(!auth) {
       window.location.reload();
