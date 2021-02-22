@@ -1,4 +1,4 @@
-<template v-slot:button-content>
+<template>
 
   <b-container>
     <b-row class="text-left" align-v="start">
@@ -15,7 +15,6 @@
                   <b-row>
                     <div class="col-12">
                       <h5>
-                      <!-- <router-link :to="`/tasklist/${task.id}`"> -->
                         {{ task.name }}
                       </h5>
                       <br>
@@ -46,7 +45,7 @@
       </b-col>
 
       <b-col cols="8" v-if="this.$route.params.taskId">
-        <b-row class="ml-0 task-header"> {{taskName}}</b-row>
+        <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
         <b-row class="ml-0 task-name">PID #{{task.processInstanceId}}</b-row>
         
@@ -118,16 +117,15 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 })
 export default class Tasklist extends Vue {
 
-    private tasks: Array<object> = []
-    private getProcessDefinitions: Record<string, any> = []
-    private taskName = null
-    private taskProcess = null
-    private formId = null
-    private submissionId = null
-    private Url = null
-    private activeIndex = null
-    private username = sessionStorage.getItem("username")
-    private task = null
+  private tasks: Array<object> = []
+  private getProcessDefinitions: Record<string, any> = []
+  private taskProcess = null
+  private formId = null
+  private submissionId = null
+  private Url = null
+  private activeIndex = null
+  private username = sessionStorage.getItem("username")
+  private task = null
 
   timeDifference(givendate: Date) {      
     const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
@@ -158,17 +156,29 @@ export default class Tasklist extends Vue {
     return process && process[dataKey];
   }
 
-  toggle(index: any){
+  getTaskFromList(tasks:any[], taskId:string){
+      const task = tasks.find(task=>task.id==taskId);
+      return task;
+    }
+
+  toggle(index: number){
       this.activeIndex = index
     }
 
+  getBPMTaskDetail(taskId:string) {
+        CamundaRest.getTaskById(sessionStorage.getItem("vue-token"), taskId).then((result) => {
+          this.task = result.data;
+        })
+    }
+
   onClaim() {
-    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task?.id?.name, {userId: this.username}).then((result)=> 
+    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task.id, {userId: this.username}).then((result)=> 
     console.log(result.data)
     )
     .catch((error) => {
         console.log("Error", error);
     })
+    this.getBPMTaskDetail(this.task.id)
   }
 
   onUnClaim(){ 
@@ -177,37 +187,30 @@ export default class Tasklist extends Vue {
     )
     .catch((error) =>{
       console.log("Error", error)
+      this.getBPMTaskDetail(this.task.id)
     })
   }
 
 
   @Watch('$route')
   fetchData() {
-        CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {
-          this.tasks = result.data;
+      if (this.$route.params.taskId) {       
+        this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
+        CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId).then((result) => {
+          CamundaRest.getProcessDefinitionById(sessionStorage.getItem('vue-token'), result.data.processDefinitionId).then((res) => {
+          this.taskProcess = res.data.name;
         });
-        if (this.$route.params.taskId) {         
-          CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId).then((result) => {
-            this.taskName = result.data.name;
-            });
-          
-          CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
-          .then((result) => {CamundaRest.getProcessDefinitionById(sessionStorage.getItem('vue-token'), result.data.processDefinitionId)
-          .then((res) => {
-            this.taskProcess = res.data.name;
-          });
-          })
+        })
 
-
-          CamundaRest.getVariablesByTaskId(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
-          .then((result)=> {
-              this.Url = result.data["formUrl"].value;
-              const formArr = this.Url.split("/");
-              this.formId = formArr[4];
-              this.submissionId = formArr[6];
-          });
-        }
+        CamundaRest.getVariablesByTaskId(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
+        .then((result)=> {
+            this.Url = result.data["formUrl"].value;
+            const formArr = this.Url.split("/");
+            this.formId = formArr[4];
+            this.submissionId = formArr[6];
+        });
       }
+    }
 
   mounted() {
     CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {

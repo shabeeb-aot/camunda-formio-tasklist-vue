@@ -40,16 +40,15 @@ keycloak.init({onLoad: 'login-required'}).then((auth) =>{
       console.log("authenticated");
     }
 
-    const email = keycloak.profile.email
-    const preferredUsername = keycloak.profile.username
+    const email = keycloak?.profile?.email
+    const preferredUsername = keycloak?.profile?.username
     sessionStorage.setItem("username", preferredUsername)
-    console.log(email)
     const KeycloakClient = process.env.VUE_APP_KEYCLOAK_CLIENT_ID
 
 
     if(keycloak.resourceAccess[KeycloakClient]) {
       const UserRoles = keycloak.resourceAccess[KeycloakClient].roles;
-      let roles = [];
+      let roles: any[] = [];
       for (let i = 0; i < UserRoles.length; i++) {
         const roleData = ROLES.find((x) => x.title === UserRoles[i]);
         if (roleData) {

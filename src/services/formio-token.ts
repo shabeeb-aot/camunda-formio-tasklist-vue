@@ -14,9 +14,7 @@ export const authenticateFormio = (userEmail: any, roles: any) => {
             },
         },
         "--- change me now ---"
-    ); // JWT secret key
-    //TODO remove this token from local Storage on logout and try to move to redux store as well
-    console.log(FORMIO_TOKEN)
+    ); 
     sessionStorage.setItem("formioToken", FORMIO_TOKEN);
     localStorage.setItem("formioToken", FORMIO_TOKEN)
 };
