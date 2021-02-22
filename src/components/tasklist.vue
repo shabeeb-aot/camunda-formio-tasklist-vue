@@ -52,12 +52,23 @@
         <div>
         <b-row class="actionable">
             <div class="col-md-auto">
-            <b-button variant="outline-primary"><b-icon :icon="'calendar3'"></b-icon> Set Follow-up date 
-            </b-button>
-            </div>
-            <div class="col-md">
-            <b-button variant="outline-primary"><b-icon :icon="'bell'"></b-icon> Due Date </b-button>
-            </div>
+              <b-icon :icon="'calendar3'"></b-icon>
+              <DatePicker 
+              type="datetime"
+              placeholder="Set Follow-up date"
+              v-model="setFollowup"
+              >
+              </DatePicker>
+              </div>
+              <div class="col-md-auto">
+                <b-icon :icon="'bell'"></b-icon>
+                <DatePicker 
+              type="datetime"
+              placeholder="Set Due Date"
+              v-model="setDue"
+                >
+                </DatePicker>
+              </div>
             <div class="col-md">
             <b-button variant="outline-primary"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
             </div>
@@ -109,10 +120,12 @@ import CamundaRest from '../services/camunda-rest';
 import { Form } from 'vue-formio';
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import 'vue-loading-overlay/dist/vue-loading.css';
+import DatePicker from 'vue2-datepicker'
 
 @Component({
   components: {
-    formio: Form
+    formio: Form,
+    DatePicker
   }
 })
 export default class Tasklist extends Vue {
@@ -126,6 +139,8 @@ export default class Tasklist extends Vue {
   private activeIndex = null
   private username = sessionStorage.getItem("username")
   private task = null
+  private setFollowup = null
+  private setDue = null
 
   timeDifference(givendate: Date) {      
     const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
@@ -156,7 +171,7 @@ export default class Tasklist extends Vue {
     return process && process[dataKey];
   }
 
-  getTaskFromList(tasks:any[], taskId:string){
+  getTaskFromList(tasks: any[], taskId: string){
       const task = tasks.find(task=>task.id==taskId);
       return task;
     }
@@ -165,7 +180,7 @@ export default class Tasklist extends Vue {
       this.activeIndex = index
     }
 
-  getBPMTaskDetail(taskId:string) {
+  getBPMTaskDetail(taskId: string) {
         CamundaRest.getTaskById(sessionStorage.getItem("vue-token"), taskId).then((result) => {
           this.task = result.data;
         })
