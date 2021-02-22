@@ -1,4 +1,4 @@
-<template>
+<template v-slot:button-content>
 
   <b-container>
     <b-row class="text-left" align-v="start">
@@ -8,11 +8,10 @@
                 <input type="text" class="filter" placeholder="Filter Tasks"/>
                 {{tasks.length}}
           </div>
-            <b-list-group-item button v-for="(task, idx) in tasks" :key="task" v-bind:to="`/tasklist/${task.id}`"
-            v-on:click="toggle(idx)"
-            :class="{'selected': idx == activeIndex}"
-            >
-              <b-link v-bind:to="`/${task.id}`">
+            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task" 
+                v-on:click="toggle(idx)"
+                :class="{'selected': idx == activeIndex}">
+              <b-link v-bind:to="`/tasklist/${task.id}`">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -46,38 +45,27 @@
 
       </b-col>
 
-      <b-col cols="8" v-if="this.$route.params.taskId"> 
-          <h1>{{taskName}}</h1>
-          <h3>{{taskProcess}}</h3>
-          <div><p>PID #{{task.processInstanceId}}</p></div>
-
-
-          <br>
-          <div class="row">
-              <div class="col-md-auto">
-              <!-- <b-icon :icon="'calendar3'"></b-icon> -->
-              <DatePicker 
-              type="datetime"
-              placeholder="Set Follow-up date"
-              v-model="setFollowup"
-              >
-              </DatePicker>
-              </div>
-              <div class="col-md">
-                <!-- <b-icon :icon="'bell'"></b-icon> -->
-                <DatePicker 
-              type="datetime"
-              placeholder="Set Due Date"
-              v-model="setDue"
-                >
-                </DatePicker>
-              </div>
-              <div class="col-md">
-              <b-button variant="outline-primary"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
-              </div>
-              <div class="col-md">
-              <b-col>
-
+      <b-col cols="8" v-if="this.$route.params.taskId">
+        <b-row class="ml-0 task-header"> {{taskName}}</b-row>
+        <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
+        <b-row class="ml-0 task-name">PID #{{task.processInstanceId}}</b-row>
+        
+        <div>
+        <b-row class="actionable">
+            <div class="col-md-auto">
+            <b-button variant="outline-primary"><b-icon :icon="'calendar3'"></b-icon> Set Follow-up date 
+            </b-button>
+            </div>
+            <div class="col-md">
+            <b-button variant="outline-primary"><b-icon :icon="'bell'"></b-icon> Due Date </b-button>
+            </div>
+            <div class="col-md">
+            <b-button variant="outline-primary"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
+            </div>
+            <div class="col-md">
+            <!-- <button type="button" class="btn btn-primary"><b-icon :icon="'person-fill'"></b-icon> Claim </button> -->
+            <b-col>
+              {{task.assignee}}
                  <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
                    <!-- <b-spinner label="Loading..."></b-spinner> -->
                    {{task.assignee}}
@@ -87,28 +75,24 @@
                    <b-icon :icon="'person-fill'"></b-icon>
                    Claim
                  </b-button>
-
               </b-col>
-              </div>
-          </div>
+            </div>
+        </b-row>
 
-          <br>
-          <br>
-          <div>
-          <b-tabs content-class="mt-3" id="service-task-details">
-            <b-tab title="Form" active>
-              <formio :src=Url
+        <div>
+            <b-tabs content-class="mt-3" id="service-task-details">
+              <b-tab title="Form" active>
+                <formio :src=Url
                 :submission=submissionId
-                :form=formId
-                v-on:submit="doSomething">
-              </formio>
-            </b-tab>
-            <b-tab title="History"></b-tab>
-            <b-tab title="Diagram"></b-tab>
-            <b-tab title="Description"></b-tab>
-          </b-tabs>
-        </div>
-        
+                :form=formId>
+                </formio>
+              </b-tab>
+              <b-tab title="History"></b-tab>
+              <b-tab title="Diagram"></b-tab>
+              <b-tab title="Description"></b-tab>
+            </b-tabs>
+          </div>
+        </div>     
       </b-col>
 
       <b-col cols="8" v-else>
@@ -125,39 +109,30 @@
 import CamundaRest from '../services/camunda-rest';
 import { Form } from 'vue-formio';
 import { Component, Vue, Watch } from 'vue-property-decorator'
-// import Loading from 'vue-loading-overlay'
-// import { Action, Getter, Mutation, State } from 'vuex-class'
-import 'vue-loading-overlay/dist/vue-loading.css'
-import DatePicker from 'vue2-datepicker'
-import 'vue2-datepicker/index.css'
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 @Component({
   components: {
-    formio: Form,
-    DatePicker 
+    formio: Form
   }
 })
 export default class Tasklist extends Vue {
     @Watch('$route')
-    fetchData
+    fetchData: () => void
 
-    private tasks = []
-    private getProcessDefinitions = []
+    private tasks: Array<object> = []
+    private getProcessDefinitions: Record<string, any> = []
     private taskName = null
     private taskProcess = null
     private formId = null
     private submissionId = null
-    private Url = "https://forms3.aot-technologies.com/form/5fd99b91e94136c21bbac79a/submission/600013a0b20f79eede2f63c2"
-    private activeIndex=null
-    private task = null
+    private Url = null
+    private activeIndex = null
     private username = sessionStorage.getItem("username")
-    private setFollowup=null
-    private setDue = null
-    private open = null
+    private task = null
 
-  
-  timeDifference(givendate) {      
-    const diff: Date = Math.abs(new Date() - new Date(givendate));
+  timeDifference(givendate: Date) {      
+    const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
     const msec = diff;
     const days = Math.floor(msec / 1000 / 60 / (60 * 24))
     const dateDiff = new Date(msec);
@@ -180,74 +155,71 @@ export default class Tasklist extends Vue {
     }
   }
 
-    onClaim() {
-      CamundaRest.claim(this.task.id, {userId: this.username}).then((result)=> 
-      console.log(result.data)
-      )
-      .catch((error) => {
-          console.log("Error", error);
-      })
-    }
+  getProcessDataFromList(processList: any[],processId: any,dataKey: string|number) {
+    const process = processList.find(process => process.id === processId);
+    return process && process[dataKey];
+  }
 
-    onUnClaim(){ 
-      CamundaRest.unclaim(this.task.id).then((result)=>
-        console.log(result.data)
-      )
-      .catch((error) =>{
-        console.log("Error", error)
-      })
-    }
-
-    fetchData() {
-      CamundaRest.getTasks().then((result) => {
-        this.tasks = result.data;
-      });
-      if (this.$route.params.taskId) {         
-        CamundaRest.getTaskById(this.$route.params.taskId).then((result) => {
-          this.taskName = result.data.name;
-          });
-        
-        CamundaRest.getTaskById(this.$route.params.taskId)
-        .then((result) => {CamundaRest.getProcessDefinitionById(result.data.processDefinitionId)
-        .then((res) => {
-          this.taskProcess = res.data.name;
-          const formArr = this.Url.split("/");
-          console.log(formArr)
-          this.formId = formArr[4];
-          this.submissionId = formArr[6];
-        });
-        })
-
-    }
-
-        this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-      }
-
-    getProcessDataFromList(getProcessDefinitions,processId,dataKey){
-      const process = getProcessDefinitions.find(process=>process.id===processId);
-      return process && process[dataKey] ;
-    }
-
-    getTaskFromList(tasks, taskId){
-      const task = tasks.find(task=>task.id==taskId);
-      return task;
-    }
-
-    toggle(index){
+  toggle(index: any){
       this.activeIndex = index
     }
 
+  onClaim() {
+    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task.id, {userId: this.username}).then((result)=> 
+    console.log(result.data)
+    )
+    .catch((error) => {
+        console.log("Error", error);
+    })
+  }
+
+  onUnClaim(){ 
+    CamundaRest.unclaim(sessionStorage.getItem("vue-token") ,this.task.id).then((result)=>
+      console.log(result.data)
+    )
+    .catch((error) =>{
+      console.log("Error", error)
+    })
+  }
+
+
+  fetchData() {
+        CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {
+          this.tasks = result.data;
+        });
+        if (this.$route.params.taskId) {         
+          CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId).then((result) => {
+            this.taskName = result.data.name;
+            });
+          
+          CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
+          .then((result) => {CamundaRest.getProcessDefinitionById(sessionStorage.getItem('vue-token'), result.data.processDefinitionId)
+          .then((res) => {
+            this.taskProcess = res.data.name;
+          });
+          })
+
+
+          CamundaRest.getVariablesByTaskId(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
+          .then((result)=> {
+              this.Url = result.data["formUrl"].value;
+              const formArr = this.Url.split("/");
+              this.formId = formArr[4];
+              this.submissionId = formArr[6];
+          });
+        }
+      }
 
   mounted() {
-    CamundaRest.getTasks().then((result) => {
+    CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {
       this.tasks = result.data;      
     }); 
 
     this.fetchData();
-
-    CamundaRest.getProcessDefinitions().then((response) => {
+    
+    CamundaRest.getProcessDefinitions(sessionStorage.getItem('vue-token')).then((response) => {
         this.getProcessDefinitions = response.data;
-    });
+    }); 
   }
 
 }
@@ -255,7 +227,6 @@ export default class Tasklist extends Vue {
 </script>
 
 <style>
-
   #ul_top_hypers li {
     display: inline;
 }
@@ -295,14 +266,23 @@ export default class Tasklist extends Vue {
 .service-task-list {
   max-height: 80vh;
   overflow-y: auto;
-  padding-right: 15px;
+  padding-right: 25px;
   border-right: 2px solid #D0D0D0;
-}
+} 
 
 #service-task-details {
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.task-header {
+  font-size: 30px;
+  font-weight: 600;
+}
+.task-name {
+  font-size: 20px;
+  font-weight: 400;
 }
 
 .selected {

@@ -41,8 +41,8 @@ keycloak.init({onLoad: initOptions.onLoad}).then((auth) =>{
       console.log("authenticated");
     }
 
-    const email = keycloak.tokenParsed.email
-    const preferredUsername = keycloak.tokenParsed.preferred_username
+    const email = keycloak.profile.email
+    const preferredUsername = keycloak.profile.username
     sessionStorage.setItem("username", preferredUsername)
     console.log(email)
     const KeycloakClient = process.env.VUE_APP_KEYCLOAK_CLIENT_ID
@@ -58,7 +58,6 @@ keycloak.init({onLoad: initOptions.onLoad}).then((auth) =>{
         }
       }
 
-      console.log(roles)
       authenticateFormio(email,roles);
     }
     

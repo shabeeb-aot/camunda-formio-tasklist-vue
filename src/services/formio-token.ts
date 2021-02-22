@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 
-export const authenticateFormio = (userEmail:any, roles:any) => {
+export const authenticateFormio = (userEmail: any, roles: any) => {
     const USER_RESOURCE_FORM_ID = process.env.VUE_APP_USER_RESOURCE_ID;
     const FORMIO_TOKEN = jwt.sign(
         {
