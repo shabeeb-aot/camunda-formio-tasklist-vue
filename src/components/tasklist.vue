@@ -149,7 +149,7 @@ export default class Tasklist extends Vue {
 @Prop() private BearerToken !: string|any;
 @Prop({default: ''}) private username = '';
 @Prop({default: ''}) private email = '';
-@Prop() private UserRoles !: Array<String>
+@Prop() private UserRoles !: Array<string>
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
