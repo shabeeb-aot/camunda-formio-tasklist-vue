@@ -70,7 +70,25 @@
                 </DatePicker>
               </div>
             <div class="col-md">
-            <b-button variant="outline-primary"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
+            <b-button variant="outline-primary" v-b-modal.AddGroupModal><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
+            
+            <b-modal
+            id="AddGroupModal"
+            ref="modal"
+            title="Manage Groups">
+                <div class="modal-text">
+                    <b-icon class="info-circle"></b-icon>
+                    You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
+                    <b-row class="mt-3 mb-3">
+                        <b-col>
+                            <label class="add">Add a group</label>
+                        </b-col>
+                        <b-col>
+                        <input type="text" placeholder="Group ID" v-model="test">
+                        </b-col>
+                    </b-row>
+                </div>
+            </b-modal>
             </div>
             <div class="col-md">
             <!-- <button type="button" class="btn btn-primary"><b-icon :icon="'person-fill'"></b-icon> Claim </button> -->
@@ -92,7 +110,7 @@
         <div>
             <b-tabs content-class="mt-3" id="service-task-details">
               <b-tab title="Form" active>
-                <formio :src=Url
+                <formio :src=formioUrl
                 :submission=submissionId
                 :form=formId>
                 </formio>
@@ -118,7 +136,7 @@
 <script lang="ts">
 import CamundaRest from '../services/camunda-rest';
 import { Form } from 'vue-formio';
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import 'vue-loading-overlay/dist/vue-loading.css';
 import DatePicker from 'vue2-datepicker'
 
@@ -129,16 +147,20 @@ import DatePicker from 'vue2-datepicker'
   }
 })
 export default class Tasklist extends Vue {
+@Prop() private CamundaUrl !: string|any;
+@Prop() private BearerToken !: string|any;
+@Prop({default: ''}) private username = '';
+@Prop({default: ''}) private email = '';
+@Prop() private UserRoles !: Array<String>
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
   private taskProcess = null
-  private formId = null
-  private submissionId = null
-  private Url = null
-  private activeIndex = null
-  private username = sessionStorage.getItem("username")
-  private task = null
+  private formId = ''
+  private submissionId = '' 
+  private formioUrl = ''
+  private activeIndex = 0
+  private task: any
   private setFollowup = null
   private setDue = null
 
@@ -176,20 +198,18 @@ export default class Tasklist extends Vue {
       return task;
     }
 
-  toggle(index: number){
+  toggle(index: number) {
       this.activeIndex = index
     }
 
   getBPMTaskDetail(taskId: string) {
-        CamundaRest.getTaskById(sessionStorage.getItem("vue-token"), taskId).then((result) => {
+        CamundaRest.getTaskById(this.BearerToken, this.CamundaUrl, taskId).then((result) => {
           this.task = result.data;
         })
     }
 
   onClaim() {
-    CamundaRest.claim(sessionStorage.getItem("vue-token") ,this.task.id, {userId: this.username}).then((result)=> 
-    console.log(result.data)
-    )
+    CamundaRest.claim(this.BearerToken,this.CamundaUrl ,this.task.id, {userId: this.username}).then()
     .catch((error) => {
         console.log("Error", error);
     })
@@ -197,9 +217,7 @@ export default class Tasklist extends Vue {
   }
 
   onUnClaim(){ 
-    CamundaRest.unclaim(sessionStorage.getItem("vue-token") ,this.task.id).then((result)=>
-      console.log(result.data)
-    )
+    CamundaRest.unclaim(this.BearerToken, this.CamundaUrl ,this.task.id).then()
     .catch((error) =>{
       console.log("Error", error)
       this.getBPMTaskDetail(this.task.id)
@@ -211,16 +229,16 @@ export default class Tasklist extends Vue {
   fetchData() {
       if (this.$route.params.taskId) {       
         this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-        CamundaRest.getTaskById(sessionStorage.getItem('vue-token'), this.$route.params.taskId).then((result) => {
-          CamundaRest.getProcessDefinitionById(sessionStorage.getItem('vue-token'), result.data.processDefinitionId).then((res) => {
+        CamundaRest.getTaskById(this.BearerToken, this.CamundaUrl, this.$route.params.taskId).then((result) => {
+          CamundaRest.getProcessDefinitionById(this.BearerToken, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
 
-        CamundaRest.getVariablesByTaskId(sessionStorage.getItem('vue-token'), this.$route.params.taskId)
+        CamundaRest.getVariablesByTaskId(this.BearerToken, this.CamundaUrl, this.$route.params.taskId)
         .then((result)=> {
-            this.Url = result.data["formUrl"].value;
-            const formArr = this.Url.split("/");
+            this.formioUrl = result.data["formUrl"].value;
+            const formArr = this.formioUrl.split("/");
             this.formId = formArr[4];
             this.submissionId = formArr[6];
         });
@@ -228,13 +246,13 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
-    CamundaRest.getTasks(sessionStorage.getItem('vue-token')).then((result) => {
+    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
 
     this.fetchData();
     
-    CamundaRest.getProcessDefinitions(sessionStorage.getItem('vue-token')).then((response) => {
+    CamundaRest.getProcessDefinitions(this.BearerToken, this.CamundaUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     }); 
   }
@@ -304,5 +322,14 @@ export default class Tasklist extends Vue {
 
 .selected {
   border-left: 2px solid #003366 !important;
+}
+
+.actionable {
+  color: #1a5a96;
+  background-color: transparent;
+  cursor: pointer;
+  margin: 10px 0;
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

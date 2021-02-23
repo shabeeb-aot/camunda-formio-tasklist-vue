@@ -15,7 +15,7 @@ const CamundaRest = {
   },
     
   getTasks(bearerToken: string, CamundaUrl: any) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/task?sortBy=created&sortOrder=desc&maxResults=10`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/task?sortBy=created&sortOrder=desc`);
   },
     
   getTaskById(bearerToken: string, taskId: string, CamundaUrl: any) {
