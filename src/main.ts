@@ -23,7 +23,7 @@ const ROLES = [
   },
 ];
 
-//pass UserRoles and email as props
+//pass UserRoles(["forms-flow-reviewer"]) and email("nancy.smith@aot.com") as props
 let roles: any[] = [];
 for (let i = 0; i < UserRoles.length; i++) {
   const roleData = ROLES.find((x) => x.title === UserRoles[i]);

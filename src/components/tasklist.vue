@@ -52,7 +52,6 @@
         <div>
         <b-row class="actionable">
             <div class="col-md-auto">
-              <b-icon :icon="'calendar3'"></b-icon>
               <DatePicker 
               type="datetime"
               placeholder="Set Follow-up date"
@@ -61,7 +60,6 @@
               </DatePicker>
               </div>
               <div class="col-md-auto">
-                <b-icon :icon="'bell'"></b-icon>
                 <DatePicker 
               type="datetime"
               placeholder="Set Due Date"
@@ -77,7 +75,7 @@
             ref="modal"
             title="Manage Groups">
                 <div class="modal-text">
-                    <b-icon class="info-circle"></b-icon>
+                    <b-icon icon="exclamation-circle"></b-icon>
                     You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
                     <b-row class="mt-3 mb-3">
                         <b-col>
@@ -203,24 +201,32 @@ export default class Tasklist extends Vue {
     }
 
   getBPMTaskDetail(taskId: string) {
-        CamundaRest.getTaskById(this.BearerToken, this.CamundaUrl, taskId).then((result) => {
+        CamundaRest.getTaskById(this.BearerToken, taskId, this.CamundaUrl).then((result) => {
           this.task = result.data;
         })
     }
 
+  getBPMTasks(){
+    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result)=> {
+      this.tasks = result.data;
+    })
+  }
+
   onClaim() {
-    CamundaRest.claim(this.BearerToken,this.CamundaUrl ,this.task.id, {userId: this.username}).then()
+    CamundaRest.claim(this.BearerToken,this.task.id, this.CamundaUrl, {userId: this.username}).then()
     .catch((error) => {
         console.log("Error", error);
     })
     this.getBPMTaskDetail(this.task.id)
+    this.getBPMTasks()
   }
 
   onUnClaim(){ 
-    CamundaRest.unclaim(this.BearerToken, this.CamundaUrl ,this.task.id).then()
+    CamundaRest.unclaim(this.BearerToken ,this.task.id, this.CamundaUrl).then()
     .catch((error) =>{
       console.log("Error", error)
       this.getBPMTaskDetail(this.task.id)
+      this.getBPMTasks()
     })
   }
 
@@ -229,13 +235,13 @@ export default class Tasklist extends Vue {
   fetchData() {
       if (this.$route.params.taskId) {       
         this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-        CamundaRest.getTaskById(this.BearerToken, this.CamundaUrl, this.$route.params.taskId).then((result) => {
+        CamundaRest.getTaskById(this.BearerToken, this.$route.params.taskId, this.CamundaUrl).then((result) => {
           CamundaRest.getProcessDefinitionById(this.BearerToken, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
 
-        CamundaRest.getVariablesByTaskId(this.BearerToken, this.CamundaUrl, this.$route.params.taskId)
+        CamundaRest.getVariablesByTaskId(this.BearerToken, this.$route.params.taskId, this.CamundaUrl)
         .then((result)=> {
             this.formioUrl = result.data["formUrl"].value;
             const formArr = this.formioUrl.split("/");
