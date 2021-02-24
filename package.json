@@ -27,6 +27,7 @@
     "vuex-class": "^0.3.2"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/keycloak-js": "^3.4.1",
     "@types/vue2-datepicker": "^3.3.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",

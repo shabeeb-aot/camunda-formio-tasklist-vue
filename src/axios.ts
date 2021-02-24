@@ -1,11 +1,16 @@
 import axios from 'axios';
 
-export function bpmAxios () {
+export function bpmAxios (bearerToken: string, CamundaUrl: any ) {
     
   return (
     axios.create({
-      baseURL: 'http://localhost:8080/engine-rest',
+      baseURL: CamundaUrl,
       withCredentials: false,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${bearerToken}`
+      }
     })
   )
 }  

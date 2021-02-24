@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 
-export const authenticateFormio = (userEmail, roles) => {
+export const authenticateFormio = (userEmail: any, roles: any) => {
     const USER_RESOURCE_FORM_ID = process.env.VUE_APP_USER_RESOURCE_ID;
     const FORMIO_TOKEN = jwt.sign(
         {
@@ -14,9 +14,7 @@ export const authenticateFormio = (userEmail, roles) => {
             },
         },
         "--- change me now ---"
-    ); // JWT secret key
-    //TODO remove this token from local Storage on logout and try to move to redux store as well
-    console.log(FORMIO_TOKEN)
+    ); 
     sessionStorage.setItem("formioToken", FORMIO_TOKEN);
     localStorage.setItem("formioToken", FORMIO_TOKEN)
 };
