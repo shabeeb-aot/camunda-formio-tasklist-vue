@@ -8,10 +8,10 @@
                 <input type="text" class="filter" placeholder="Filter Tasks"/>
                 {{tasks.length}}
           </div>
-            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task" 
+            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-              <b-link v-bind:to="`/tasklist/${task.id}`">
+              <b-link v-bind:to="`/${task.id}`">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -132,11 +132,13 @@
 </template>
 
 <script lang="ts">
-import CamundaRest from '../services/camunda-rest';
 import { Form } from 'vue-formio';
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
-import 'vue-loading-overlay/dist/vue-loading.css';
 import DatePicker from 'vue2-datepicker'
+import CamundaRest from '../services/camunda-rest';
+import {authenticateFormio} from "@/services/formio-token";
+
+import 'vue2-datepicker/index.css'
 
 @Component({
   components: {
@@ -146,9 +148,9 @@ import DatePicker from 'vue2-datepicker'
 })
 export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string|any;
-@Prop() private BearerToken !: string|any;
-@Prop({default: ''}) private username = '';
-@Prop({default: ''}) private email = '';
+@Prop() private token !: string|any;
+@Prop() private username !: string|any;
+@Prop() private email !: string|any;
 @Prop() private UserRoles !: Array<string>
 
   private tasks: Array<object> = []
@@ -201,19 +203,19 @@ export default class Tasklist extends Vue {
     }
 
   getBPMTaskDetail(taskId: string) {
-        CamundaRest.getTaskById(this.BearerToken, taskId, this.CamundaUrl).then((result) => {
+        CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
           this.task = result.data;
         })
     }
 
   getBPMTasks(){
-    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result)=> {
+    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
       this.tasks = result.data;
     })
   }
 
   onClaim() {
-    CamundaRest.claim(this.BearerToken,this.task.id, this.CamundaUrl, {userId: this.username}).then()
+    CamundaRest.claim(this.token,this.task.id, this.CamundaUrl, {userId: this.username}).then()
     .catch((error) => {
         console.log("Error", error);
     })
@@ -222,7 +224,7 @@ export default class Tasklist extends Vue {
   }
 
   onUnClaim(){ 
-    CamundaRest.unclaim(this.BearerToken ,this.task.id, this.CamundaUrl).then()
+    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then()
     .catch((error) =>{
       console.log("Error", error)
       this.getBPMTaskDetail(this.task.id)
@@ -235,13 +237,13 @@ export default class Tasklist extends Vue {
   fetchData() {
       if (this.$route.params.taskId) {       
         this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-        CamundaRest.getTaskById(this.BearerToken, this.$route.params.taskId, this.CamundaUrl).then((result) => {
-          CamundaRest.getProcessDefinitionById(this.BearerToken, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
+        CamundaRest.getTaskById(this.token, this.$route.params.taskId, this.CamundaUrl).then((result) => {
+          CamundaRest.getProcessDefinitionById(this.token, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
 
-        CamundaRest.getVariablesByTaskId(this.BearerToken, this.$route.params.taskId, this.CamundaUrl)
+        CamundaRest.getVariablesByTaskId(this.token, this.$route.params.taskId, this.CamundaUrl)
         .then((result)=> {
             this.formioUrl = result.data["formUrl"].value;
             const formArr = this.formioUrl.split("/");
@@ -252,13 +254,13 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
-    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result) => {
+    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
 
     this.fetchData();
     
-    CamundaRest.getProcessDefinitions(this.BearerToken, this.CamundaUrl).then((response) => {
+    CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     }); 
   }
