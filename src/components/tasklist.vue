@@ -11,7 +11,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-                <router-link :to="{path: task.id}">
+                <router-link :to="{path: task.id}" class="routercss">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -110,7 +110,7 @@
 
         <div>
             <b-tabs content-class="mt-3" id="service-task-details">
-              <b-tab title="Form" active>
+              <b-tab title="Form">
                 <formio :src=formioUrl
                 :submission=submissionId
                 :form=formId>
@@ -118,7 +118,6 @@
               </b-tab>
               <b-tab title="History"></b-tab>
               <b-tab title="Diagram"></b-tab>
-              <b-tab title="Description"></b-tab>
             </b-tabs>
           </div>
         </div>     
@@ -324,5 +323,10 @@ export default class Tasklist extends Vue {
   margin: 10px 0;
   font-size: 14px;
   font-weight: bold;
+}
+
+.routercss {
+  color: #212529;
+  text-align: left;
 }
 </style>
