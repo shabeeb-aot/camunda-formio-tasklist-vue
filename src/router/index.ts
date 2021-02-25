@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Tasklist from '@/components/tasklist.vue';
+import Tasklist from '@/views/tasklist.vue';
 
 Vue.use(VueRouter)
 
