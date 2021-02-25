@@ -11,7 +11,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-                <router-link :to="{path: '/'+task.id}">
+                <router-link :to="{path: task.id}">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -95,11 +95,8 @@
             </b-modal>
             </div>
             <div class="col-md">
-            <!-- <button type="button" class="btn btn-primary"><b-icon :icon="'person-fill'"></b-icon> Claim </button> -->
             <b-col>
-              {{task.assignee}}
                  <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
-                   <!-- <b-spinner label="Loading..."></b-spinner> -->
                    {{task.assignee}}
                    <b-icon :icon="'person-x-fill'"></b-icon>
                  </b-button>
@@ -198,20 +195,24 @@ export default class Tasklist extends Vue {
   }
 
   onClaim() {
-    CamundaRest.claim(this.token,this.task.id, this.CamundaUrl, {userId: this.username}).then()
+    CamundaRest.claim(this.token,this.task.id, {userId: this.username}, this.CamundaUrl).then(()=> 
+      {this.getBPMTaskDetail(this.task.id)
+      this.getBPMTasks()
+      }
+    )
     .catch((error) => {
         console.log("Error", error);
     })
-    this.getBPMTaskDetail(this.task.id)
-    this.getBPMTasks()
   }
 
   onUnClaim(){ 
-    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then()
+    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then(()=> 
+    {this.getBPMTaskDetail(this.task.id)
+      this.getBPMTasks()
+    }
+    )
     .catch((error) =>{
       console.log("Error", error)
-      this.getBPMTaskDetail(this.task.id)
-      this.getBPMTasks()
     })
   }
 
