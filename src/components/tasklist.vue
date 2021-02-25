@@ -82,7 +82,7 @@
                             <label class="add">Add a group</label>
                         </b-col>
                         <b-col>
-                        <input type="text" placeholder="Group ID" v-model="test">
+                        <input type="text" placeholder="Group ID" v-model="setGroup">
                         </b-col>
                     </b-row>
                 </div>
@@ -150,8 +150,8 @@ export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string|any;
 @Prop() private token !: string|any;
 @Prop() private username !: string|any;
-@Prop() private email !: string|any;
-@Prop() private UserRoles !: Array<string>
+@Prop() private useremail !: string|any;
+@Prop() private UserRoles !: Array<string>;
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
@@ -163,6 +163,7 @@ export default class Tasklist extends Vue {
   private task: any
   private setFollowup = null
   private setDue = null
+  private setGroup = null
 
   timeDifference(givendate: Date) {      
     const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
@@ -238,7 +239,7 @@ export default class Tasklist extends Vue {
       if (this.$route.params.taskId) {       
         this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
         CamundaRest.getTaskById(this.token, this.$route.params.taskId, this.CamundaUrl).then((result) => {
-          CamundaRest.getProcessDefinitionById(this.token, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
+          CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
@@ -254,6 +255,7 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
+    authenticateFormio(this.useremail, this.UserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
