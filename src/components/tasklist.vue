@@ -11,7 +11,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-              <b-link v-bind:to="`/${task.id}`">
+              <b-link v-bind:to="`${task.id}`">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -32,7 +32,13 @@
 
                   <b-row class="task-row-3">
                     <b-col lg=8 xs=8 class="pr-0" title="task.created">
-                      Created on: {{ timeDifference(task.created) }}
+                      <div v-if="task.due">
+                      Due in: {{task.due | moment("from","now")}}
+                      </div>
+                      <div v-if="task.followUp">
+                      Follow-up in: {{task.followUp | moment("from", "now")}} 
+                      </div>
+                      Created on: {{ task.created | moment("from", "now") }}
                     </b-col>
                     <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
                       {{ task.priority }}
@@ -164,30 +170,6 @@ export default class Tasklist extends Vue {
   private setFollowup = null
   private setDue = null
   private setGroup = null
-
-  timeDifference(givendate: Date) {      
-    const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
-    const msec = diff;
-    const days = Math.floor(msec / 1000 / 60 / (60 * 24))
-    const dateDiff = new Date(msec);
-
-    const hours = dateDiff.getHours();
-    const minutes = dateDiff.getMinutes();
-    const seconds = dateDiff.getSeconds();
-
-    if(days === 0 && hours === 0 && minutes === 0) {
-      return seconds+ " seconds ago"
-    }
-    else if (days === 0 && hours === 0) {
-      return minutes+ " minutes ago"
-    }
-    else if(days === 0) {
-      return hours+ " hours ago"
-    }
-    else {
-      return days+ " days ago"
-    }
-  }
 
   getProcessDataFromList(processList: any[],processId: any,dataKey: string|number) {
     const process = processList.find(process => process.id === processId);

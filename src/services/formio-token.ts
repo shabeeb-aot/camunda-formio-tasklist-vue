@@ -17,7 +17,6 @@ export const authenticateFormio = (userEmail: any, UserRoles: any) => {
     if (roleData) {
         roles = roles.concat(roleData.id);
     }
-    console.log(roles)
     const USER_RESOURCE_FORM_ID = process.env.VUE_APP_USER_RESOURCE_ID;
     const FORMIO_TOKEN = jwt.sign(
         {
