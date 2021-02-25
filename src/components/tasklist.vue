@@ -11,7 +11,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-              <b-link v-bind:to="`${task.id}`">
+                <router-link :to="{path: '/'+task.id}">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -44,7 +44,7 @@
                       {{ task.priority }}
                     </b-col>
                   </b-row>
-                </b-link>
+                </router-link>
             </b-list-group-item>
         </b-list-group>
 
