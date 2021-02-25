@@ -1,6 +1,6 @@
 <template>
 
-  <b-container>
+  <b-container fluid>
     <b-row class="text-left" align-v="start">
       <b-col cols="4">
           <b-list-group  v-if="tasks && tasks.length" class="service-task-list">   
@@ -11,7 +11,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-                <router-link :to="{path: task.id}" class="routercss">
+                <div @click="setselectedTask(task.id)" class="routercss">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -44,13 +44,13 @@
                       {{ task.priority }}
                     </b-col>
                   </b-row>
-                </router-link>
+                </div>
             </b-list-group-item>
         </b-list-group>
 
       </b-col>
 
-      <b-col cols="8" v-if="this.$route.params.taskId">
+      <b-col cols="8" v-if="selectedTask">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
         <b-row class="ml-0 task-name">PID #{{task.processInstanceId}}</b-row>
@@ -109,11 +109,11 @@
         </b-row>
 
         <div>
-            <b-tabs content-class="mt-3" id="service-task-details">
+            <b-tabs content-class="mt-3" id="service-task-details" v-if="showfrom">
               <b-tab title="Form">
-                <formio :src=formioUrl
-                :submission=submissionId
-                :form=formId>
+                <formio :src="formioUrl"
+                :submission="submissionId"
+                :form="formId">
                 </formio>
               </b-tab>
               <b-tab title="History"></b-tab>
@@ -138,7 +138,8 @@ import { Form } from 'vue-formio';
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 import DatePicker from 'vue2-datepicker'
 import CamundaRest from '../services/camunda-rest';
-import {authenticateFormio} from "@/services/formio-token";
+import {authenticateFormio} from "../services/formio-token";
+import moment from "moment";
 
 import 'vue2-datepicker/index.css'
 
@@ -154,6 +155,9 @@ export default class Tasklist extends Vue {
 @Prop() private username !: string|any;
 @Prop() private useremail !: string|any;
 @Prop() private UserRoles !: Array<string>;
+@Prop() private formIOResourceId !: string|any;
+@Prop() private formIOReviewereId !: string|any;
+@Prop() private formIOReviewer !: string|any;
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
@@ -166,6 +170,8 @@ export default class Tasklist extends Vue {
   private setFollowup = null
   private setDue = null
   private setGroup = null
+  private selectedTask: any = '' 
+  private showfrom = false
 
   getProcessDataFromList(processList: any[],processId: any,dataKey: string|number) {
     const process = processList.find(process => process.id === processId);
@@ -175,6 +181,12 @@ export default class Tasklist extends Vue {
   getTaskFromList(tasks: any[], taskId: string){
       const task = tasks.find(task=>task.id==taskId);
       return task;
+    }
+
+    setselectedTask(task){
+      this.selectedTask = task
+       console.log('selectedTask', this.selectedTask)
+       this.fetchData()
     }
 
   toggle(index: number) {
@@ -218,26 +230,29 @@ export default class Tasklist extends Vue {
 
   @Watch('$route')
   fetchData() {
-      if (this.$route.params.taskId) {       
-        this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-        CamundaRest.getTaskById(this.token, this.$route.params.taskId, this.CamundaUrl).then((result) => {
+    
+      if (this.selectedTask) {       
+        this.task = this.getTaskFromList(this.tasks, this.selectedTask);
+        CamundaRest.getTaskById(this.token, this.selectedTask, this.CamundaUrl).then((result) => {
           CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
-
-        CamundaRest.getVariablesByTaskId(this.token, this.$route.params.taskId, this.CamundaUrl)
+        this.showfrom = false
+        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
         .then((result)=> {
-            this.formioUrl = result.data["formUrl"].value;
+          console.log('result', result)
+            this.formioUrl = 'https://dev-sbc-ffa-forms.apps.silver.devops.gov.bc.ca/form/6036caff93586a5305fb9e6b/submission/6037ee1c93586a2691fb9fa1'// result.data["formUrl"].value;
             const formArr = this.formioUrl.split("/");
             this.formId = formArr[4];
             this.submissionId = formArr[6];
+            this.showfrom = true
         });
       }
     }
 
   mounted() {
-    authenticateFormio(this.useremail, this.UserRoles)
+    authenticateFormio(this.formIOResourceId, this.formIOReviewereId, this.formIOReviewer,this.useremail, this.UserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
