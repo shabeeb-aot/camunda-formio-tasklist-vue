@@ -8,10 +8,10 @@
                 <input type="text" class="filter" placeholder="Filter Tasks"/>
                 {{tasks.length}}
           </div>
-            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task" 
+            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-              <b-link v-bind:to="`/tasklist/${task.id}`">
+                <router-link :to="{path: task.id}" class="routercss">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -32,13 +32,19 @@
 
                   <b-row class="task-row-3">
                     <b-col lg=8 xs=8 class="pr-0" title="task.created">
-                      Created on: {{ timeDifference(task.created) }}
+                      <div v-if="task.due">
+                      Due in: {{task.due | moment("from","now")}}
+                      </div>
+                      <div v-if="task.followUp">
+                      Follow-up in: {{task.followUp | moment("from", "now")}} 
+                      </div>
+                      Created on: {{ task.created | moment("from", "now") }}
                     </b-col>
                     <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
                       {{ task.priority }}
                     </b-col>
                   </b-row>
-                </b-link>
+                </router-link>
             </b-list-group-item>
         </b-list-group>
 
@@ -82,18 +88,15 @@
                             <label class="add">Add a group</label>
                         </b-col>
                         <b-col>
-                        <input type="text" placeholder="Group ID" v-model="test">
+                        <input type="text" placeholder="Group ID" v-model="setGroup">
                         </b-col>
                     </b-row>
                 </div>
             </b-modal>
             </div>
             <div class="col-md">
-            <!-- <button type="button" class="btn btn-primary"><b-icon :icon="'person-fill'"></b-icon> Claim </button> -->
             <b-col>
-              {{task.assignee}}
                  <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
-                   <!-- <b-spinner label="Loading..."></b-spinner> -->
                    {{task.assignee}}
                    <b-icon :icon="'person-x-fill'"></b-icon>
                  </b-button>
@@ -107,7 +110,7 @@
 
         <div>
             <b-tabs content-class="mt-3" id="service-task-details">
-              <b-tab title="Form" active>
+              <b-tab title="Form">
                 <formio :src=formioUrl
                 :submission=submissionId
                 :form=formId>
@@ -115,7 +118,6 @@
               </b-tab>
               <b-tab title="History"></b-tab>
               <b-tab title="Diagram"></b-tab>
-              <b-tab title="Description"></b-tab>
             </b-tabs>
           </div>
         </div>     
@@ -132,11 +134,13 @@
 </template>
 
 <script lang="ts">
-import CamundaRest from '../services/camunda-rest';
 import { Form } from 'vue-formio';
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
-import 'vue-loading-overlay/dist/vue-loading.css';
 import DatePicker from 'vue2-datepicker'
+import CamundaRest from '../services/camunda-rest';
+import {authenticateFormio} from "@/services/formio-token";
+
+import 'vue2-datepicker/index.css'
 
 @Component({
   components: {
@@ -146,10 +150,10 @@ import DatePicker from 'vue2-datepicker'
 })
 export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string|any;
-@Prop() private BearerToken !: string|any;
-@Prop({default: ''}) private username = '';
-@Prop({default: ''}) private email = '';
-@Prop() private UserRoles !: Array<string>
+@Prop() private token !: string|any;
+@Prop() private username !: string|any;
+@Prop() private useremail !: string|any;
+@Prop() private UserRoles !: Array<string>;
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
@@ -161,30 +165,7 @@ export default class Tasklist extends Vue {
   private task: any
   private setFollowup = null
   private setDue = null
-
-  timeDifference(givendate: Date) {      
-    const diff: number = Math.abs(new Date().valueOf() - new Date(givendate).valueOf());
-    const msec = diff;
-    const days = Math.floor(msec / 1000 / 60 / (60 * 24))
-    const dateDiff = new Date(msec);
-
-    const hours = dateDiff.getHours();
-    const minutes = dateDiff.getMinutes();
-    const seconds = dateDiff.getSeconds();
-
-    if(days === 0 && hours === 0 && minutes === 0) {
-      return seconds+ " seconds ago"
-    }
-    else if (days === 0 && hours === 0) {
-      return minutes+ " minutes ago"
-    }
-    else if(days === 0) {
-      return hours+ " hours ago"
-    }
-    else {
-      return days+ " days ago"
-    }
-  }
+  private setGroup = null
 
   getProcessDataFromList(processList: any[],processId: any,dataKey: string|number) {
     const process = processList.find(process => process.id === processId);
@@ -201,32 +182,36 @@ export default class Tasklist extends Vue {
     }
 
   getBPMTaskDetail(taskId: string) {
-        CamundaRest.getTaskById(this.BearerToken, taskId, this.CamundaUrl).then((result) => {
+        CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
           this.task = result.data;
         })
     }
 
   getBPMTasks(){
-    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result)=> {
+    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
       this.tasks = result.data;
     })
   }
 
   onClaim() {
-    CamundaRest.claim(this.BearerToken,this.task.id, this.CamundaUrl, {userId: this.username}).then()
+    CamundaRest.claim(this.token,this.task.id, {userId: this.username}, this.CamundaUrl).then(()=> 
+      {this.getBPMTaskDetail(this.task.id)
+      this.getBPMTasks()
+      }
+    )
     .catch((error) => {
         console.log("Error", error);
     })
-    this.getBPMTaskDetail(this.task.id)
-    this.getBPMTasks()
   }
 
   onUnClaim(){ 
-    CamundaRest.unclaim(this.BearerToken ,this.task.id, this.CamundaUrl).then()
+    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then(()=> 
+    {this.getBPMTaskDetail(this.task.id)
+      this.getBPMTasks()
+    }
+    )
     .catch((error) =>{
       console.log("Error", error)
-      this.getBPMTaskDetail(this.task.id)
-      this.getBPMTasks()
     })
   }
 
@@ -235,13 +220,13 @@ export default class Tasklist extends Vue {
   fetchData() {
       if (this.$route.params.taskId) {       
         this.task = this.getTaskFromList(this.tasks, this.$route.params.taskId);
-        CamundaRest.getTaskById(this.BearerToken, this.$route.params.taskId, this.CamundaUrl).then((result) => {
-          CamundaRest.getProcessDefinitionById(this.BearerToken, this.CamundaUrl, result.data.processDefinitionId).then((res) => {
+        CamundaRest.getTaskById(this.token, this.$route.params.taskId, this.CamundaUrl).then((result) => {
+          CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
           this.taskProcess = res.data.name;
         });
         })
 
-        CamundaRest.getVariablesByTaskId(this.BearerToken, this.$route.params.taskId, this.CamundaUrl)
+        CamundaRest.getVariablesByTaskId(this.token, this.$route.params.taskId, this.CamundaUrl)
         .then((result)=> {
             this.formioUrl = result.data["formUrl"].value;
             const formArr = this.formioUrl.split("/");
@@ -252,13 +237,14 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
-    CamundaRest.getTasks(this.BearerToken, this.CamundaUrl).then((result) => {
+    authenticateFormio(this.useremail, this.UserRoles)
+    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
 
     this.fetchData();
     
-    CamundaRest.getProcessDefinitions(this.BearerToken, this.CamundaUrl).then((response) => {
+    CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     }); 
   }
@@ -337,5 +323,10 @@ export default class Tasklist extends Vue {
   margin: 10px 0;
   font-size: 14px;
   font-weight: bold;
+}
+
+.routercss {
+  color: #212529;
+  text-align: left;
 }
 </style>
