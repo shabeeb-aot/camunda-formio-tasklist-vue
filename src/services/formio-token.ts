@@ -25,12 +25,13 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
                 _id: USER_RESOURCE_FORM_ID, // form.io form Id of user resource
             },
             user: {
-                _id: userEmail, // keep it like that
+                _id: userEmail || 'external', // keep it like that
                 roles: roles,
             },
         },
         "--- change me now ---"
-    ); 
+    );
+
     sessionStorage.setItem("formioToken", FORMIO_TOKEN);
     localStorage.setItem("formioToken", FORMIO_TOKEN)
 };

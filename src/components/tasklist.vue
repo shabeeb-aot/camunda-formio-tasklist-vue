@@ -142,6 +142,10 @@ import {authenticateFormio} from "../services/formio-token";
 import moment from "moment";
 
 import 'vue2-datepicker/index.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import "formiojs/dist/formio.full.min.css";
+// import './styles.scss';
 
 @Component({
   components: {
@@ -153,7 +157,7 @@ export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string|any;
 @Prop() private token !: string|any;
 @Prop() private username !: string|any;
-@Prop() private useremail !: string|any;
+@Prop({default:'external'}) private userEmail !: string|any;
 @Prop() private UserRoles !: Array<string>;
 @Prop() private formIOResourceId !: string|any;
 @Prop() private formIOReviewereId !: string|any;
@@ -252,7 +256,7 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
-    authenticateFormio(this.formIOResourceId, this.formIOReviewereId, this.formIOReviewer,this.useremail, this.UserRoles)
+    authenticateFormio(this.formIOResourceId, this.formIOReviewereId, this.formIOReviewer,this.userEmail, this.UserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
