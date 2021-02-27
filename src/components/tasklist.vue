@@ -283,6 +283,12 @@ export default class Tasklist extends Vue {
 </script>
 
 <style>
+  body {
+  font-size: 16px;
+  font-family: Nunito Sans, SemiBold;
+  background-color: white !important;
+}
+
   #ul_top_hypers li {
     display: inline;
 }
