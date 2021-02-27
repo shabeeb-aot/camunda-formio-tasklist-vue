@@ -112,7 +112,6 @@
             <b-tabs content-class="mt-3" id="service-task-details" v-if="showfrom">
               <b-tab title="Form">
                 <div v-if="task.assignee" class="ml-4 mr-4">
-                  console.log("user task")
                   <formio :src="formioUrl"
                   :submission="submissionId"
                   :form="formId"
@@ -121,7 +120,6 @@
                 </formio>
                 </div>
                 <div v-else class="ml-4 mr-4">
-                  console.log("formio without claim")
                   <formio :src="formioUrl"
                   :submission="submissionId"
                   :form="formId"
@@ -309,6 +307,12 @@ export default class Tasklist extends Vue {
   font-size: 16px;
   font-family: Nunito Sans, SemiBold;
   background-color: white !important;
+}
+
+.bg-default {
+  background-color: #38598a;
+  border: #38598a;
+  color: white !important;
 }
 
   #ul_top_hypers li {
