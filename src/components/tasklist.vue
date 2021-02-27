@@ -111,11 +111,24 @@
         <div>
             <b-tabs content-class="mt-3" id="service-task-details" v-if="showfrom">
               <b-tab title="Form">
-                <formio :src="formioUrl"
-                :submission="submissionId"
-                :form="formId"
-                >
+                <div v-if="task.assignee" class="ml-4 mr-4">
+                  console.log("user task")
+                  <formio :src="formioUrl"
+                  :submission="submissionId"
+                  :form="formId"
+                  :options="options"
+                  >
                 </formio>
+                </div>
+                <div v-else class="ml-4 mr-4">
+                  console.log("formio without claim")
+                  <formio :src="formioUrl"
+                  :submission="submissionId"
+                  :form="formId"
+                  :options="readoption"
+                  >
+                  </formio>
+                </div>
               </b-tab>
               <b-tab title="History"></b-tab>
               <b-tab title="Diagram"></b-tab>
@@ -149,7 +162,7 @@ Vue.use(IconsPlugin)
 import 'vue2-datepicker/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import "formiojs/dist/formio.full.min.css";
+import 'formiojs/dist/formio.full.min.css'
 // import './styles.scss';
 
 @Component({
@@ -182,6 +195,15 @@ export default class Tasklist extends Vue {
   private setGroup = null
   private selectedTask: any = '' 
   private showfrom = false
+  private readoption: any = {readOnly: true,}
+  private options: any =  {
+      noAlerts: false,
+      i18n: {
+        en: {
+          error: "Please fix the errors before submitting again.",
+        },
+      }
+    }
 
   timedifference(date: any) {
     return moment(date).fromNow();
