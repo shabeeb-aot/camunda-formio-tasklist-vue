@@ -33,12 +33,12 @@
                   <b-row class="task-row-3">
                     <b-col lg=8 xs=8 class="pr-0" title="task.created">
                       <div v-if="task.due">
-                      Due in: {{task.due | moment("from","now")}}
+                      Due in: {{ timedifference(task.due) }}
                       </div>
                       <div v-if="task.followUp">
-                      Follow-up in: {{task.followUp | moment("from", "now")}} 
+                      Follow-up in: {{ timedifference(task.followUp) }} 
                       </div>
-                      Created on: {{ task.created | moment("from", "now") }}
+                      Created on: {{ timedifference(task.created) }}
                     </b-col>
                     <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
                       {{ task.priority }}
@@ -113,7 +113,8 @@
               <b-tab title="Form">
                 <formio :src="formioUrl"
                 :submission="submissionId"
-                :form="formId">
+                :form="formId"
+                >
                 </formio>
               </b-tab>
               <b-tab title="History"></b-tab>
@@ -135,11 +136,15 @@
 
 <script lang="ts">
 import { Form } from 'vue-formio';
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import DatePicker from 'vue2-datepicker'
+import moment from "moment";
 import CamundaRest from '../services/camunda-rest';
 import {authenticateFormio} from "../services/formio-token";
-import moment from "moment";
+
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 
 import 'vue2-datepicker/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -158,10 +163,11 @@ export default class Tasklist extends Vue {
 @Prop() private token !: string|any;
 @Prop() private username !: string|any;
 @Prop({default:'external'}) private userEmail !: string|any;
-@Prop() private UserRoles !: Array<string>;
+@Prop() private formIOUserRoles !: Array<string>;
 @Prop() private formIOResourceId !: string|any;
-@Prop() private formIOReviewereId !: string|any;
+@Prop() private formIOReviewerId !: string|any;
 @Prop() private formIOReviewer !: string|any;
+@Prop() private formIOProjectUrl!: string|any;
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
@@ -177,9 +183,13 @@ export default class Tasklist extends Vue {
   private selectedTask: any = '' 
   private showfrom = false
 
-  getProcessDataFromList(processList: any[],processId: any,dataKey: string|number) {
-    const process = processList.find(process => process.id === processId);
-    return process && process[dataKey];
+  timedifference(date: any) {
+    return moment(date).fromNow();
+  }
+
+  getProcessDataFromList = (processList: any[],processId: any,dataKey: string) => {
+    const process = processList.find(process=>process.id===processId);
+    return process && process[dataKey] ;
   }
 
   getTaskFromList(tasks: any[], taskId: string){
@@ -187,9 +197,8 @@ export default class Tasklist extends Vue {
       return task;
     }
 
-    setselectedTask(task){
+    setselectedTask(task: any){
       this.selectedTask = task
-       console.log('selectedTask', this.selectedTask)
        this.fetchData()
     }
 
@@ -232,7 +241,6 @@ export default class Tasklist extends Vue {
   }
 
 
-  @Watch('$route')
   fetchData() {
     
       if (this.selectedTask) {       
@@ -245,8 +253,7 @@ export default class Tasklist extends Vue {
         this.showfrom = false
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
         .then((result)=> {
-          console.log('result', result)
-            this.formioUrl = 'https://dev-sbc-ffa-forms.apps.silver.devops.gov.bc.ca/form/6036caff93586a5305fb9e6b/submission/6037ee1c93586a2691fb9fa1'// result.data["formUrl"].value;
+            this.formioUrl = result.data["formUrl"].value;
             const formArr = this.formioUrl.split("/");
             this.formId = formArr[4];
             this.submissionId = formArr[6];
@@ -256,7 +263,7 @@ export default class Tasklist extends Vue {
     }
 
   mounted() {
-    authenticateFormio(this.formIOResourceId, this.formIOReviewereId, this.formIOReviewer,this.userEmail, this.UserRoles)
+    authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
     }); 
