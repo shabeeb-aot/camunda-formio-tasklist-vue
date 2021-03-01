@@ -2,7 +2,26 @@
 
   <b-container fluid>
     <b-row class="text-left" align-v="start">
-      <b-col cols="4">
+      <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
+          <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
+            <b-list-group-item button v-for="(filter, filteridx) in filterList" :key="filter.id"
+            v-on:click="togglefilter(filteridx)"
+            :class="{'selected': filteridx == activefilter}">
+              <b-row>
+                <div class="col-12">
+                  {{filter.name}} ({{filter.itemCount}})
+                </div>   
+              </b-row>
+            </b-list-group-item>
+          </b-list-group>
+        <div class="mt-2 ml-3" v-else>
+          <b-row class="not-selected mt-2 ml-1 row">
+          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+           <p>No filters found</p>
+          </b-row>
+        </div>
+      </b-col>
+      <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0">
           <b-list-group  v-if="tasks && tasks.length" class="service-task-list">   
           <div class="filter-container">
                 <input type="text" class="filter" placeholder="Filter Tasks"/>
@@ -49,7 +68,8 @@
 
       </b-col>
 
-      <b-col cols="8" v-if="selectedTask">
+      <b-col cols="6"  lg="6" xs="12" sm="12" md="6" xl="6" v-if="selectedTask" class="pl-0">
+        <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
         <b-row class="ml-0 task-name">Application # {{ task.processInstanceId }}</b-row>
@@ -131,10 +151,11 @@
               <b-tab title="Diagram"></b-tab>
             </b-tabs>
           </div>
+        </div>
         </div>     
       </b-col>
 
-      <b-col cols="8" v-else>
+      <b-col cols="6" v-else>
         <b-row class="not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
@@ -161,6 +182,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
 // import './styles.scss';
+import '../../public/styles.scss'
 
 @Component({
   components: {
@@ -201,6 +223,8 @@ export default class Tasklist extends Vue {
         },
       }
     }
+  private filterList: any = []
+  private activefilter = 0
 
   timedifference(date: any) {
     return moment(date).fromNow();
@@ -224,6 +248,10 @@ export default class Tasklist extends Vue {
   toggle(index: number) {
       this.activeIndex = index
     }
+
+  togglefilter(index: number) {
+    this.activefilter = index
+  }
 
   getBPMTaskDetail(taskId: string) {
         CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
@@ -284,6 +312,12 @@ export default class Tasklist extends Vue {
       }
     }
 
+  created() {
+    CamundaRest.filterList(this.token, this.CamundaUrl).then((response) => {
+      this.filterList = response.data;
+    });
+  }
+
   mounted() {
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
@@ -294,7 +328,7 @@ export default class Tasklist extends Vue {
     
     CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
         this.getProcessDefinitions = response.data;
-    }); 
+    });
   }
 
 }
@@ -357,7 +391,8 @@ export default class Tasklist extends Vue {
   border-right: 2px solid #D0D0D0;
 } 
 
-#service-task-details {
+.service-task-details {
+  min-height: 80vh;
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
