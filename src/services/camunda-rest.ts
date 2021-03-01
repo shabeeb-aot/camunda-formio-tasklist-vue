@@ -44,7 +44,11 @@ const CamundaRest = {
 
   getUsers(bearerToken: string, CamundaUrl: any) {
     return bpmAxios(bearerToken, CamundaUrl).get(`/user`)
-  }      
+  },
+  
+  filterList(bearerToken: string, CamundaUrl: any) {
+    return bpmAxios(bearerToken, CamundaUrl).get('/filter?resourceType=Task&itemCount=true')
+  }
 }
 
 export default CamundaRest;
