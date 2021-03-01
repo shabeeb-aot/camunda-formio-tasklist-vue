@@ -255,6 +255,19 @@ export default class Tasklist extends Vue {
         CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
           this.task = result.data;
         })
+
+        this.showfrom = false
+        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
+        .then((result)=> {
+            this.formioUrl = result.data["formUrl"].value;
+            const domain = (this.formioUrl.split("://")[1]).split('/')[0]
+            const replacedomain = this.formIOProjectUrl.split("//")[1]
+            this.formioUrl = this.formioUrl.replace(domain, replacedomain)
+            const formArr = this.formioUrl.split("/");
+            this.formId = formArr[4];
+            this.submissionId = formArr[6];
+            this.showfrom = true
+        });
     }
 
   getBPMTasks(){
