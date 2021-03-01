@@ -1,6 +1,6 @@
 <template>
 
-  <b-container fluid>
+  <b-container fluid id="main">
     <b-row class="text-left" align-v="start">
       <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
           <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
@@ -72,27 +72,27 @@
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0 task-name">Application # {{ task.processInstanceId }}</b-row>
+        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ task.processInstanceId }}</b-row>
         
         <div>
         <b-row class="actionable">
-            <div class="col-md-auto">
+            <b-col>
               <DatePicker 
               type="datetime"
               placeholder="Set Follow-up date"
               v-model="setFollowup"
               >
               </DatePicker>
-              </div>
-              <div class="col-md-auto">
+            </b-col>
+              <b-col>
                 <DatePicker 
               type="datetime"
               placeholder="Set Due Date"
               v-model="setDue"
                 >
                 </DatePicker>
-              </div>
-            <div class="col-md">
+              </b-col>
+            <b-col>
             <b-button variant="outline-primary" v-b-modal.AddGroupModal><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
             
             <b-modal
@@ -112,8 +112,7 @@
                     </b-row>
                 </div>
             </b-modal>
-            </div>
-            <div class="col-md">
+            </b-col>
             <b-col>
                  <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
                    {{task.assignee}}
@@ -124,11 +123,10 @@
                    Claim
                  </b-button>
               </b-col>
-            </div>
         </b-row>
 
         <div>
-            <b-tabs content-class="mt-3" id="service-task-details" v-if="showfrom">
+            <b-tabs content-class="mt-3" v-if="showfrom">
               <b-tab title="Form">
                 <div v-if="task.assignee" class="ml-4 mr-4">
                   <formio :src="formioUrl"
@@ -340,6 +338,12 @@ export default class Tasklist extends Vue {
   font-size: 16px;
   font-family: Nunito Sans, SemiBold;
   background-color: white !important;
+}
+
+#main {
+  margin-top: 2px;
+  min-height: 85vh;
+  padding-bottom: 1.5rem;
 }
 
 .bg-default {
