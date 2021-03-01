@@ -17,7 +17,6 @@
                       <h5>
                         {{ task.name }}
                       </h5>
-                      <br>
                     </div>
                   </b-row>
 
@@ -53,7 +52,7 @@
       <b-col cols="8" v-if="selectedTask">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0 task-name">PID #{{task.processInstanceId}}</b-row>
+        <b-row class="ml-0 task-name">Application # {{ task.processInstanceId }}</b-row>
         
         <div>
         <b-row class="actionable">
