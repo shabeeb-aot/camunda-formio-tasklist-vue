@@ -180,7 +180,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
 // import './styles.scss';
-import '../../public/styles.scss'
+// import '../../public/styles.scss'
 
 @Component({
   components: {
@@ -191,13 +191,14 @@ import '../../public/styles.scss'
 export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string|any;
 @Prop() private token !: string|any;
-@Prop() private username !: string|any;
+@Prop() private userName !: string|any;
 @Prop({default:'external'}) private userEmail !: string|any;
 @Prop() private formIOUserRoles !: Array<string>;
 @Prop() private formIOResourceId !: string|any;
 @Prop() private formIOReviewerId !: string|any;
 @Prop() private formIOReviewer !: string|any;
 @Prop() private formIOProjectUrl!: string|any;
+// put a console warning if any params not passed
 
   private tasks: Array<object> = []
   private getProcessDefinitions: Record<string, any> = []
@@ -259,6 +260,7 @@ export default class Tasklist extends Vue {
         this.showfrom = false
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
         .then((result)=> {
+            console.log("this.formIOProjectUrl", this.formIOProjectUrl)
             this.formioUrl = result.data["formUrl"].value;
             const domain = (this.formioUrl.split("://")[1]).split('/')[0]
             const replacedomain = this.formIOProjectUrl.split("//")[1]
@@ -277,11 +279,11 @@ export default class Tasklist extends Vue {
   }
 
   onClaim() {
-    CamundaRest.claim(this.token,this.task.id, {userId: this.username}, this.CamundaUrl).then(()=> 
-      {this.getBPMTaskDetail(this.task.id)
-      this.getBPMTasks()
-      }
-    )
+    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.CamundaUrl).then(()=> 
+      {
+        this.getBPMTaskDetail(this.task.id)
+        this.getBPMTasks()
+      })
     .catch((error) => {
         console.log("Error", error);
     })
@@ -311,6 +313,7 @@ export default class Tasklist extends Vue {
         this.showfrom = false
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
         .then((result)=> {
+          //  move this to a function
             this.formioUrl = result.data["formUrl"].value;
             const domain = (this.formioUrl.split("://")[1]).split('/')[0]
             const replacedomain = this.formIOProjectUrl.split("//")[1]
@@ -330,6 +333,7 @@ export default class Tasklist extends Vue {
   }
 
   mounted() {
+
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
@@ -360,8 +364,8 @@ export default class Tasklist extends Vue {
 }
 
 .bg-default {
-  background-color: #38598a;
-  border: #38598a;
+  background-color: #38598a !important;
+  border: #38598a !important;
   color: white !important;
 }
 
