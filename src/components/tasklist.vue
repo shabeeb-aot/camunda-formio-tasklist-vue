@@ -1,6 +1,6 @@
 <template>
 
-  <b-container fluid id="main">
+  <b-container fluid class="camunda-tasklist-main">
     <b-row class="text-left" align-v="start">
       <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
           <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
@@ -30,7 +30,7 @@
             <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                 v-on:click="toggle(idx)"
                 :class="{'selected': idx == activeIndex}">
-                <div @click="setselectedTask(task.id)" class="routercss">
+                <div @click="setselectedTask(task.id)" class="select-task">
                   <b-row>
                     <div class="col-12">
                       <h5>
@@ -188,8 +188,7 @@ import 'vue2-datepicker/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
-// import './styles.scss';
-// import '../../public/styles.scss'
+import '../camundaFormIOTasklist.scss'
 
 @Component({
   components: {
@@ -319,7 +318,6 @@ export default class Tasklist extends Vue {
         this.showfrom = false
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
         .then((result)=> {
-          //  move this to a function
             this.formioUrl = result.data["formUrl"].value;
             
             const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
@@ -352,100 +350,3 @@ export default class Tasklist extends Vue {
 }
 
 </script>
-
-<style>
-  body {
-  font-size: 16px;
-  font-family: Nunito Sans, SemiBold;
-  background-color: white !important;
-}
-
-#main {
-  margin-top: 2px;
-  min-height: 85vh;
-  padding-bottom: 1.5rem;
-}
-
-.bg-default {
-  background-color: #38598a !important;
-  border: #38598a !important;
-  color: white !important;
-}
-
-  #ul_top_hypers li {
-    display: inline;
-}
-.not-selected{
-  border: 3px solid #b3b3b3;
-  padding: 10px;
-  color: #b3b3b3;
-  width: 100%;
-}
-
-.filter-container{
-  border: 1px solid #555;
-  border-radius: 5px;
-  width: 100%;
-  padding: 0;
-  margin: 0 5px 10px 5px;
-  font-size: 13px;
-}
-
-.filter{
-  width: 85%;
-  margin: 5px;
-  border: none;
-  font-style: italic;
-}
-.filter:focus{
-  outline: none;
-}
-
-.task-row-2 {
-  font-size: 15px;
-}
-.task-row-3 {
-  font-size: 11px;
-}
-
-.service-task-list {
-  max-height: 80vh;
-  overflow-y: auto;
-  padding-right: 25px;
-  border-right: 2px solid #D0D0D0;
-} 
-
-.service-task-details {
-  min-height: 80vh;
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.task-header {
-  font-size: 30px;
-  font-weight: 600;
-}
-.task-name {
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.selected {
-  border-left: 2px solid #003366 !important;
-}
-
-.actionable {
-  color: #1a5a96;
-  background-color: transparent;
-  cursor: pointer;
-  margin: 10px 0;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.routercss {
-  color: #212529;
-  text-align: left;
-}
-</style>
