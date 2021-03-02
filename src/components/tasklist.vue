@@ -3,23 +3,7 @@
   <b-container fluid class="camunda-tasklist-main">
     <b-row class="text-left" align-v="start">
       <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
-          <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
-            <b-list-group-item button v-for="(filter, filteridx) in filterList" :key="filter.id"
-            v-on:click="togglefilter(filteridx)"
-            :class="{'selected': filteridx == activefilter}">
-              <b-row>
-                <div class="col-12">
-                  {{filter.name}} ({{filter.itemCount}})
-                </div>   
-              </b-row>
-            </b-list-group-item>
-          </b-list-group>
-        <div class="mt-2 ml-3" v-else>
-          <b-row class="not-selected mt-2 ml-1 row">
-          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
-           <p>No filters found</p>
-          </b-row>
-        </div>
+          <TaskFilter filterList="filterList"></TaskFilter>
       </b-col>
       <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0" v-if="tasks && tasks.length">
         <b-list-group  class="service-task-list">   
@@ -180,6 +164,7 @@ import moment from "moment";
 import CamundaRest from '../services/camunda-rest';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
+import TaskFilter from '../components/taskfilter.vue'
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -193,23 +178,24 @@ import '../camundaFormIOTasklist.scss'
 @Component({
   components: {
     formio: Form,
-    DatePicker
+    DatePicker,
+    TaskFilter
   }
 })
 export default class Tasklist extends Vue {
-@Prop() private CamundaUrl !: string|any;
-@Prop() private token !: string|any;
-@Prop() private userName !: string|any;
-@Prop({default:'external'}) private userEmail !: string|any;
+@Prop() private CamundaUrl !: string;
+@Prop() private token !: string;
+@Prop() private userName !: string;
+@Prop({default:'external'}) private userEmail !: string;
 @Prop() private formIOUserRoles !: Array<string>;
-@Prop() private formIOResourceId !: string|any;
-@Prop() private formIOReviewerId !: string|any;
-@Prop() private formIOReviewer !: string|any;
-@Prop() private formIOProjectUrl!: string|any;
+@Prop() private formIOResourceId !: string;
+@Prop() private formIOReviewerId !: string;
+@Prop() private formIOReviewer !: string;
+@Prop() private formIOProjectUrl!: string;
 // put a console warning if any params not passed
 
   private tasks: Array<object> = []
-  private getProcessDefinitions: Record<string, any> = []
+  private getProcessDefinitions: Array<object> = []
   private taskProcess = null
   private formId = ''
   private submissionId = '' 
@@ -219,10 +205,10 @@ export default class Tasklist extends Vue {
   private setFollowup = null
   private setDue = null
   private setGroup = null
-  private selectedTask: any = '' 
+  private selectedTask = '' 
   private showfrom = false
-  private readoption: any = {readOnly: true,}
-  private options: any =  {
+  private readoption = {readOnly: true,}
+  private options =  {
       noAlerts: false,
       i18n: {
         en: {
@@ -230,14 +216,16 @@ export default class Tasklist extends Vue {
         },
       }
     }
-  private filterList: any = []
-  private activefilter = 0
+  private filterList: Array<object> = []
 
-  timedifference(date: any) {
+
+
+  timedifference(date: Date) {
     return moment(date).fromNow();
   }
 
-  getProcessDataFromList = (processList: any[],processId: any,dataKey: string) => {
+  getProcessDataFromList(processList:any[] ,processId: any,dataKey: string){
+    console.log(typeof(processList))
     const process = processList.find(process=>process.id===processId);
     return process && process[dataKey] ;
   }
@@ -247,7 +235,7 @@ export default class Tasklist extends Vue {
       return task;
     }
 
-    setselectedTask(task: any){
+    setselectedTask(task: string){
       this.selectedTask = task
        this.fetchData()
     }
@@ -256,9 +244,6 @@ export default class Tasklist extends Vue {
       this.activeIndex = index
     }
 
-  togglefilter(index: number) {
-    this.activefilter = index
-  }
 
   getBPMTaskDetail(taskId: string) {
         CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
@@ -334,7 +319,6 @@ export default class Tasklist extends Vue {
   }
 
   mounted() {
-
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
       this.tasks = result.data;      
