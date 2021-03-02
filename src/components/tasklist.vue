@@ -21,8 +21,8 @@
           </b-row>
         </div>
       </b-col>
-      <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0">
-          <b-list-group  v-if="tasks && tasks.length" class="service-task-list">   
+      <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0" v-if="tasks && tasks.length">
+        <b-list-group  class="service-task-list">   
           <div class="filter-container">
                 <input type="text" class="filter" placeholder="Filter Tasks"/>
                 {{tasks.length}}
@@ -67,6 +67,14 @@
         </b-list-group>
 
       </b-col>
+
+      <b-col lg="4" xs="12" sm="6" md="4" xl="4" v-else>
+        <b-row class="not-selected mt-2 ml-1 row">
+          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+          <p>No tasks found in the list.</p>
+        </b-row>
+      </b-col>
+
 
       <b-col cols="6"  lg="6" xs="12" sm="12" md="6" xl="6" v-if="selectedTask" class="pl-0">
         <div class="service-task-details">
@@ -171,6 +179,7 @@ import DatePicker from 'vue2-datepicker'
 import moment from "moment";
 import CamundaRest from '../services/camunda-rest';
 import {authenticateFormio} from "../services/formio-token";
+import {getFormDetails} from "../services/get-formio";
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -262,12 +271,9 @@ export default class Tasklist extends Vue {
         .then((result)=> {
             console.log("this.formIOProjectUrl", this.formIOProjectUrl)
             this.formioUrl = result.data["formUrl"].value;
-            const domain = (this.formioUrl.split("://")[1]).split('/')[0]
-            const replacedomain = this.formIOProjectUrl.split("//")[1]
-            this.formioUrl = this.formioUrl.replace(domain, replacedomain)
-            const formArr = this.formioUrl.split("/");
-            this.formId = formArr[4];
-            this.submissionId = formArr[6];
+            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+            this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
+
             this.showfrom = true
         });
     }
@@ -315,12 +321,9 @@ export default class Tasklist extends Vue {
         .then((result)=> {
           //  move this to a function
             this.formioUrl = result.data["formUrl"].value;
-            const domain = (this.formioUrl.split("://")[1]).split('/')[0]
-            const replacedomain = this.formIOProjectUrl.split("//")[1]
-            this.formioUrl = this.formioUrl.replace(domain, replacedomain)
-            const formArr = this.formioUrl.split("/");
-            this.formId = formArr[4];
-            this.submissionId = formArr[6];
+            
+            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+            this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
             this.showfrom = true
         });
       }
