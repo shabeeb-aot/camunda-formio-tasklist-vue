@@ -61,7 +61,7 @@
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ task.processInstanceId }}</b-row>
+        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ applicationId}}</b-row>
         
         <div>
         <b-row class="actionable">
@@ -187,7 +187,6 @@ export default class Tasklist extends Vue {
 @Prop() private formIOReviewerId !: string;
 @Prop() private formIOReviewer !: string;
 @Prop() private formIOProjectUrl!: string;
-// put a console warning if any params not passed
 
 private tasks: Array<object> = []
 private getProcessDefinitions: Array<object> = []
@@ -212,6 +211,7 @@ private options =  {
     }
 }
 private filterList = []
+private applicationId = ''
 
 checkPropsIsPassed() {
     if(! this.CamundaUrl|| this.CamundaUrl===""){
@@ -320,6 +320,7 @@ fetchData() {
         })
         this.showfrom = false
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+            this.applicationId = result.data["applicationId"].value;
             this.formioUrl = result.data["formUrl"].value;           
             const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
             this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
