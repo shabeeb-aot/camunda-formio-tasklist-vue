@@ -1,9 +1,9 @@
 <template>
     <b-container fluid class="camunda-tasklist-main">
         <b-row class="text-left" align-v="start">
-            <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
-                <TaskFilter filters="filterList"></TaskFilter>
-            </b-col>
+            <!-- <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
+                <TaskFilter :filters="filterList"></TaskFilter>
+            </b-col> -->
             <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0" v-if="tasks && tasks.length">
                 <b-list-group  class="service-task-list">   
                 <div class="filter-container">
@@ -54,7 +54,7 @@
             </b-col>
 
 
-      <b-col cols="6"  lg="6" xs="12" sm="12" md="6" xl="6" v-if="selectedTask" class="pl-0">
+      <b-col cols="8"  lg="8" xs="12" sm="12" md="8" xl="8" v-if="selectedTask" class="pl-0">
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
@@ -122,7 +122,7 @@
                   >
                 </formio>
                 </div>
-                <div v-else class="ml-4 mr-4">
+                <div v-else class="ml-4 mr-4 formio-form-overlay">
                   <formio :src="formioUrl"
                   :submission="submissionId"
                   :form="formId"
@@ -139,7 +139,7 @@
         </div>     
       </b-col>
 
-      <b-col cols="6" v-else>
+      <b-col cols="8" v-else>
         <b-row class="not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
@@ -175,7 +175,7 @@ import 'vue2-datepicker/index.css';
 export default class Tasklist extends Vue {
 @Prop() private CamundaUrl !: string;
 @Prop() private token !: string;
-@Prop() private username !: string;
+@Prop() private userName !: string;
 @Prop({default:'external'}) private userEmail !: string;
 @Prop() private formIOUserRoles !: Array<string>;
 @Prop() private formIOResourceId !: string;
@@ -256,7 +256,7 @@ getBPMTasks(){
 }
 
 onClaim() {
-    CamundaRest.claim(this.token,this.task.id, {userId: this.username}, this.CamundaUrl).then(()=> 
+    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.CamundaUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
