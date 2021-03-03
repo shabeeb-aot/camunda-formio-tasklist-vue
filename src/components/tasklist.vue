@@ -4,8 +4,11 @@
             <!-- <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
                 <TaskFilter :filters="filterList"></TaskFilter>
             </b-col> -->
-            <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0" v-if="tasks && tasks.length">
-                <b-list-group  class="service-task-list">   
+            <b-col lg="3" xs="12" sm="6" md="3" xl="3" class="pl-0 service-task-list" v-if="tasks && tasks.length">
+                <b-list-group>
+                <div>
+                    <p> Created</p>    
+                </div>   
                 <div class="filter-container">
                     <input type="text" class="filter" placeholder="Filter Tasks"/>
                         {{tasks.length}}
@@ -46,7 +49,7 @@
                   </b-list-group>
             </b-col>
 
-            <b-col lg="4" xs="12" sm="6" md="4" xl="4" v-else>
+            <b-col lg="3" xs="12" sm="6" md="3" xl="3" v-else>
               <b-row class="not-selected mt-2 ml-1 row">
                 <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
                 <p>No tasks found in the list.</p>
@@ -54,7 +57,7 @@
             </b-col>
 
 
-      <b-col cols="8"  lg="8" xs="12" sm="12" md="8" xl="8" v-if="selectedTask" class="pl-0">
+      <b-col cols="9"  lg="9" xs="12" sm="12" md="9" xl="9" v-if="selectedTask" class="pl-0">
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
@@ -122,13 +125,15 @@
                   >
                 </formio>
                 </div>
-                <div v-else class="ml-4 mr-4 formio-form-overlay">
-                  <formio :src="formioUrl"
-                  :submission="submissionId"
-                  :form="formId"
-                  :options="readoption"
-                  >
-                  </formio>
+                <div v-else class="ml-4 mr-4">
+                    <b-overlay :show="true">
+                        <formio :src="formioUrl"
+                        :submission="submissionId"
+                        :form="formId"
+                        :options="readoption"
+                        >
+                        </formio>
+                    </b-overlay>
                 </div>
               </b-tab>
               <b-tab title="History"></b-tab>
@@ -139,7 +144,7 @@
         </div>     
       </b-col>
 
-      <b-col cols="8" v-else>
+      <b-col cols="9" v-else>
         <b-row class="not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>

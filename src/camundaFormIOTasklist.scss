@@ -51,6 +51,10 @@ body {
 }
 
 .service-task-list {
+  box-shadow: 0 0 10px 5px #D0D0D0;
+  clip-path: inset(0px -15px 0px 0px);
+  padding: 0rem 1.25rem !important;
+  border-top: 1px solid #ced4da !important;
   max-height: 80vh;
   overflow-y: auto;
   padding-right: 25px;
