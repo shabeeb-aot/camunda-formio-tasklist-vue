@@ -12,7 +12,7 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
     },
     ];
 
-    let roles: any[] = [STAFF_REVIEWER_ID];
+    let roles: any[] = [];
     const roleData = ROLES.find((x) => x.title === UserRoles);
     if (roleData) {
         roles = roles.concat(roleData.id);

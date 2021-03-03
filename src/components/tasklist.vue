@@ -1,78 +1,67 @@
 <template>
-
-  <b-container fluid id="main">
-    <b-row class="text-left" align-v="start">
-      <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
-          <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
-            <b-list-group-item button v-for="(filter, filteridx) in filterList" :key="filter.id"
-            v-on:click="togglefilter(filteridx)"
-            :class="{'selected': filteridx == activefilter}">
-              <b-row>
-                <div class="col-12">
-                  {{filter.name}} ({{filter.itemCount}})
+    <b-container fluid class="camunda-tasklist-main">
+        <b-row class="text-left" align-v="start">
+            <!-- <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
+                <TaskFilter :filters="filterList"></TaskFilter>
+            </b-col> -->
+            <b-col lg="3" xs="12" sm="6" md="3" xl="3" class="pl-0 service-task-list" v-if="tasks && tasks.length">
+                <b-list-group>
+                <div>
+                    <p> Created</p>    
                 </div>   
-              </b-row>
-            </b-list-group-item>
-          </b-list-group>
-        <div class="mt-2 ml-3" v-else>
-          <b-row class="not-selected mt-2 ml-1 row">
-          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
-           <p>No filters found</p>
-          </b-row>
-        </div>
-      </b-col>
-      <b-col lg="4" xs="12" sm="6" md="4" xl="4" class="pl-0">
-          <b-list-group  v-if="tasks && tasks.length" class="service-task-list">   
-          <div class="filter-container">
-                <input type="text" class="filter" placeholder="Filter Tasks"/>
-                {{tasks.length}}
-          </div>
-            <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
-                v-on:click="toggle(idx)"
-                :class="{'selected': idx == activeIndex}">
-                <div @click="setselectedTask(task.id)" class="routercss">
-                  <b-row>
-                    <div class="col-12">
-                      <h5>
-                        {{ task.name }}
-                      </h5>
-                    </div>
-                  </b-row>
-
-                  <b-row class="task-row-2">
-                    <div class="col-6 pr-0">
-                    {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
-                    </div>
-                    <div title="Task assignee" class="col-6 pr-0 text-right">
-                      {{task.assignee}}
-                    </div>
-                  </b-row>
-
-                  <b-row class="task-row-3">
-                    <b-col lg=8 xs=8 class="pr-0" title="task.created">
-                      <div v-if="task.due">
-                      Due in: {{ timedifference(task.due) }}
-                      </div>
-                      <div v-if="task.followUp">
-                      Follow-up in: {{ timedifference(task.followUp) }} 
-                      </div>
-                      Created on: {{ timedifference(task.created) }}
-                    </b-col>
-                    <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
-                      {{ task.priority }}
-                    </b-col>
-                  </b-row>
+                <div class="filter-container">
+                    <input type="text" class="filter" placeholder="Filter Tasks"/>
+                        {{tasks.length}}
                 </div>
-            </b-list-group-item>
-        </b-list-group>
+                <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
+                    v-on:click="toggle(idx)"
+                    :class="{'selected': idx == activeIndex}">
+                    <div @click="setselectedTask(task.id)" class="select-task">
+                        <b-row>
+                        <div class="col-12">
+                        <h5>{{ task.name }}</h5>
+                        </div>
+                        </b-row>
+                        <b-row class="task-row-2">
+                            <div class="col-6 pr-0">
+                                {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
+                            </div>
+                            <div title="Task assignee" class="col-6 pr-0 text-right">
+                              {{task.assignee}}
+                            </div>
+                        </b-row>
+                        <b-row class="task-row-3">
+                            <b-col lg=8 xs=8 class="pr-0" title="task.created">
+                                <div v-if="task.due">
+                                    Due in: {{ timedifference(task.due) }}
+                                </div>
+                                <div v-if="task.followUp">
+                                    Follow-up in: {{ timedifference(task.followUp) }} 
+                                </div>
+                                    Created on: {{ timedifference(task.created) }}
+                            </b-col>
+                            <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
+                                {{ task.priority }}
+                            </b-col>
+                        </b-row>
+                    </div>
+                  </b-list-group-item>
+                  </b-list-group>
+            </b-col>
 
-      </b-col>
+            <b-col lg="3" xs="12" sm="6" md="3" xl="3" v-else>
+              <b-row class="not-selected mt-2 ml-1 row">
+                <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+                <p>No tasks found in the list.</p>
+              </b-row>
+            </b-col>
 
-      <b-col cols="6"  lg="6" xs="12" sm="12" md="6" xl="6" v-if="selectedTask" class="pl-0">
+
+      <b-col cols="9"  lg="9" xs="12" sm="12" md="9" xl="9" v-if="selectedTask" class="pl-0">
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ task.processInstanceId }}</b-row>
+        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ applicationId}}</b-row>
         
         <div>
         <b-row class="actionable">
@@ -137,12 +126,14 @@
                 </formio>
                 </div>
                 <div v-else class="ml-4 mr-4">
-                  <formio :src="formioUrl"
-                  :submission="submissionId"
-                  :form="formId"
-                  :options="readoption"
-                  >
-                  </formio>
+                    <b-overlay :show="true">
+                        <formio :src="formioUrl"
+                        :submission="submissionId"
+                        :form="formId"
+                        :options="readoption"
+                        >
+                        </formio>
+                    </b-overlay>
                 </div>
               </b-tab>
               <b-tab title="History"></b-tab>
@@ -153,7 +144,7 @@
         </div>     
       </b-col>
 
-      <b-col cols="6" v-else>
+      <b-col cols="9" v-else>
         <b-row class="not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
@@ -164,179 +155,191 @@
 </template>
 
 <script lang="ts">
-import { Form } from 'vue-formio';
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import DatePicker from 'vue2-datepicker'
-import moment from "moment";
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
+import DatePicker from 'vue2-datepicker'
+import { Form } from 'vue-formio';
+import TaskFilter from './tasklist-filter.vue';
 import {authenticateFormio} from "../services/formio-token";
+import {getFormDetails} from "../services/get-formio";
+import moment from "moment";
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-
-import 'vue2-datepicker/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
-// import './styles.scss';
-// import '../../public/styles.scss'
+import '../camundaFormIOTasklist.scss'
+import 'vue2-datepicker/index.css';
 
 @Component({
-  components: {
-    formio: Form,
-    DatePicker
-  }
+    components: {
+        formio: Form,
+        DatePicker,
+        TaskFilter
+    }
 })
 export default class Tasklist extends Vue {
-@Prop() private CamundaUrl !: string|any;
-@Prop() private token !: string|any;
-@Prop() private userName !: string|any;
-@Prop({default:'external'}) private userEmail !: string|any;
-@Prop() private formIOUserRoles !: Array<string>;
-@Prop() private formIOResourceId !: string|any;
-@Prop() private formIOReviewerId !: string|any;
-@Prop() private formIOReviewer !: string|any;
-@Prop() private formIOProjectUrl!: string|any;
-// put a console warning if any params not passed
+@Prop() private CamundaUrl !: string;
+@Prop() private token !: string;
+@Prop() private userName !: string;
+@Prop({default:'external'}) private userEmail !: string;
+@Prop() private formIOUserRoles !: string;
+@Prop() private formIOResourceId !: string;
+@Prop() private formIOReviewerId !: string;
+@Prop() private formIOReviewer !: string;
+@Prop() private formIOProjectUrl!: string;
 
-  private tasks: Array<object> = []
-  private getProcessDefinitions: Record<string, any> = []
-  private taskProcess = null
-  private formId = ''
-  private submissionId = '' 
-  private formioUrl = ''
-  private activeIndex = 0
-  private task: any
-  private setFollowup = null
-  private setDue = null
-  private setGroup = null
-  private selectedTask: any = '' 
-  private showfrom = false
-  private readoption: any = {readOnly: true,}
-  private options: any =  {
-      noAlerts: false,
-      i18n: {
+private tasks: Array<object> = []
+private getProcessDefinitions: Array<object> = []
+private taskProcess = null
+private formId = ''
+private submissionId = '' 
+private formioUrl = ''
+private activeIndex = 0
+private task: any
+private setFollowup = null
+private setDue = null
+private setGroup = null
+private selectedTask = '' 
+private showfrom = false
+private readoption = {readOnly: true,}
+private options =  {
+    noAlerts: false,
+    i18n: {
         en: {
-          error: "Please fix the errors before submitting again.",
+            error: "Please fix the errors before submitting again.",
         },
-      }
     }
-  private filterList: any = []
-  private activefilter = 0
+}
+private filterList = []
+private applicationId = ''
 
-  timedifference(date: any) {
+checkPropsIsPassed() {
+    if(! this.CamundaUrl|| this.CamundaUrl===""){
+        console.error("CamundaUrl prop not Passed")
+    }
+
+    else if(! this.token || this.token==="") {
+        console.error("token prop not Passed")
+    }
+
+    else if(! this.userName|| this.userName==="") {
+        console.error("userName prop not passed")
+    }
+
+    else if(! this.formIOUserRoles|| this.formIOUserRoles==="") {
+        console.error("formioUserRoles prop not passed")
+    }
+
+    else if(! this.formIOResourceId|| this.formIOResourceId==="") {
+        console.error("formIOResourceId prop not passed")
+    }
+    else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
+        console.error("formIOReviewerId prop not passed")
+    }
+    else if(! this.formIOReviewer|| this.formIOReviewer==="") {
+        console.error("formIOReviewer prop not passed")
+    }
+    else if(! this.formIOProjectUrl|| this.formIOProjectUrl==="") {
+        console.error("formIOProjectUrl prop not passed")
+    }
+}
+
+timedifference(date: Date) {
     return moment(date).fromNow();
-  }
+}
 
-  getProcessDataFromList = (processList: any[],processId: any,dataKey: string) => {
+getProcessDataFromList(processList: any[] ,processId: any,dataKey: string){
     const process = processList.find(process=>process.id===processId);
     return process && process[dataKey] ;
-  }
+}
 
-  getTaskFromList(tasks: any[], taskId: string){
-      const task = tasks.find(task=>task.id==taskId);
-      return task;
-    }
+getTaskFromList(tasks: any[], taskId: string){
+    const task = tasks.find(task=>task.id===taskId);
+    return task;
+}
 
-    setselectedTask(task: any){
-      this.selectedTask = task
-       this.fetchData()
-    }
+setselectedTask(task: string){
+    this.selectedTask = task
+    this.fetchData()
+}
 
-  toggle(index: number) {
-      this.activeIndex = index
-    }
+toggle(index: number) {
+    this.activeIndex = index
+}
 
-  togglefilter(index: number) {
-    this.activefilter = index
-  }
 
-  getBPMTaskDetail(taskId: string) {
-        CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
-          this.task = result.data;
-        })
-
-        this.showfrom = false
-        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
-        .then((result)=> {
-            console.log("this.formIOProjectUrl", this.formIOProjectUrl)
-            this.formioUrl = result.data["formUrl"].value;
-            const domain = (this.formioUrl.split("://")[1]).split('/')[0]
-            const replacedomain = this.formIOProjectUrl.split("//")[1]
-            this.formioUrl = this.formioUrl.replace(domain, replacedomain)
-            const formArr = this.formioUrl.split("/");
-            this.formId = formArr[4];
-            this.submissionId = formArr[6];
-            this.showfrom = true
-        });
-    }
-
-  getBPMTasks(){
-    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
-      this.tasks = result.data;
+getBPMTaskDetail(taskId: string) {
+    CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
+        this.task = result.data;
     })
-  }
 
-  onClaim() {
+    this.showfrom = false
+    CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+        this.formioUrl = result.data["formUrl"].value;
+        const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+        this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
+
+        this.showfrom = true
+    });
+}
+
+getBPMTasks(){
+    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
+        this.tasks = result.data;
+    })
+}
+
+onClaim() {
     CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.CamundaUrl).then(()=> 
-      {
+    {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
-      })
-    .catch((error) => {
+    }).catch((error) => {
         console.log("Error", error);
     })
-  }
+}
 
-  onUnClaim(){ 
+onUnClaim(){ 
     CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then(()=> 
-    {this.getBPMTaskDetail(this.task.id)
-      this.getBPMTasks()
-    }
-    )
-    .catch((error) =>{
-      console.log("Error", error)
+    {
+        this.getBPMTaskDetail(this.task.id)
+        this.getBPMTasks()
+    }).catch((error) =>{
+        console.log("Error", error)
     })
-  }
+}
 
 
-  fetchData() {
-    
-      if (this.selectedTask) {       
+fetchData() {
+    if (this.selectedTask) {       
         this.task = this.getTaskFromList(this.tasks, this.selectedTask);
         CamundaRest.getTaskById(this.token, this.selectedTask, this.CamundaUrl).then((result) => {
-          CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
-          this.taskProcess = res.data.name;
-        });
+            CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
+                this.taskProcess = res.data.name;
+            });
         })
         this.showfrom = false
-        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl)
-        .then((result)=> {
-          //  move this to a function
-            this.formioUrl = result.data["formUrl"].value;
-            const domain = (this.formioUrl.split("://")[1]).split('/')[0]
-            const replacedomain = this.formIOProjectUrl.split("//")[1]
-            this.formioUrl = this.formioUrl.replace(domain, replacedomain)
-            const formArr = this.formioUrl.split("/");
-            this.formId = formArr[4];
-            this.submissionId = formArr[6];
+        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+            this.applicationId = result.data["applicationId"].value;
+            this.formioUrl = result.data["formUrl"].value;           
+            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+            this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
             this.showfrom = true
         });
-      }
     }
+}
 
-  created() {
+created() {
     CamundaRest.filterList(this.token, this.CamundaUrl).then((response) => {
-      this.filterList = response.data;
+        this.filterList = response.data;
     });
-  }
+}
 
-  mounted() {
-
+mounted() {
+    this.checkPropsIsPassed();
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
-      this.tasks = result.data;      
+        this.tasks = result.data;      
     }); 
 
     this.fetchData();
@@ -344,105 +347,6 @@ export default class Tasklist extends Vue {
     CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     });
-  }
-
 }
-
+}
 </script>
-
-<style>
-  body {
-  font-size: 16px;
-  font-family: Nunito Sans, SemiBold;
-  background-color: white !important;
-}
-
-#main {
-  margin-top: 2px;
-  min-height: 85vh;
-  padding-bottom: 1.5rem;
-}
-
-.bg-default {
-  background-color: #38598a !important;
-  border: #38598a !important;
-  color: white !important;
-}
-
-  #ul_top_hypers li {
-    display: inline;
-}
-.not-selected{
-  border: 3px solid #b3b3b3;
-  padding: 10px;
-  color: #b3b3b3;
-  width: 100%;
-}
-
-.filter-container{
-  border: 1px solid #555;
-  border-radius: 5px;
-  width: 100%;
-  padding: 0;
-  margin: 0 5px 10px 5px;
-  font-size: 13px;
-}
-
-.filter{
-  width: 85%;
-  margin: 5px;
-  border: none;
-  font-style: italic;
-}
-.filter:focus{
-  outline: none;
-}
-
-.task-row-2 {
-  font-size: 15px;
-}
-.task-row-3 {
-  font-size: 11px;
-}
-
-.service-task-list {
-  max-height: 80vh;
-  overflow-y: auto;
-  padding-right: 25px;
-  border-right: 2px solid #D0D0D0;
-} 
-
-.service-task-details {
-  min-height: 80vh;
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.task-header {
-  font-size: 30px;
-  font-weight: 600;
-}
-.task-name {
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.selected {
-  border-left: 2px solid #003366 !important;
-}
-
-.actionable {
-  color: #1a5a96;
-  background-color: transparent;
-  cursor: pointer;
-  margin: 10px 0;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.routercss {
-  color: #212529;
-  text-align: left;
-}
-</style>
