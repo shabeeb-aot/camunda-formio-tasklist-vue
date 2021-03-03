@@ -177,7 +177,7 @@ export default class Tasklist extends Vue {
 @Prop() private token !: string;
 @Prop() private userName !: string;
 @Prop({default:'external'}) private userEmail !: string;
-@Prop() private formIOUserRoles !: Array<string>;
+@Prop() private formIOUserRoles !: string;
 @Prop() private formIOResourceId !: string;
 @Prop() private formIOReviewerId !: string;
 @Prop() private formIOReviewer !: string;
@@ -208,7 +208,36 @@ private options =  {
 }
 private filterList = []
 
+checkPropsIsPassed() {
+    if(! this.CamundaUrl|| this.CamundaUrl===""){
+        console.error("CamundaUrl prop not Passed")
+    }
 
+    else if(! this.token || this.token==="") {
+        console.error("token prop not Passed")
+    }
+
+    else if(! this.userName|| this.userName==="") {
+        console.error("userName prop not passed")
+    }
+
+    else if(! this.formIOUserRoles|| this.formIOUserRoles==="") {
+        console.error("formioUserRoles prop not passed")
+    }
+
+    else if(! this.formIOResourceId|| this.formIOResourceId==="") {
+        console.error("formIOResourceId prop not passed")
+    }
+    else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
+        console.error("formIOReviewerId prop not passed")
+    }
+    else if(! this.formIOReviewer|| this.formIOReviewer==="") {
+        console.error("formIOReviewer prop not passed")
+    }
+    else if(! this.formIOProjectUrl|| this.formIOProjectUrl==="") {
+        console.error("formIOProjectUrl prop not passed")
+    }
+}
 
 timedifference(date: Date) {
     return moment(date).fromNow();
@@ -301,6 +330,7 @@ created() {
 }
 
 mounted() {
+    this.checkPropsIsPassed();
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
     CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
         this.tasks = result.data;      
