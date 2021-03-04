@@ -6,20 +6,17 @@
             </b-col> -->
             <b-col lg="3" xs="12" sm="6" md="3" xl="3" class="pl-0 service-task-list" v-if="tasks && tasks.length">
                 <b-list-group>
-                <div>
-                    <p> Created</p>
-                    <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
-                        <b-list-group-item button v-for="(filter, filteridx) in filterList" :key="filter.id"
-                        @click="fetchTaskList(filter.id)"
-                        :class="{'selected': filteridx == activefilter}">
-                        <b-row>
+                    <div class="dropdown">
+                    <button class="dropbtn">Filters</button>
+                        <b-list-group  v-if="filterList && filterList.length" class="dropdown-content">
+                        <b-list-group-item button v-for="(filter) in filterList" :key="filter.id"
+                        @click="fetchTaskList(filter.id)">
                             <div class="col-12">
-                            {{filter.name}}
+                            {{filter.name}} ({{filter.itemCount}})
                             </div>   
-                        </b-row>
                         </b-list-group-item>
-                    </b-list-group>  
-                </div>   
+                        </b-list-group>
+                    </div>
                 <div class="filter-container">
                     <input type="text" class="filter" placeholder="Filter Tasks"/>
                         {{tasks.length}}
@@ -139,7 +136,7 @@
                 </formio>
                 </div>
                 <div v-else class="ml-4 mr-4">
-                    <b-overlay :show="true">
+                    <b-overlay :show="true" spinner-type="none">
                         <formio :src="formioUrl"
                         :submission="submissionId"
                         :form="formId"
@@ -330,11 +327,9 @@ fetchTaskList(filterId: string) {
 }
 
 updateFollowUpDate() {
-    console.log(this.setFollowup)
-    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-    const time = timearr.split('+')
-    const replaceTimezone = time[1].replace(':', '')
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"followUp": moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(time[1], replaceTimezone)}).then(()=> {
+    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
+    const replaceTimezone = timearr[1].replace(':', '')
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"followUp": moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)}).then(()=> {
         console.log("Updated follow up date")
     }).catch((error) =>{
         console.log("Error", error)
@@ -342,7 +337,7 @@ updateFollowUpDate() {
 }
 
 updateDueDate() {
-    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
+    const timearr = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
     CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"due": moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) }).then(()=> {
         console.log("Update due date")
