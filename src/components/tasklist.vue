@@ -7,7 +7,18 @@
             <b-col lg="3" xs="12" sm="6" md="3" xl="3" class="pl-0 service-task-list" v-if="tasks && tasks.length">
                 <b-list-group>
                 <div>
-                    <p> Created</p>    
+                    <p> Created</p>
+                    <b-list-group  v-if="filterList && filterList.length" class="service-task-list">
+                        <b-list-group-item button v-for="(filter, filteridx) in filterList" :key="filter.id"
+                        @click="fetchTaskList(filter.id)"
+                        :class="{'selected': filteridx == activefilter}">
+                        <b-row>
+                            <div class="col-12">
+                            {{filter.name}}
+                            </div>   
+                        </b-row>
+                        </b-list-group-item>
+                    </b-list-group>  
                 </div>   
                 <div class="filter-container">
                     <input type="text" class="filter" placeholder="Filter Tasks"/>
@@ -61,7 +72,7 @@
         <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0 task-name" title="process-instance-id">Application # {{ applicationId}}</b-row>
+        <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
         
         <div>
         <b-row class="actionable">
@@ -70,6 +81,7 @@
               type="datetime"
               placeholder="Set Follow-up date"
               v-model="setFollowup"
+              @change="updateFollowUpDate"
               >
               </DatePicker>
             </b-col>
@@ -78,6 +90,7 @@
               type="datetime"
               placeholder="Set Due Date"
               v-model="setDue"
+              @change="updateDueDate"
                 >
                 </DatePicker>
               </b-col>
@@ -211,6 +224,7 @@ private options =  {
     }
 }
 private filterList = []
+private activefilter = 0
 private applicationId = ''
 
 checkPropsIsPassed() {
@@ -309,6 +323,33 @@ onUnClaim(){
     })
 }
 
+fetchTaskList(filterId: string) {
+    CamundaRest.filterTaskList(this.token, filterId, this.CamundaUrl).then((result) => {
+        this.tasks = result.data;      
+    }); 
+}
+
+updateFollowUpDate() {
+    console.log(this.setFollowup)
+    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+    const time = timearr.split('+')
+    const replaceTimezone = time[1].replace(':', '')
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"followUp": moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(time[1], replaceTimezone)}).then(()=> {
+        console.log("Updated follow up date")
+    }).catch((error) =>{
+        console.log("Error", error)
+    })
+}
+
+updateDueDate() {
+    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
+    const replaceTimezone = timearr[1].replace(':', '')
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"due": moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) }).then(()=> {
+        console.log("Update due date")
+    }).catch((error) =>{
+        console.log("Error", error)
+    })
+}
 
 fetchData() {
     if (this.selectedTask) {       
@@ -329,18 +370,30 @@ fetchData() {
     }
 }
 
+togglefilter(index: number) {
+    this.activefilter = index
+}
+
+findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            return array[i]["id"];
+        }
+    }
+    return null;
+}
+
 created() {
     CamundaRest.filterList(this.token, this.CamundaUrl).then((response) => {
         this.filterList = response.data;
+        const key = this.findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
+        this.fetchTaskList(key)
     });
 }
 
 mounted() {
     this.checkPropsIsPassed();
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
-    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result) => {
-        this.tasks = result.data;      
-    }); 
 
     this.fetchData();
     
