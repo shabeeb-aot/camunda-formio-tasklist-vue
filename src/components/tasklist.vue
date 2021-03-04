@@ -41,12 +41,12 @@
                         <b-row class="task-row-3">
                             <b-col lg=8 xs=8 class="pr-0" title="task.created">
                                 <div v-if="task.due">
-                                    Due in: {{ timedifference(task.due) }}
+                                    Due {{ timedifference(task.due) }}
                                 </div>
                                 <div v-if="task.followUp">
-                                    Follow-up in: {{ timedifference(task.followUp) }} 
+                                    Follow-up {{ timedifference(task.followUp) }} 
                                 </div>
-                                    Created on: {{ timedifference(task.created) }}
+                                    Created {{ timedifference(task.created) }}
                             </b-col>
                             <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
                                 {{ task.priority }}
@@ -327,20 +327,28 @@ fetchTaskList(filterId: string) {
 }
 
 updateFollowUpDate() {
+    const referenceobject = this.task
     const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"followUp": moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)}).then(()=> {
+    referenceobject["followUp"] = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) 
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, referenceobject).then(()=> {
         console.log("Updated follow up date")
+        this.getBPMTaskDetail(this.task.id)
+        this.getBPMTasks()
     }).catch((error) =>{
         console.log("Error", error)
     })
 }
 
 updateDueDate() {
+    const referenceobject = this.task
     const timearr = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"due": moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) }).then(()=> {
+    referenceobject["due"] = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, referenceobject).then(()=> {
         console.log("Update due date")
+        this.getBPMTaskDetail(this.task.id)
+        this.getBPMTasks()
     }).catch((error) =>{
         console.log("Error", error)
     })
