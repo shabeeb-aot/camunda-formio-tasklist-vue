@@ -97,17 +97,26 @@
             <b-modal
             id="AddGroupModal"
             ref="modal"
-            title="Manage Groups">
+            title="Manage Groups"
+            >
                 <div class="modal-text">
                     <b-icon icon="exclamation-circle"></b-icon>
                     You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
                     <b-row class="mt-3 mb-3">
                         <b-col>
+                            <b-button @click="addGroup">
                             <label class="add">Add a group</label>
+                            </b-button>
                         </b-col>
                         <b-col>
-                        <input type="text" placeholder="Group ID" v-model="setGroup">
+                        <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
                         </b-col>
+                            <ul v-for="g in groupList" :key="g.groupId">
+                                <p v-if="g.type==='candidate'">
+                                    <b-button @click="deleteGroup(g.groupId)">X</b-button>
+                                    {{g.groupId}}
+                                </p>
+                            </ul>
                     </b-row>
                 </div>
             </b-modal>
@@ -169,7 +178,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
-import TaskFilter from './tasklist-filter.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
@@ -184,7 +192,6 @@ import 'vue2-datepicker/index.css';
     components: {
         formio: Form,
         DatePicker,
-        TaskFilter
     }
 })
 export default class Tasklist extends Vue {
@@ -223,6 +230,7 @@ private options =  {
 private filterList = []
 private activefilter = 0
 private applicationId = ''
+private groupList = []
 
 checkPropsIsPassed() {
     if(! this.CamundaUrl|| this.CamundaUrl===""){
@@ -321,7 +329,8 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string) {
-    CamundaRest.filterTaskList(this.token, filterId, this.CamundaUrl).then((result) => {
+
+    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": "created","sortOrder": "desc" }]}, this.CamundaUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
 }
@@ -363,6 +372,7 @@ fetchData() {
             });
         })
         this.showfrom = false
+        this.getGroupDetails();
         CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
             this.applicationId = result.data["applicationId"].value;
             this.formioUrl = result.data["formUrl"].value;           
@@ -384,6 +394,28 @@ findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
         }
     }
     return null;
+}
+
+addGroup() {
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.CamundaUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
+        console.log("Create group", result.data);
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+        this.getBPMTasks();
+    })
+}
+
+getGroupDetails() {
+    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.CamundaUrl).then((response) => {
+        this.groupList = response.data;
+    })
+}
+
+deleteGroup(groupid: string) {
+    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.CamundaUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+    })
 }
 
 created() {
