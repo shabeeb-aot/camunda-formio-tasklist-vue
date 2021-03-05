@@ -66,8 +66,8 @@ const CamundaRest = {
         return bpmAxios(bearerToken, CamundaUrl).get('/filter?resourceType=Task&itemCount=true')
     },
 
-    filterTaskList(bearerToken: string, filterId: string, CamundaUrl: string) {
-        return bpmAxios(bearerToken, CamundaUrl).get(`/filter/${filterId}/list?sortBy=created&sortOrder=desc`)
+    filterTaskList(bearerToken: string, filterId: string, values: any, CamundaUrl: string) {
+        return bpmAxios(bearerToken, CamundaUrl).post(`/filter/${filterId}/list`, values)
     }
   }
 
