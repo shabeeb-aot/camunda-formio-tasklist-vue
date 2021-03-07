@@ -1,13 +1,9 @@
 <template>
-    <b-container fluid class="camunda-tasklist-main">
-        <b-row class="text-left" align-v="start">
-            <!-- <b-col class="pl-0" lg="2" xs="12" sm="6" md="2" xl="2">
-                <TaskFilter :filters="filterList"></TaskFilter>
-            </b-col> -->
-            <b-col lg="3" xs="12" sm="6" md="3" xl="3" class="pl-0 service-task-list" v-if="tasks && tasks.length">
-                <b-list-group>
-                    <div class="dropdown">
-                    <button class="dropbtn">Filters</button>
+<b-container class="task-outer-container">
+  <b-row>
+    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length">
+    <div class="dropdown">
+                     <button class="dropbtn">Filters</button>
                         <b-list-group  v-if="filterList && filterList.length" class="dropdown-content">
                         <b-list-group-item button v-for="(filter) in filterList" :key="filter.id"
                         @click="fetchTaskList(filter.id)">
@@ -17,6 +13,8 @@
                         </b-list-group-item>
                         </b-list-group>
                     </div>
+                <b-list-group class="list-container">
+                    
                 <div class="filter-container">
                     <input type="text" class="filter" placeholder="Filter Tasks"/>
                         {{tasks.length}}
@@ -56,17 +54,11 @@
                   </b-list-group-item>
                   </b-list-group>
             </b-col>
-
-            <b-col lg="3" xs="12" sm="6" md="3" xl="3" v-else>
-              <b-row class="not-selected mt-2 ml-1 row">
+    <b-col cols="4" v-else> <b-row class="not-selected mt-2 ml-1 row">
                 <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
                 <p>No tasks found in the list.</p>
-              </b-row>
-            </b-col>
-
-
-      <b-col cols="9"  lg="9" xs="12" sm="12" md="9" xl="9" v-if="selectedTask" class="pl-0">
-        <div class="service-task-details">
+              </b-row></b-col>
+    <b-col  v-if="selectedTask"> <div class="service-task-details">
         <b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
         <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
@@ -94,7 +86,7 @@
             <b-col>
             <b-button variant="outline-primary" v-b-modal.AddGroupModal><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
             
-            <b-modal
+             <b-modal
             id="AddGroupModal"
             ref="modal"
             title="Manage Groups"
@@ -161,18 +153,14 @@
           </div>
         </div>
         </div>     
-      </b-col>
-
-      <b-col cols="9" v-else>
-        <b-row class="not-selected mt-2 ml-1 row">
+   </b-col>
+     <b-col v-else><b-row class="not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
-        </b-row>
-      </b-col>
-    </b-row>
-  </b-container>
+        </b-row></b-col>
+  </b-row>
+</b-container>
 </template>
-
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
