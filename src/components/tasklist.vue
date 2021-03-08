@@ -114,7 +114,7 @@
                         <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
                         </b-col>
                             <ul v-for="g in groupList" :key="g.groupId">
-                                <p v-if="g.type==='candidate'">
+                                <p>
                                     <b-button variant="danger" @click="deleteGroup(g.groupId)">X</b-button>
                                     {{g.groupId}}
                                 </p>
@@ -420,9 +420,7 @@ getGroupDetails() {
         this.groupListItems = []
         this.groupListNames = null
         for (const group of response.data){
-            if (group.type==="candidate") {
                 this.groupListItems.push(group.groupId)
-            }
         }
         if (this.groupListItems.length) {
             this.groupListNames = this.groupListItems
