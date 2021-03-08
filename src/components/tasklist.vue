@@ -257,6 +257,12 @@ checkPropsIsPassed() {
     else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
         console.error("formIOApiUrl prop not passed")
     }
+    else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+        console.error("formsflow.ai API url prop not passed")
+    }
+    else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
+        console.error("formsflow.ai URL prop not passed")
+    }
 }
 
 timedifference(date: Date) {
@@ -437,6 +443,10 @@ created() {
 
 mounted() {
     this.checkPropsIsPassed();
+    localStorage.setItem("bpmApiUrl", this.bpmApiUrl)
+    localStorage.setItem("authToken", this.token)
+    localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl)
+    localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl)
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
     this.fetchData();
