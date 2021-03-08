@@ -1,12 +1,22 @@
 <template>
 <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
-    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length">
+    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
+    <div class="col-md-2">
+        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortorder" @change="setSortOrder">
+            <option selected value="created">Created</option>
+            <option value="dueDate">Due-Date</option>
+            <option value="followUp">Follow-up Date</option>
+            <option value="name">Task Name</option>
+            <option value="assignee">Assignee</option>
+        </select>
+    </div>
     <div class="cft-filter-dropdown">
                      <button class="cft-filter-dropbtn">Filters</button>
                         <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-                        <b-list-group-item button v-for="(filter) in filterList" :key="filter.id"
-                        @click="fetchTaskList(filter.id)">
+                        <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+                        @click="fetchTaskList(filter.id); togglefilter(idx)"
+                        :class="{'cft-selected': idx == activefilter}">
                             <div class="col-12">
                             {{filter.name}} ({{filter.itemCount}})
                             </div>   
@@ -189,9 +199,6 @@ Vue.use(IconsPlugin)
 export default class Tasklist extends Vue {
 @Prop() private bpmApiUrl !: string;
 @Prop() private token !: string;
-@Prop() private userName !: string;
-@Prop({default:'external'}) private userEmail !: string;
-@Prop() private formIOUserRoles !: string;
 @Prop() private formIOResourceId !: string;
 @Prop() private formIOReviewerId !: string;
 @Prop() private formIOReviewer !: string;
@@ -227,6 +234,11 @@ private applicationId = ''
 private groupList = []
 private groupListNames: any
 private groupListItems: string[] = []
+private userName = ''
+private userEmail = 'external'
+private formIOUserRoles = ''
+private selectSortorder = 'created'
+private filterId = ''
 
 checkPropsIsPassed() {
     if(! this.bpmApiUrl|| this.bpmApiUrl===""){
@@ -237,29 +249,22 @@ checkPropsIsPassed() {
         console.error("token prop not Passed")
     }
 
-    else if(! this.userName|| this.userName==="") {
-        console.error("userName prop not passed")
-    }
-
-    else if(! this.formIOUserRoles|| this.formIOUserRoles==="") {
-        console.error("formioUserRoles prop not passed")
-    }
-
     else if(! this.formIOResourceId|| this.formIOResourceId==="") {
         console.error("formIOResourceId prop not passed")
     }
+
     else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
         console.error("formIOReviewerId prop not passed")
     }
-    else if(! this.formIOReviewer|| this.formIOReviewer==="") {
-        console.error("formIOReviewer prop not passed")
-    }
+
     else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
         console.error("formIOApiUrl prop not passed")
     }
+
     else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
         console.error("formsflow.ai API url prop not passed")
     }
+
     else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
         console.error("formsflow.ai URL prop not passed")
     }
@@ -331,10 +336,14 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string) {
-
-    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": "created","sortOrder": "desc" }]}, this.bpmApiUrl,).then((result) => {
+    this.filterId = filterId
+    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": this.selectSortorder,"sortOrder": "desc" }]}, this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
+}
+
+setSortOrder() {
+    this.fetchTaskList(this.filterId);
 }
 
 updateFollowUpDate() {
@@ -447,8 +456,11 @@ mounted() {
     localStorage.setItem("authToken", this.token);
     localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
     localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-    localStorage.setItem("UserDetails", JSON.parse(atob(this.token.split('.')[1])));
-    console.log(JSON.parse(atob(this.token.split('.')[1])));
+    const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
+    this.userName = decodeToken["preferred_username"]
+    this.userEmail = decodeToken["email"] || "external"
+    this.formIOUserRoles = String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"])
+    localStorage.setItem("UserDetails", decodeToken);
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
     this.fetchData();
