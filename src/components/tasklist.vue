@@ -226,7 +226,7 @@ private activefilter = 0
 private applicationId = ''
 private groupList = []
 private groupListNames: any
-private groupListItems = []
+private groupListItems: string[] = []
 
 checkPropsIsPassed() {
     if(! this.bpmApiUrl|| this.bpmApiUrl===""){
@@ -443,10 +443,12 @@ created() {
 
 mounted() {
     this.checkPropsIsPassed();
-    localStorage.setItem("bpmApiUrl", this.bpmApiUrl)
-    localStorage.setItem("authToken", this.token)
-    localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl)
-    localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl)
+    localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
+    localStorage.setItem("authToken", this.token);
+    localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
+    localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+    localStorage.setItem("UserDetails", JSON.parse(atob(this.token.split('.')[1])));
+    console.log(JSON.parse(atob(this.token.split('.')[1])));
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
     this.fetchData();
