@@ -95,8 +95,8 @@
                 </DatePicker>
               </b-col>
             <b-col>
-            <b-button variant="outline-primary" v-b-modal.AddGroupModal><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
-            
+            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
+            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
             <b-modal
             id="AddGroupModal"
             ref="modal"
@@ -106,11 +106,18 @@
                     You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
                     <b-row class="mt-3 mb-3">
                         <b-col>
+                            <b-button variant="primary" @click="addGroup">
                             <label class="add">Add a group</label>
                         </b-col>
                         <b-col>
                         <input type="text" placeholder="Group ID" v-model="setGroup">
                         </b-col>
+                            <ul v-for="g in groupList" :key="g.groupId">
+                                <p v-if="g.type==='candidate'">
+                                    <b-button variant="danger" @click="deleteGroup(g.groupId)">X</b-button>
+                                    {{g.groupId}}
+                                </p>
+                            </ul>
                     </b-row>
                 </div>
             </b-modal>
@@ -176,12 +183,16 @@ import TaskFilter from './tasklist-filter.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
 import '../camundaFormIOTasklist.scss'
 import 'vue2-datepicker/index.css';
+
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 
 @Component({
     components: {
@@ -191,7 +202,7 @@ import 'vue2-datepicker/index.css';
     }
 })
 export default class Tasklist extends Vue {
-@Prop() private CamundaUrl !: string;
+@Prop() private bpmApiUrl !: string;
 @Prop() private token !: string;
 @Prop() private userName !: string;
 @Prop({default:'external'}) private userEmail !: string;
@@ -199,7 +210,9 @@ export default class Tasklist extends Vue {
 @Prop() private formIOResourceId !: string;
 @Prop() private formIOReviewerId !: string;
 @Prop() private formIOReviewer !: string;
-@Prop() private formIOProjectUrl!: string;
+@Prop() private formIOApiUrl!: string;
+@Prop() private formsflowaiApiUrl!: string;
+@Prop() private formsflowaiUrl!: string;
 
 private tasks: Array<object> = []
 private getProcessDefinitions: Array<object> = []
@@ -226,10 +239,13 @@ private options =  {
 private filterList = []
 private activefilter = 0
 private applicationId = ''
+private groupList = []
+private groupListNames: any
+private groupListItems = []
 
 checkPropsIsPassed() {
-    if(! this.CamundaUrl|| this.CamundaUrl===""){
-        console.error("CamundaUrl prop not Passed")
+    if(! this.bpmApiUrl|| this.bpmApiUrl===""){
+        console.error("bpmApiUrl prop not Passed")
     }
 
     else if(! this.token || this.token==="") {
@@ -253,8 +269,8 @@ checkPropsIsPassed() {
     else if(! this.formIOReviewer|| this.formIOReviewer==="") {
         console.error("formIOReviewer prop not passed")
     }
-    else if(! this.formIOProjectUrl|| this.formIOProjectUrl==="") {
-        console.error("formIOProjectUrl prop not passed")
+    else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
+        console.error("formIOApiUrl prop not passed")
     }
 }
 
@@ -283,14 +299,14 @@ toggle(index: number) {
 
 
 getBPMTaskDetail(taskId: string) {
-    CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
+    CamundaRest.getTaskById(this.token, taskId, this.bpmApiUrl).then((result) => {
         this.task = result.data;
     })
 
     this.showfrom = false
-    CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+    CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.bpmApiUrl).then((result)=> {
         this.formioUrl = result.data["formUrl"].value;
-        const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+        const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOApiUrl);
         this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
 
         this.showfrom = true
@@ -298,13 +314,13 @@ getBPMTaskDetail(taskId: string) {
 }
 
 getBPMTasks(){
-    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
+    CamundaRest.getTasks(this.token, this.bpmApiUrl).then((result)=> {
         this.tasks = result.data;
     })
 }
 
 onClaim() {
-    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.CamundaUrl).then(()=> 
+    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.bpmApiUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
@@ -314,7 +330,7 @@ onClaim() {
 }
 
 onUnClaim(){ 
-    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then(()=> 
+    CamundaRest.unclaim(this.token ,this.task.id, this.bpmApiUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
@@ -324,17 +340,18 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string) {
-    CamundaRest.filterTaskList(this.token, filterId, this.CamundaUrl).then((result) => {
+
+    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": "created","sortOrder": "desc" }]}, this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
 }
 
 updateFollowUpDate() {
-    console.log(this.setFollowup)
-    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-    const time = timearr.split('+')
-    const replaceTimezone = time[1].replace(':', '')
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"followUp": moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(time[1], replaceTimezone)}).then(()=> {
+    const referenceobject = this.task
+    const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
+    const replaceTimezone = timearr[1].replace(':', '')
+    referenceobject["followUp"] = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) 
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.bpmApiUrl, referenceobject).then(()=> {
         console.log("Updated follow up date")
     }).catch((error) =>{
         console.log("Error", error)
@@ -344,7 +361,8 @@ updateFollowUpDate() {
 updateDueDate() {
     const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, {"due": moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) }).then(()=> {
+    referenceobject["due"] = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.bpmApiUrl, referenceobject).then(()=> {
         console.log("Update due date")
     }).catch((error) =>{
         console.log("Error", error)
@@ -354,16 +372,17 @@ updateDueDate() {
 fetchData() {
     if (this.selectedTask) {       
         this.task = this.getTaskFromList(this.tasks, this.selectedTask);
-        CamundaRest.getTaskById(this.token, this.selectedTask, this.CamundaUrl).then((result) => {
-            CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
+        this.getGroupDetails()
+        CamundaRest.getTaskById(this.token, this.selectedTask, this.bpmApiUrl).then((result) => {
+            CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.bpmApiUrl).then((res) => {
                 this.taskProcess = res.data.name;
             });
         })
         this.showfrom = false
-        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.bpmApiUrl).then((result)=> {
             this.applicationId = result.data["applicationId"].value;
             this.formioUrl = result.data["formUrl"].value;           
-            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOApiUrl);
             this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
             this.showfrom = true
         });
@@ -383,8 +402,45 @@ findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
     return null;
 }
 
+addGroup() {
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
+        console.log("Create group", result.data);
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+        this.getBPMTasks();
+    })
+}
+
+getGroupDetails() {
+    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then((response) => {
+        this.groupList = response.data;
+        this.groupListItems = []
+        this.groupListNames = null
+        for (const group of response.data){
+            if (group.type==="candidate") {
+                this.groupListItems.push(group.groupId)
+            }
+        }
+        if (this.groupListItems.length) {
+            this.groupListNames = this.groupListItems
+        }
+    })
+}
+
+deleteGroup(groupid: string) {
+    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+    })
+}
+
+submitFunctionality() {
+    console.log("Form submitted")
+    this.getBPMTaskDetail(this.task.id)
+}
+
 created() {
-    CamundaRest.filterList(this.token, this.CamundaUrl).then((response) => {
+    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
         this.filterList = response.data;
         const key = this.findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
         this.fetchTaskList(key)
@@ -396,8 +452,7 @@ mounted() {
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
     this.fetchData();
-    
-    CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
+    CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     });
 }
