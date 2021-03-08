@@ -1,10 +1,10 @@
 <template>
-<b-container class="task-outer-container">
-  <b-row>
+<b-container fluid class="task-outer-container">
+  <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length">
-    <div class="dropdown">
-                     <button class="dropbtn">Filters</button>
-                        <b-list-group  v-if="filterList && filterList.length" class="dropdown-content">
+    <div class="cft-filter-dropdown">
+                     <button class="cft-filter-dropbtn">Filters</button>
+                        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
                         <b-list-group-item button v-for="(filter) in filterList" :key="filter.id"
                         @click="fetchTaskList(filter.id)">
                             <div class="col-12">
@@ -13,22 +13,22 @@
                         </b-list-group-item>
                         </b-list-group>
                     </div>
-                <b-list-group class="list-container">
+                <b-list-group class="cft-list-container">
                     
-                <div class="filter-container">
-                    <input type="text" class="filter" placeholder="Filter Tasks"/>
+                <div class="cft-filter-container">
+                    <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
                         {{tasks.length}}
                 </div>
                 <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                     v-on:click="toggle(idx)"
-                    :class="{'selected': idx == activeIndex}">
-                    <div @click="setselectedTask(task.id)" class="select-task">
+                    :class="{'cft-selected': idx == activeIndex}">
+                    <div @click="setselectedTask(task.id)" class="cft-select-task">
                         <b-row>
                         <div class="col-12">
                         <h5>{{ task.name }}</h5>
                         </div>
                         </b-row>
-                        <b-row class="task-row-2">
+                        <b-row class="cft-task-row-2">
                             <div class="col-6 pr-0">
                                 {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
                             </div>
@@ -36,7 +36,7 @@
                               {{task.assignee}}
                             </div>
                         </b-row>
-                        <b-row class="task-row-3">
+                        <b-row class="cft-task-row-3">
                             <b-col lg=8 xs=8 class="pr-0" title="task.created">
                                 <div v-if="task.due">
                                     Due {{ timedifference(task.due) }}
@@ -54,7 +54,7 @@
                   </b-list-group-item>
                   </b-list-group>
             </b-col>
-    <b-col cols="4" v-else> <b-row class="not-selected mt-2 ml-1 row">
+    <b-col cols="4" v-else> <b-row class="cft-not-selected mt-2 ml-1 row">
                 <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
                 <p>No tasks found in the list.</p>
               </b-row></b-col>
@@ -64,7 +64,7 @@
         <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
         
         <div>
-        <b-row class="actionable">
+        <b-row class="cft-actionable">
             <b-col>
               <DatePicker 
               type="datetime"
@@ -154,7 +154,7 @@
         </div>
         </div>     
    </b-col>
-     <b-col v-else><b-row class="not-selected mt-2 ml-1 row">
+     <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
         </b-row></b-col>
