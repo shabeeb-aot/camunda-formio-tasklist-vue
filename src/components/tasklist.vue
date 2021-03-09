@@ -2,19 +2,21 @@
 <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-    <div class="col-md-4">
-        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortBy" @change="setSortOrder">
+    <b-col cols="5">
+        <select  v-model="selectSortBy" @change="fetchOnSorting">
             <option selected value="created">Created</option>
             <option value="dueDate">Due-Date</option>
-            <option value="followUp">Follow-up Date</option>
+            <option value="followUpDate">Follow-up Date</option>
             <option value="name">Task Name</option>
             <option value="assignee">Assignee</option>
         </select>
-        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortOrder" @change="setSortOrder">
-            <option selected value="desc">Desc</option>
-            <option value="asc">Asc</option>
-        </select>
-    </div>
+        <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
+            <b-icon-chevron-up></b-icon-chevron-up>
+        </a>
+        <a v-else  @click="toggleSort" href="#" title="Descending">
+            <b-icon-chevron-down></b-icon-chevron-down>
+        </a>
+    </b-col>
     <div class="cft-filter-dropdown">
                      <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
                         <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
@@ -243,6 +245,7 @@ private userEmail = 'external'
 private formIOUserRoles = ''
 private selectSortBy = 'created'
 private selectSortOrder = 'desc'
+private isAsc = false
 private filterId = ''
 
 checkPropsIsPassed() {
@@ -342,12 +345,27 @@ onUnClaim(){
 
 fetchTaskList(filterId: string) {
     this.filterId = filterId
-    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }]}, this.bpmApiUrl,).then((result) => {
+    CamundaRest.filterTaskList(this.token, filterId, {
+        "processVariables":[],"taskVariables":[],"caseInstanceVariables":[],
+        "sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }],
+        "active":true},
+        this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
 }
 
-setSortOrder() {
+toggleSort() {
+    this.isAsc = !this.isAsc;
+    if (this.isAsc){
+        this.selectSortOrder = 'asc'
+    }
+    else {
+        this.selectSortOrder = 'desc'
+    }
+    this.fetchOnSorting()
+}
+
+fetchOnSorting() {
     this.fetchTaskList(this.filterId);
 }
 
