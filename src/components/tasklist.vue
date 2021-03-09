@@ -2,17 +2,21 @@
 <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-    <div class="col-md-2">
-        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortorder" @change="setSortOrder">
+    <div class="col-md-4">
+        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortBy" @change="setSortOrder">
             <option selected value="created">Created</option>
             <option value="dueDate">Due-Date</option>
             <option value="followUp">Follow-up Date</option>
             <option value="name">Task Name</option>
             <option value="assignee">Assignee</option>
         </select>
+        <select class="form-select" aria-label=".form-select-lg example" v-model="selectSortOrder" @change="setSortOrder">
+            <option selected value="desc">Desc</option>
+            <option value="asc">Asc</option>
+        </select>
     </div>
     <div class="cft-filter-dropdown">
-                     <button class="cft-filter-dropbtn">Filters</button>
+                     <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
                         <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
                         <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
                         @click="fetchTaskList(filter.id); togglefilter(idx)"
@@ -138,7 +142,7 @@
         <div>
             <b-tabs content-class="mt-3" v-if="showfrom">
               <b-tab title="Form">
-                <div v-if="task.assignee" class="ml-4 mr-4">
+                <div v-if="task.assignee===userName" class="ml-4 mr-4">
                   <formio :src="formioUrl"
                   :submission="submissionId"
                   :form="formId"
@@ -147,7 +151,7 @@
                 </formio>
                 </div>
                 <div v-else class="ml-4 mr-4">
-                    <b-overlay :show="true" spinner-type="none">
+                    <b-overlay show="true" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
                         <formio :src="formioUrl"
                         :submission="submissionId"
                         :form="formId"
@@ -237,7 +241,8 @@ private groupListItems: string[] = []
 private userName = ''
 private userEmail = 'external'
 private formIOUserRoles = ''
-private selectSortorder = 'created'
+private selectSortBy = 'created'
+private selectSortOrder = 'desc'
 private filterId = ''
 
 checkPropsIsPassed() {
@@ -337,7 +342,7 @@ onUnClaim(){
 
 fetchTaskList(filterId: string) {
     this.filterId = filterId
-    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": this.selectSortorder,"sortOrder": "desc" }]}, this.bpmApiUrl,).then((result) => {
+    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }]}, this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
 }
