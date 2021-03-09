@@ -106,6 +106,8 @@
             id="AddGroupModal"
             ref="modal"
             title="Manage Groups"
+            ok-title="Close"
+            ok-only
             >
                 <div class="modal-text">
                     <b-icon icon="exclamation-circle"></b-icon>
@@ -113,18 +115,23 @@
                     <b-row class="mt-3 mb-3">
                         <b-col>
                             <b-button variant="primary" @click="addGroup">
-                            <label class="add">Add a group</label>
+                                <span>Add a group</span>
+                                <span><b-icon-plus></b-icon-plus></span>
                             </b-button>
                         </b-col>
                         <b-col>
-                        <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
+                            <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
                         </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col v-if="groupList.length">
                             <ul v-for="g in groupList" :key="g.groupId">
-                                <p>
-                                    <b-button variant="danger" @click="deleteGroup(g.groupId)">X</b-button>
-                                    {{g.groupId}}
-                                </p>
+                                <div class="mt-1">
+                                    <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
+                                    <span>{{g.groupId}}</span>
+                                </div>
                             </ul>
+                        </b-col>
                     </b-row>
                 </div>
             </b-modal>
