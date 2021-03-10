@@ -5,7 +5,7 @@
         <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
           <div class="cft-filter-sort"> 
             <b-col cols="5">
-                <select  v-model="selectSortBy" @change="fetchOnSorting">
+                <select class="form-select" aria-label="Select sorting options" v-model="selectSortBy" @change="fetchOnSorting">
                     <option selected value="created">Created</option>
                     <option value="dueDate">Due-Date</option>
                     <option value="followUpDate">Follow-up Date</option>
@@ -42,59 +42,36 @@
                   v-on:click="toggle(idx)"
                   :class="{'cft-selected': idx == activeIndex}">
                   <div @click="setselectedTask(task.id)" class="cft-select-task">
-                      <b-row>
                       <div class="col-12">
                         <h5>{{ task.name }}</h5>
-                        <div class="cft-task-details-assign assigne-details ">
+                      </div>
+                    <div class="cft-task-details-assign assigne-details ">
                               <div >
                                   {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
                               </div>
                               <div title="Task assignee" >
                                 {{task.assignee}}
-                              </div>      
+                              </div> 
                         </div>
 
                         <div class="cft-task-details-assign font-11" >
                               <div >
-                                  <div v-if="task.due">
-                                    Due {{ timedifference(task.due) }}
-                                </div>
-                                <div v-if="task.followUp">
-                                    Follow-up {{ timedifference(task.followUp) }} 
-                                </div>
+                                  <span v-if="task.due">
+                                    Due {{ timedifference(task.due) }},
+                                </span>
+                                <span v-if="task.followUp">
+                                    Follow-up {{ timedifference(task.followUp) }},
+                                </span>
+                                <span v-if="task.created">
                                     Created {{ timedifference(task.created) }}         
-                                </div>
+                                </span>
                                 <div title="Task assignee" >
                                  {{ task.priority }}
-                                </div>      
-                        </div>
-
+                                </div>
+                              </div>      
                       </div>
-                      </b-row>
-                      <!-- <b-row class="cft-task-row-2">
-                          <div class="col-6 pr-0">
-                              {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
-                          </div>
-                          <div title="priority" class="col-6 pr-0 text-right">
-                              {{task.assignee}}
-                          </div>
-                      </b-row>
-                      <b-row class="cft-task-row-3">
-                          <b-col lg=8 xs=8 class="pr-0" title="task.created">
-                              <div v-if="task.due">
-                                  Due {{ timedifference(task.due) }}
-                              </div>
-                              <div v-if="task.followUp">
-                                  Follow-up {{ timedifference(task.followUp) }} 
-                              </div>
-                                  Created {{ timedifference(task.created) }}
-                          </b-col>
-                          <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
-                              {{ task.priority }}
-                          </b-col>
-                      </b-row> -->
                   </div>
-                  </b-list-group-item>
+                    </b-list-group-item>
               </b-list-group>
           </b-col>
         <b-col cols="4" v-else> 
@@ -180,15 +157,6 @@
               <div>
                   <b-tabs content-class="mt-3" v-if="showfrom">
                     <b-tab title="Form">
-                        <!-- <div v-if="task.assignee===userName" class="ml-4 mr-4">
-                        <formio 
-                          :src="formioUrl"
-                          :submission="submissionId"
-                          :form="formId"
-                          :options="options"
-                        >
-                        </formio>
-                        </div> -->
                         <div  class="ml-4 mr-4">
                             <b-overlay :show="task.assignee !== userName" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
                                 <formio :src="formioUrl"
