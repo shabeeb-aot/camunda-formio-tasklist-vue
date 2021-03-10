@@ -1,11 +1,15 @@
 {
   "name": "camunda-formio-tasklist-vue",
   "version": "0.1.0",
+  "description": "Vue components to integrate formsflow.ai",
   "private": true,
+  "main": "./dist/camunda-formio-tasklist-vue.common.js",
+  "author": "faiz.shabeeb@aot-technologies.com",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-package":"vue-cli-service build --target lib --name camunda-formio-tasklist-vue ./src/components/index.js"
   },
   "dependencies": {
     "@types/vue-moment": "^4.0.2",
@@ -46,5 +50,14 @@
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",
     "vue-template-compiler": "^2.6.11"
-  }
+  },
+  "files": [
+    "dist/*",
+    "src/*",
+    "src/assets/*",
+    "src/assets/theme.scss",
+    "public/*",
+    "*.json",
+    "*.js"
+  ]
 }
