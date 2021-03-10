@@ -181,7 +181,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {timedifference, getProcessDataFromList, getTaskFromList, findFilterKeyOfAllTask} from "../services/utils";
+import {getTaskFromList, findFilterKeyOfAllTask} from "../services/utils";
 import TaskListSorting from '../components/tasklist-sorting.vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -247,6 +247,16 @@ private selectSortBy = 'created'
 private selectSortOrder = 'desc'
 private isAsc = false
 private filterId = ''
+
+timedifference(date: Date)  {
+  return moment(date).fromNow();
+}
+
+getProcessDataFromList(processList: any[] ,processId: any,dataKey: string) {
+  const process = processList.find(process=>process.id===processId);
+  return process && process[dataKey] ;
+}
+
 
 setselectedTask(task: string){
   this.selectedTask = task
