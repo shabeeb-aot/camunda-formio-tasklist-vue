@@ -18,7 +18,7 @@ module.exports = {
     "sort-imports": "warn",
     camelcase: "warn",
     "vue/valid-template-root": "warn",
-    "indent": ["warn", 4],
+    "indent": ["warn", 2],
     "eqeqeq": "warn",
     "handle-callback-err": "warn",
     "prefer-promise-reject-errors": "warn",
