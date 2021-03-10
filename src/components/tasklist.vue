@@ -1,38 +1,22 @@
 <template>
   <b-container fluid class="task-outer-container">
     <b-row class="cft-service-task-list">
-  
-        <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-          <div class="cft-filter-sort"> 
-            <b-col cols="5">
-                <select class="form-select" aria-label="Select sorting options" v-model="selectSortBy" @change="fetchOnSorting">
-                    <option selected value="created">Created</option>
-                    <option value="dueDate">Due-Date</option>
-                    <option value="followUpDate">Follow-up Date</option>
-                    <option value="name">Task Name</option>
-                    <option value="assignee">Assignee</option>
-                </select>
-                <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
-                    <b-icon-chevron-up></b-icon-chevron-up>
-                </a>
-                <a v-else  @click="toggleSort" href="#" title="Descending">
-                    <b-icon-chevron-down></b-icon-chevron-down>
-                </a>
-            </b-col>
-            <div class="cft-filter-dropdown">
-                <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
-                <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-                <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-                @click="fetchTaskList(filter.id); togglefilter(idx)"
-                :class="{'cft-selected': idx == activefilter}">
-                    <div class="col-12">
-                    {{filter.name}} ({{filter.itemCount}})
-                    </div>   
-                </b-list-group-item>
-                </b-list-group>
-            </div>
-        </div>
-          <b-list-group class="cft-list-container">
+      <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
+            <!-- <TaskListSorting isAsc="true" filterList=filterList
+            bpmApiUrl="https://bpm2.aot-technologies.com/camunda/engine-rest"/> -->
+        <b-list-group class="cft-list-container">
+          <div class="cft-filter-dropdown">
+            <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
+            <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+              <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+              @click="fetchTaskList(filter.id); togglefilter(idx)"
+              :class="{'cft-selected': idx == activefilter}">
+                <div class="col-12">
+                  {{filter.name}} ({{filter.itemCount}})
+                </div>   
+              </b-list-group-item>
+            </b-list-group>
+          </div>
                       
               <div class="cft-filter-container">
                   <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
@@ -163,6 +147,7 @@
                                 :submission="submissionId"
                                 :form="formId"
                                 :options="task.assignee===userName ? options :  readoption"
+                                v-on:submit="submitFunctionality"
                                 >
                                 </formio>
                             </b-overlay>
@@ -183,6 +168,7 @@
   </b-container>
 </template>
 <script lang="ts">
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
@@ -190,7 +176,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import TaskListSorting from '@/components/tasklist-sorting.vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -205,6 +191,7 @@ Vue.use(IconsPlugin)
     components: {
         formio: Form,
         DatePicker,
+        TaskListSorting
     }
 })
 export default class Tasklist extends Vue {
@@ -255,36 +242,6 @@ private selectSortOrder = 'desc'
 private isAsc = false
 private filterId = ''
 
-checkPropsIsPassed() {
-    if(! this.bpmApiUrl|| this.bpmApiUrl===""){
-        console.error("bpmApiUrl prop not Passed")
-    }
-
-    else if(! this.token || this.token==="") {
-        console.error("token prop not Passed")
-    }
-
-    else if(! this.formIOResourceId|| this.formIOResourceId==="") {
-        console.error("formIOResourceId prop not passed")
-    }
-
-    else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
-        console.error("formIOReviewerId prop not passed")
-    }
-
-    else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
-        console.error("formIOApiUrl prop not passed")
-    }
-
-    else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
-        console.error("formsflow.ai API url prop not passed")
-    }
-
-    else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
-        console.error("formsflow.ai URL prop not passed")
-    }
-}
-
 timedifference(date: Date) {
     return moment(date).fromNow();
 }
@@ -306,6 +263,54 @@ setselectedTask(task: string){
 
 toggle(index: number) {
     this.activeIndex = index
+}
+
+togglefilter(index: number) {
+    this.activefilter = index
+}
+
+findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            return array[i]["id"];
+        }
+    }
+    return null;
+}
+
+addGroup() {
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
+        console.log("Create group", result.data);
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+        this.getBPMTasks();
+    })
+}
+
+getGroupDetails() {
+    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then((response) => {
+        this.groupList = response.data;
+        this.groupListItems = []
+        this.groupListNames = null
+        for (const group of response.data){
+            this.groupListItems.push(group.groupId)
+        }
+        if (this.groupListItems.length) {
+            this.groupListNames = this.groupListItems
+        }
+    })
+}
+
+deleteGroup(groupid: string) {
+    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
+        this.getGroupDetails();
+        this.getBPMTaskDetail(this.task.id);
+    })
+}
+
+submitFunctionality() {
+    console.log("Form submitted")
+    this.getBPMTaskDetail(this.task.id)
 }
 
 
@@ -334,6 +339,7 @@ onClaim() {
     CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.bpmApiUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
+        this.selectedTask = ''
         this.getBPMTasks()
     }).catch((error) => {
         console.log("Error", error);
@@ -422,54 +428,6 @@ fetchData() {
     }
 }
 
-togglefilter(index: number) {
-    this.activefilter = index
-}
-
-findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][key] === value) {
-            return array[i]["id"];
-        }
-    }
-    return null;
-}
-
-addGroup() {
-    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
-        console.log("Create group", result.data);
-        this.getGroupDetails();
-        this.getBPMTaskDetail(this.task.id);
-        this.getBPMTasks();
-    })
-}
-
-getGroupDetails() {
-    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then((response) => {
-        this.groupList = response.data;
-        this.groupListItems = []
-        this.groupListNames = null
-        for (const group of response.data){
-            this.groupListItems.push(group.groupId)
-        }
-        if (this.groupListItems.length) {
-            this.groupListNames = this.groupListItems
-        }
-    })
-}
-
-deleteGroup(groupid: string) {
-    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
-        this.getGroupDetails();
-        this.getBPMTaskDetail(this.task.id);
-    })
-}
-
-submitFunctionality() {
-    console.log("Form submitted")
-    this.getBPMTaskDetail(this.task.id)
-}
-
 created() {
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
         this.filterList = response.data;
@@ -479,7 +437,33 @@ created() {
 }
 
 mounted() {
-    this.checkPropsIsPassed();
+     if(! this.bpmApiUrl|| this.bpmApiUrl===""){
+        console.error("bpmApiUrl prop not Passed")
+    }
+
+    else if(! this.token || this.token==="") {
+        console.error("token prop not Passed")
+    }
+
+    else if(! this.formIOResourceId|| this.formIOResourceId==="") {
+        console.error("formIOResourceId prop not passed")
+    }
+
+    else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
+        console.error("formIOReviewerId prop not passed")
+    }
+
+    else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
+        console.error("formIOApiUrl prop not passed")
+    }
+
+    else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+        console.error("formsflow.ai API url prop not passed")
+    }
+
+    else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
+        console.error("formsflow.ai URL prop not passed")
+    }
     localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
     localStorage.setItem("authToken", this.token);
     localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
