@@ -1,188 +1,218 @@
 <template>
-<b-container fluid class="task-outer-container">
-  <b-row class="cft-service-task-list">
-    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-    <b-col cols="5">
-        <select  v-model="selectSortBy" @change="fetchOnSorting">
-            <option selected value="created">Created</option>
-            <option value="dueDate">Due-Date</option>
-            <option value="followUpDate">Follow-up Date</option>
-            <option value="name">Task Name</option>
-            <option value="assignee">Assignee</option>
-        </select>
-        <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
-            <b-icon-chevron-up></b-icon-chevron-up>
-        </a>
-        <a v-else  @click="toggleSort" href="#" title="Descending">
-            <b-icon-chevron-down></b-icon-chevron-down>
-        </a>
-    </b-col>
-    <div class="cft-filter-dropdown">
-                     <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
-                        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-                        <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-                        @click="fetchTaskList(filter.id); togglefilter(idx)"
-                        :class="{'cft-selected': idx == activefilter}">
-                            <div class="col-12">
-                            {{filter.name}} ({{filter.itemCount}})
-                            </div>   
-                        </b-list-group-item>
-                        </b-list-group>
-                    </div>
-                <b-list-group class="cft-list-container">
-                    
-                <div class="cft-filter-container">
-                    <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
-                        {{tasks.length}}
-                </div>
-                <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
-                    v-on:click="toggle(idx)"
-                    :class="{'cft-selected': idx == activeIndex}">
-                    <div @click="setselectedTask(task.id)" class="cft-select-task">
-                        <b-row>
-                        <div class="col-12">
+  <b-container fluid class="task-outer-container">
+    <b-row class="cft-service-task-list">
+  
+        <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
+          <div class="cft-filter-sort"> 
+            <b-col cols="5">
+                <select  v-model="selectSortBy" @change="fetchOnSorting">
+                    <option selected value="created">Created</option>
+                    <option value="dueDate">Due-Date</option>
+                    <option value="followUpDate">Follow-up Date</option>
+                    <option value="name">Task Name</option>
+                    <option value="assignee">Assignee</option>
+                </select>
+                <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
+                    <b-icon-chevron-up></b-icon-chevron-up>
+                </a>
+                <a v-else  @click="toggleSort" href="#" title="Descending">
+                    <b-icon-chevron-down></b-icon-chevron-down>
+                </a>
+            </b-col>
+            <div class="cft-filter-dropdown">
+                <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
+                <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+                <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+                @click="fetchTaskList(filter.id); togglefilter(idx)"
+                :class="{'cft-selected': idx == activefilter}">
+                    <div class="col-12">
+                    {{filter.name}} ({{filter.itemCount}})
+                    </div>   
+                </b-list-group-item>
+                </b-list-group>
+            </div>
+        </div>
+          <b-list-group class="cft-list-container">
+                      
+              <div class="cft-filter-container">
+                  <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
+                      {{tasks.length}}
+              </div>
+              <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
+                  v-on:click="toggle(idx)"
+                  :class="{'cft-selected': idx == activeIndex}">
+                  <div @click="setselectedTask(task.id)" class="cft-select-task">
+                      <b-row>
+                      <div class="col-12">
                         <h5>{{ task.name }}</h5>
+                        <div class="cft-task-details-assign assigne-details ">
+                              <div >
+                                  {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
+                              </div>
+                              <div title="Task assignee" >
+                                {{task.assignee}}
+                              </div>      
                         </div>
-                        </b-row>
-                        <b-row class="cft-task-row-2">
-                            <div class="col-6 pr-0">
-                                {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
-                            </div>
-                            <div title="Task assignee" class="col-6 pr-0 text-right">
-                              {{task.assignee}}
-                            </div>
-                        </b-row>
-                        <b-row class="cft-task-row-3">
-                            <b-col lg=8 xs=8 class="pr-0" title="task.created">
-                                <div v-if="task.due">
+
+                        <div class="cft-task-details-assign font-11" >
+                              <div >
+                                  <div v-if="task.due">
                                     Due {{ timedifference(task.due) }}
                                 </div>
                                 <div v-if="task.followUp">
                                     Follow-up {{ timedifference(task.followUp) }} 
                                 </div>
-                                    Created {{ timedifference(task.created) }}
-                            </b-col>
-                            <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
-                                {{ task.priority }}
-                            </b-col>
-                        </b-row>
-                    </div>
-                  </b-list-group-item>
-                  </b-list-group>
-            </b-col>
-    <b-col cols="4" v-else> <b-row class="cft-not-selected mt-2 ml-1 row">
-                <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
-                <p>No tasks found in the list.</p>
-              </b-row></b-col>
-    <b-col  v-if="selectedTask"> <div class="service-task-details">
-        <b-row class="ml-0 task-header"> {{task.name}}</b-row>
-        <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
-        <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
-        
-        <div>
-        <b-row class="cft-actionable">
-            <b-col>
-              <DatePicker 
-              type="datetime"
-              placeholder="Set Follow-up date"
-              v-model="setFollowup"
-              @change="updateFollowUpDate"
-              >
-              </DatePicker>
-            </b-col>
-              <b-col>
-                <DatePicker 
-              type="datetime"
-              placeholder="Set Due Date"
-              v-model="setDue"
-              @change="updateDueDate"
-                >
-                </DatePicker>
-              </b-col>
-            <b-col>
-            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
-            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
-            <b-modal
-            id="AddGroupModal"
-            ref="modal"
-            title="Manage Groups"
-            ok-title="Close"
-            ok-only
-            >
-                <div class="modal-text">
-                    <b-icon icon="exclamation-circle"></b-icon>
-                    You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
-                    <b-row class="mt-3 mb-3">
-                        <b-col>
-                            <b-button variant="primary" @click="addGroup">
-                                <span>Add a group</span>
-                                <span><b-icon-plus></b-icon-plus></span>
-                            </b-button>
-                        </b-col>
-                        <b-col>
-                            <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
-                        </b-col>
-                    </b-row>
-                    <b-row>
-                        <b-col v-if="groupList.length">
-                            <ul v-for="g in groupList" :key="g.groupId">
-                                <div class="mt-1">
-                                    <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
-                                    <span>{{g.groupId}}</span>
+                                    Created {{ timedifference(task.created) }}         
                                 </div>
-                            </ul>
-                        </b-col>
-                    </b-row>
-                </div>
-            </b-modal>
-            </b-col>
-            <b-col>
-                 <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
-                   {{task.assignee}}
-                   <b-icon :icon="'person-x-fill'"></b-icon>
-                 </b-button>
-                 <b-button variant="outline-primary" v-else @click="onClaim">
-                   <b-icon :icon="'person-fill'"></b-icon>
-                   Claim
-                 </b-button>
-              </b-col>
-        </b-row>
+                                <div title="Task assignee" >
+                                 {{ task.priority }}
+                                </div>      
+                        </div>
 
-        <div>
-            <b-tabs content-class="mt-3" v-if="showfrom">
-              <b-tab title="Form">
-                <div v-if="task.assignee===userName" class="ml-4 mr-4">
-                  <formio :src="formioUrl"
-                  :submission="submissionId"
-                  :form="formId"
-                  :options="options"
-                  >
-                </formio>
-                </div>
-                <div v-else class="ml-4 mr-4">
-                    <b-overlay show="true" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
-                        <formio :src="formioUrl"
-                        :submission="submissionId"
-                        :form="formId"
-                        :options="readoption"
+                      </div>
+                      </b-row>
+                      <!-- <b-row class="cft-task-row-2">
+                          <div class="col-6 pr-0">
+                              {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
+                          </div>
+                          <div title="priority" class="col-6 pr-0 text-right">
+                              {{task.assignee}}
+                          </div>
+                      </b-row>
+                      <b-row class="cft-task-row-3">
+                          <b-col lg=8 xs=8 class="pr-0" title="task.created">
+                              <div v-if="task.due">
+                                  Due {{ timedifference(task.due) }}
+                              </div>
+                              <div v-if="task.followUp">
+                                  Follow-up {{ timedifference(task.followUp) }} 
+                              </div>
+                                  Created {{ timedifference(task.created) }}
+                          </b-col>
+                          <b-col lg=4 xs=4 sm=4 class="pr-0 text-right" title="priority">
+                              {{ task.priority }}
+                          </b-col>
+                      </b-row> -->
+                  </div>
+                  </b-list-group-item>
+              </b-list-group>
+          </b-col>
+        <b-col cols="4" v-else> 
+          <b-row class="cft-not-selected mt-2 ml-1 row">
+                    <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+                    <p>No tasks found in the list.</p>
+          </b-row>
+        </b-col>
+        <b-col  v-if="selectedTask"> <div class="service-task-details">
+            <b-row class="ml-0 task-header"> {{task.name}}</b-row>
+            <b-row class="ml-0 task-name">{{taskProcess}}</b-row>
+            <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
+            
+            <div>
+              <b-row class="cft-actionable">
+                  <b-col>
+                    <DatePicker 
+                    type="datetime"
+                    placeholder="Set Follow-up date"
+                    v-model="setFollowup"
+                    @change="updateFollowUpDate"
+                    >
+                    </DatePicker>
+                  </b-col>
+                  <b-col>
+                    <DatePicker 
+                    type="datetime"
+                    placeholder="Set Due Date"
+                    v-model="setDue"
+                    @change="updateDueDate"
+                    >
+                    </DatePicker>
+                  </b-col>
+                  <b-col>
+                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
+                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
+                    <b-modal
+                      id="AddGroupModal"
+                      ref="modal"
+                      title="Manage Groups"
+                      ok-title="Close"
+                      ok-only
+                    >
+                      <div class="modal-text">
+                          <b-icon icon="exclamation-circle"></b-icon>
+                          You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
+                          <b-row class="mt-3 mb-3">
+                              <b-col>
+                                  <b-button variant="primary" @click="addGroup">
+                                      <span>Add a group</span>
+                                      <span><b-icon-plus></b-icon-plus></span>
+                                  </b-button>
+                              </b-col>
+                              <b-col>
+                                  <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
+                              </b-col>
+                          </b-row>
+                          <b-row>
+                              <b-col v-if="groupList.length">
+                                  <ul v-for="g in groupList" :key="g.groupId">
+                                      <div class="mt-1">
+                                          <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
+                                          <span>{{g.groupId}}</span>
+                                      </div>
+                                  </ul>
+                              </b-col>
+                          </b-row>
+                      </div>
+                    </b-modal>
+                  </b-col>
+                  <b-col>
+                      <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
+                          {{task.assignee}}
+                        <b-icon :icon="'person-x-fill'"></b-icon>
+                      </b-button>
+                      <b-button variant="outline-primary" v-else @click="onClaim">
+                        <b-icon :icon="'person-fill'"></b-icon>
+                        Claim
+                      </b-button>
+                  </b-col>
+              </b-row>
+
+              <div>
+                  <b-tabs content-class="mt-3" v-if="showfrom">
+                    <b-tab title="Form">
+                        <!-- <div v-if="task.assignee===userName" class="ml-4 mr-4">
+                        <formio 
+                          :src="formioUrl"
+                          :submission="submissionId"
+                          :form="formId"
+                          :options="options"
                         >
                         </formio>
-                    </b-overlay>
+                        </div> -->
+                        <div  class="ml-4 mr-4">
+                            <b-overlay :show="task.assignee !== userName" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
+                                <formio :src="formioUrl"
+                                :submission="submissionId"
+                                :form="formId"
+                                :options="task.assignee===userName ? options :  readoption"
+                                >
+                                </formio>
+                            </b-overlay>
+                        </div>
+                    </b-tab>
+                    <b-tab title="History"></b-tab>
+                    <b-tab title="Diagram"></b-tab>
+                  </b-tabs>
                 </div>
-              </b-tab>
-              <b-tab title="History"></b-tab>
-              <b-tab title="Diagram"></b-tab>
-            </b-tabs>
-          </div>
-        </div>
-        </div>     
-   </b-col>
-     <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
-          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
-       <p>Select a task in the list.</p>
-        </b-row></b-col>
-  </b-row>
-</b-container>
+            </div>
+          </div>     
+        </b-col>
+        <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
+            <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+        <p>Select a task in the list.</p>
+            </b-row></b-col>
+    </b-row>
+  </b-container>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
@@ -218,6 +248,8 @@ export default class Tasklist extends Vue {
 @Prop() private formIOApiUrl!: string;
 @Prop() private formsflowaiApiUrl!: string;
 @Prop() private formsflowaiUrl!: string;
+@Prop() private formIOUserRoles !: string;
+@Prop() private userName !: string;
 
 private tasks: Array<object> = []
 private getProcessDefinitions: Array<object> = []
@@ -245,11 +277,11 @@ private filterList = []
 private activefilter = 0
 private applicationId = ''
 private groupList = []
-private groupListNames: any
+private groupListNames: any = null
 private groupListItems: string[] = []
-private userName = ''
+// private userName = ''
 private userEmail = 'external'
-private formIOUserRoles = ''
+// private formIOUserRoles = ''
 private selectSortBy = 'created'
 private selectSortOrder = 'desc'
 private isAsc = false
@@ -356,7 +388,7 @@ fetchTaskList(filterId: string) {
         "processVariables":[],"taskVariables":[],"caseInstanceVariables":[],
         "sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }],
         "active":true},
-        this.bpmApiUrl,).then((result) => {
+    this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
 }
@@ -450,7 +482,7 @@ getGroupDetails() {
         this.groupListItems = []
         this.groupListNames = null
         for (const group of response.data){
-                this.groupListItems.push(group.groupId)
+            this.groupListItems.push(group.groupId)
         }
         if (this.groupListItems.length) {
             this.groupListNames = this.groupListItems
@@ -485,9 +517,9 @@ mounted() {
     localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
     localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
     const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
-    this.userName = decodeToken["preferred_username"]
+    this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
     this.userEmail = decodeToken["email"] || "external"
-    this.formIOUserRoles = String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"])
+    // this.formIOUserRoles = String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"])
     localStorage.setItem("UserDetails", decodeToken);
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 

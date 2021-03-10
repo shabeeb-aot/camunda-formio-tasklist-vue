@@ -120,7 +120,7 @@
     z-index: 2;
   }
   .cft-list-container {
-    margin-top: 3rem;
+    margin-top: 5px;
   }
   .cft-filter-dropdown-content :hover {background-color: #f1f1f1}
 
@@ -128,5 +128,20 @@
   {
     display: block;
   }
+  .cft-task-details-assign{
+    display: flex;
+    justify-content: space-between;
+  }
+  .font-11{
+    font-size: 11px;
+  }
+  .assigne-details{
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 3px;
+    margin-top: 15px;
+
+  }
+
 }
 
