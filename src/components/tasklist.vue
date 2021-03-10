@@ -1,34 +1,50 @@
 <template>
-<b-container class="task-outer-container">
-  <b-row>
-    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length">
-    <div class="dropdown">
-                     <button class="dropbtn">Filters</button>
-                        <b-list-group  v-if="filterList && filterList.length" class="dropdown-content">
-                        <b-list-group-item button v-for="(filter) in filterList" :key="filter.id"
-                        @click="fetchTaskList(filter.id)">
+<b-container fluid class="task-outer-container">
+  <b-row class="cft-service-task-list">
+    <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
+    <b-col cols="5">
+        <select  v-model="selectSortBy" @change="fetchOnSorting">
+            <option selected value="created">Created</option>
+            <option value="dueDate">Due-Date</option>
+            <option value="followUpDate">Follow-up Date</option>
+            <option value="name">Task Name</option>
+            <option value="assignee">Assignee</option>
+        </select>
+        <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
+            <b-icon-chevron-up></b-icon-chevron-up>
+        </a>
+        <a v-else  @click="toggleSort" href="#" title="Descending">
+            <b-icon-chevron-down></b-icon-chevron-down>
+        </a>
+    </b-col>
+    <div class="cft-filter-dropdown">
+                     <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
+                        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+                        <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+                        @click="fetchTaskList(filter.id); togglefilter(idx)"
+                        :class="{'cft-selected': idx == activefilter}">
                             <div class="col-12">
                             {{filter.name}} ({{filter.itemCount}})
                             </div>   
                         </b-list-group-item>
                         </b-list-group>
                     </div>
-                <b-list-group class="list-container">
+                <b-list-group class="cft-list-container">
                     
-                <div class="filter-container">
-                    <input type="text" class="filter" placeholder="Filter Tasks"/>
+                <div class="cft-filter-container">
+                    <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
                         {{tasks.length}}
                 </div>
                 <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
                     v-on:click="toggle(idx)"
-                    :class="{'selected': idx == activeIndex}">
-                    <div @click="setselectedTask(task.id)" class="select-task">
+                    :class="{'cft-selected': idx == activeIndex}">
+                    <div @click="setselectedTask(task.id)" class="cft-select-task">
                         <b-row>
                         <div class="col-12">
                         <h5>{{ task.name }}</h5>
                         </div>
                         </b-row>
-                        <b-row class="task-row-2">
+                        <b-row class="cft-task-row-2">
                             <div class="col-6 pr-0">
                                 {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}         
                             </div>
@@ -36,7 +52,7 @@
                               {{task.assignee}}
                             </div>
                         </b-row>
-                        <b-row class="task-row-3">
+                        <b-row class="cft-task-row-3">
                             <b-col lg=8 xs=8 class="pr-0" title="task.created">
                                 <div v-if="task.due">
                                     Due {{ timedifference(task.due) }}
@@ -54,7 +70,7 @@
                   </b-list-group-item>
                   </b-list-group>
             </b-col>
-    <b-col cols="4" v-else> <b-row class="not-selected mt-2 ml-1 row">
+    <b-col cols="4" v-else> <b-row class="cft-not-selected mt-2 ml-1 row">
                 <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
                 <p>No tasks found in the list.</p>
               </b-row></b-col>
@@ -64,7 +80,7 @@
         <b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
         
         <div>
-        <b-row class="actionable">
+        <b-row class="cft-actionable">
             <b-col>
               <DatePicker 
               type="datetime"
@@ -84,31 +100,38 @@
                 </DatePicker>
               </b-col>
             <b-col>
-            <b-button variant="outline-primary" v-b-modal.AddGroupModal><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add groups </b-button>
-            
-             <b-modal
+            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
+            <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
+            <b-modal
             id="AddGroupModal"
             ref="modal"
             title="Manage Groups"
+            ok-title="Close"
+            ok-only
             >
                 <div class="modal-text">
                     <b-icon icon="exclamation-circle"></b-icon>
                     You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
                     <b-row class="mt-3 mb-3">
                         <b-col>
-                            <b-button @click="addGroup">
-                            <label class="add">Add a group</label>
+                            <b-button variant="primary" @click="addGroup">
+                                <span>Add a group</span>
+                                <span><b-icon-plus></b-icon-plus></span>
                             </b-button>
                         </b-col>
                         <b-col>
-                        <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
+                            <input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
                         </b-col>
+                    </b-row>
+                    <b-row>
+                        <b-col v-if="groupList.length">
                             <ul v-for="g in groupList" :key="g.groupId">
-                                <p v-if="g.type==='candidate'">
-                                    <b-button @click="deleteGroup(g.groupId)">X</b-button>
-                                    {{g.groupId}}
-                                </p>
+                                <div class="mt-1">
+                                    <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
+                                    <span>{{g.groupId}}</span>
+                                </div>
                             </ul>
+                        </b-col>
                     </b-row>
                 </div>
             </b-modal>
@@ -128,7 +151,7 @@
         <div>
             <b-tabs content-class="mt-3" v-if="showfrom">
               <b-tab title="Form">
-                <div v-if="task.assignee" class="ml-4 mr-4">
+                <div v-if="task.assignee===userName" class="ml-4 mr-4">
                   <formio :src="formioUrl"
                   :submission="submissionId"
                   :form="formId"
@@ -137,7 +160,7 @@
                 </formio>
                 </div>
                 <div v-else class="ml-4 mr-4">
-                    <b-overlay :show="true" spinner-type="none">
+                    <b-overlay show="true" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
                         <formio :src="formioUrl"
                         :submission="submissionId"
                         :form="formId"
@@ -154,7 +177,7 @@
         </div>
         </div>     
    </b-col>
-     <b-col v-else><b-row class="not-selected mt-2 ml-1 row">
+     <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
           <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
        <p>Select a task in the list.</p>
         </b-row></b-col>
@@ -169,12 +192,16 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'formiojs/dist/formio.full.min.css'
 import '../camundaFormIOTasklist.scss'
 import 'vue2-datepicker/index.css';
+
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 
 @Component({
     components: {
@@ -183,15 +210,14 @@ import 'vue2-datepicker/index.css';
     }
 })
 export default class Tasklist extends Vue {
-@Prop() private CamundaUrl !: string;
+@Prop() private bpmApiUrl !: string;
 @Prop() private token !: string;
-@Prop() private userName !: string;
-@Prop({default:'external'}) private userEmail !: string;
-@Prop() private formIOUserRoles !: string;
 @Prop() private formIOResourceId !: string;
 @Prop() private formIOReviewerId !: string;
 @Prop() private formIOReviewer !: string;
-@Prop() private formIOProjectUrl!: string;
+@Prop() private formIOApiUrl!: string;
+@Prop() private formsflowaiApiUrl!: string;
+@Prop() private formsflowaiUrl!: string;
 
 private tasks: Array<object> = []
 private getProcessDefinitions: Array<object> = []
@@ -219,35 +245,43 @@ private filterList = []
 private activefilter = 0
 private applicationId = ''
 private groupList = []
+private groupListNames: any
+private groupListItems: string[] = []
+private userName = ''
+private userEmail = 'external'
+private formIOUserRoles = ''
+private selectSortBy = 'created'
+private selectSortOrder = 'desc'
+private isAsc = false
+private filterId = ''
 
 checkPropsIsPassed() {
-    if(! this.CamundaUrl|| this.CamundaUrl===""){
-        console.error("CamundaUrl prop not Passed")
+    if(! this.bpmApiUrl|| this.bpmApiUrl===""){
+        console.error("bpmApiUrl prop not Passed")
     }
 
     else if(! this.token || this.token==="") {
         console.error("token prop not Passed")
     }
 
-    else if(! this.userName|| this.userName==="") {
-        console.error("userName prop not passed")
-    }
-
-    else if(! this.formIOUserRoles|| this.formIOUserRoles==="") {
-        console.error("formioUserRoles prop not passed")
-    }
-
     else if(! this.formIOResourceId|| this.formIOResourceId==="") {
         console.error("formIOResourceId prop not passed")
     }
+
     else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
         console.error("formIOReviewerId prop not passed")
     }
-    else if(! this.formIOReviewer|| this.formIOReviewer==="") {
-        console.error("formIOReviewer prop not passed")
+
+    else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
+        console.error("formIOApiUrl prop not passed")
     }
-    else if(! this.formIOProjectUrl|| this.formIOProjectUrl==="") {
-        console.error("formIOProjectUrl prop not passed")
+
+    else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+        console.error("formsflow.ai API url prop not passed")
+    }
+
+    else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
+        console.error("formsflow.ai URL prop not passed")
     }
 }
 
@@ -276,14 +310,14 @@ toggle(index: number) {
 
 
 getBPMTaskDetail(taskId: string) {
-    CamundaRest.getTaskById(this.token, taskId, this.CamundaUrl).then((result) => {
+    CamundaRest.getTaskById(this.token, taskId, this.bpmApiUrl).then((result) => {
         this.task = result.data;
     })
 
     this.showfrom = false
-    CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+    CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.bpmApiUrl).then((result)=> {
         this.formioUrl = result.data["formUrl"].value;
-        const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+        const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOApiUrl);
         this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
 
         this.showfrom = true
@@ -291,13 +325,13 @@ getBPMTaskDetail(taskId: string) {
 }
 
 getBPMTasks(){
-    CamundaRest.getTasks(this.token, this.CamundaUrl).then((result)=> {
+    CamundaRest.getTasks(this.token, this.bpmApiUrl).then((result)=> {
         this.tasks = result.data;
     })
 }
 
 onClaim() {
-    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.CamundaUrl).then(()=> 
+    CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.bpmApiUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
@@ -307,7 +341,7 @@ onClaim() {
 }
 
 onUnClaim(){ 
-    CamundaRest.unclaim(this.token ,this.task.id, this.CamundaUrl).then(()=> 
+    CamundaRest.unclaim(this.token ,this.task.id, this.bpmApiUrl).then(()=> 
     {
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
@@ -317,10 +351,29 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string) {
-
-    CamundaRest.filterTaskList(this.token, filterId, {"sorting":[{"sortBy": "created","sortOrder": "desc" }]}, this.CamundaUrl,).then((result) => {
+    this.filterId = filterId
+    CamundaRest.filterTaskList(this.token, filterId, {
+        "processVariables":[],"taskVariables":[],"caseInstanceVariables":[],
+        "sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }],
+        "active":true},
+        this.bpmApiUrl,).then((result) => {
         this.tasks = result.data;      
     }); 
+}
+
+toggleSort() {
+    this.isAsc = !this.isAsc;
+    if (this.isAsc){
+        this.selectSortOrder = 'asc'
+    }
+    else {
+        this.selectSortOrder = 'desc'
+    }
+    this.fetchOnSorting()
+}
+
+fetchOnSorting() {
+    this.fetchTaskList(this.filterId);
 }
 
 updateFollowUpDate() {
@@ -328,10 +381,8 @@ updateFollowUpDate() {
     const timearr = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
     referenceobject["followUp"] = moment(this.setFollowup).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone) 
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, referenceobject).then(()=> {
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.bpmApiUrl, referenceobject).then(()=> {
         console.log("Updated follow up date")
-        this.getBPMTaskDetail(this.task.id)
-        this.getBPMTasks()
     }).catch((error) =>{
         console.log("Error", error)
     })
@@ -342,7 +393,7 @@ updateDueDate() {
     const timearr = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split('+')
     const replaceTimezone = timearr[1].replace(':', '')
     referenceobject["due"] = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)
-    CamundaRest.updateTasksByID(this.token, this.task.id, this.CamundaUrl, referenceobject).then(()=> {
+    CamundaRest.updateTasksByID(this.token, this.task.id, this.bpmApiUrl, referenceobject).then(()=> {
         console.log("Update due date")
         this.getBPMTaskDetail(this.task.id)
         this.getBPMTasks()
@@ -354,17 +405,17 @@ updateDueDate() {
 fetchData() {
     if (this.selectedTask) {       
         this.task = this.getTaskFromList(this.tasks, this.selectedTask);
-        CamundaRest.getTaskById(this.token, this.selectedTask, this.CamundaUrl).then((result) => {
-            CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.CamundaUrl).then((res) => {
+        this.getGroupDetails()
+        CamundaRest.getTaskById(this.token, this.selectedTask, this.bpmApiUrl).then((result) => {
+            CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.bpmApiUrl).then((res) => {
                 this.taskProcess = res.data.name;
             });
         })
         this.showfrom = false
-        this.getGroupDetails();
-        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.CamundaUrl).then((result)=> {
+        CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.bpmApiUrl).then((result)=> {
             this.applicationId = result.data["applicationId"].value;
             this.formioUrl = result.data["formUrl"].value;           
-            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOProjectUrl);
+            const {formioUrl, formId, submissionId} = getFormDetails(this.formioUrl, this.formIOApiUrl);
             this.formioUrl = formioUrl; this.submissionId = submissionId; this.formId = formId
             this.showfrom = true
         });
@@ -385,7 +436,7 @@ findFilterKeyOfAllTask(array: string|any[], key: string|number, value: any) {
 }
 
 addGroup() {
-    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.CamundaUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
         console.log("Create group", result.data);
         this.getGroupDetails();
         this.getBPMTaskDetail(this.task.id);
@@ -394,20 +445,33 @@ addGroup() {
 }
 
 getGroupDetails() {
-    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.CamundaUrl).then((response) => {
+    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then((response) => {
         this.groupList = response.data;
+        this.groupListItems = []
+        this.groupListNames = null
+        for (const group of response.data){
+                this.groupListItems.push(group.groupId)
+        }
+        if (this.groupListItems.length) {
+            this.groupListNames = this.groupListItems
+        }
     })
 }
 
 deleteGroup(groupid: string) {
-    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.CamundaUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
+    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
         this.getGroupDetails();
         this.getBPMTaskDetail(this.task.id);
     })
 }
 
+submitFunctionality() {
+    console.log("Form submitted")
+    this.getBPMTaskDetail(this.task.id)
+}
+
 created() {
-    CamundaRest.filterList(this.token, this.CamundaUrl).then((response) => {
+    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
         this.filterList = response.data;
         const key = this.findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
         this.fetchTaskList(key)
@@ -416,11 +480,19 @@ created() {
 
 mounted() {
     this.checkPropsIsPassed();
+    localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
+    localStorage.setItem("authToken", this.token);
+    localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
+    localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+    const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
+    this.userName = decodeToken["preferred_username"]
+    this.userEmail = decodeToken["email"] || "external"
+    this.formIOUserRoles = String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"])
+    localStorage.setItem("UserDetails", decodeToken);
     authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
     this.fetchData();
-    
-    CamundaRest.getProcessDefinitions(this.token, this.CamundaUrl).then((response) => {
+    CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
         this.getProcessDefinitions = response.data;
     });
 }

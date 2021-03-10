@@ -27,7 +27,7 @@ const CamundaRest = {
     },
 
     getTaskGroupByID(bearerToken: string, taskId: string, CamundaUrl: string) {
-        return bpmAxios(bearerToken, CamundaUrl).get(`/task/${taskId}/identity-links`);
+        return bpmAxios(bearerToken, CamundaUrl).get(`/task/${taskId}/identity-links?type=candidate`);
     },
 
     createTaskGroupByID(bearerToken: string, taskId: string, CamundaUrl: string, values: any) {
