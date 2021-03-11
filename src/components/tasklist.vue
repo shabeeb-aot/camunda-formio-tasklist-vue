@@ -2,14 +2,13 @@
   <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-      <!-- <TaskListSorting isAsc="true" filterList=filterList
-      bpmApiUrl="https://bpm2.aot-technologies.com/camunda/engine-rest"/> -->
+      <TaskListSorting isAsc="true" :filterList="filterList"/>
     <b-list-group class="cft-list-container">
       <div class="cft-filter-dropdown">
       <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
       <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
         <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-        @click="fetchTaskList(filter.id); togglefilter(idx)"
+        @click="fetchTaskList(filter.id, sortBy, sortOrder); togglefilter(idx)"
         :class="{'cft-selected': idx == activefilter}">
         <div class="col-12">
           {{filter.name}} ({{filter.itemCount}})
@@ -152,7 +151,8 @@
                 :submission="submissionId"
                 :form="formId"
                 :options="task.assignee===userName ? options :  readoption"
-                v-on:submit="submitFunctionality"
+                v-on:submit="onFormSubmitCallback"
+                v-on:customEvent="oncustomEventCallback"
                 >
                 </formio>
               </b-overlay>
@@ -223,7 +223,7 @@ private task: any
 private setFollowup = null
 private setDue = null
 private setGroup = null
-private selectedTask = '' 
+private selectedTask = ''
 private showfrom = false
 private readoption = {readOnly: true,}
 private options =  {
@@ -246,7 +246,7 @@ private userEmail = 'external'
 private selectSortBy = 'created'
 private selectSortOrder = 'desc'
 private isAsc = false
-private filterId = ''
+private selectedfilterId = ''
 
 timedifference(date: Date)  {
   return moment(date).fromNow();
@@ -275,8 +275,7 @@ addGroup() {
   CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
     console.log("Create group", result.data);
     this.getGroupDetails();
-    this.getBPMTaskDetail(this.task.id);
-    this.getBPMTasks();
+    this.reloadCurrentTask()
   })
 }
 
@@ -297,13 +296,35 @@ getGroupDetails() {
 deleteGroup(groupid: string) {
   CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
     this.getGroupDetails();
-    this.getBPMTaskDetail(this.task.id);
+    // this.getBPMTaskDetail(this.task.id);
+    this.reloadCurrentTask()
   })
 }
 
-submitFunctionality() {
-  console.log("Form submitted")
-  this.getBPMTaskDetail(this.task.id)
+onFormSubmitCallback() {
+  if(this.task.id){
+    console.log("Form submitted")
+    this.onBPMTaskFormSubmit(this.task.id)
+  }
+}
+
+onBPMTaskFormSubmit(taskId: string){
+  const formRequestFormat={
+    variables: {
+      formUrl: {
+        value: this.formioUrl
+      },
+      applicationId: {
+        value: this.applicationId
+      }
+    }
+  };
+  CamundaRest.formTaskSubmit(this.token, taskId, formRequestFormat, this.bpmApiUrl).then(() => {
+    this.reloadCurrentTask()
+  })
+  .catch((error) => {
+        console.log("Error", error);
+  })
 }
 
 
@@ -322,18 +343,33 @@ getBPMTaskDetail(taskId: string) {
   });
 }
 
-getBPMTasks(){
-  CamundaRest.getTasks(this.token, this.bpmApiUrl).then((result)=> {
-    this.tasks = result.data;
-  })
+oncustomEventCallback = (customEvent: any) => {
+  switch(customEvent.type){
+    case "reloadTasks":
+      this.reloadTasks();
+      break;
+    case "reloadCurrentTask":
+      this.reloadCurrentTask();
+      break;
+  }
+}
+
+reloadTasks() {
+  //used to unSelect the task and refresh taskList
+  this.selectedTask = ''
+  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
+}
+
+reloadCurrentTask() {
+  //used to refresh selected task and taskList
+  this.getBPMTaskDetail(this.task.id)
+  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
 }
 
 onClaim() {
   CamundaRest.claim(this.token,this.task.id, {userId: this.userName}, this.bpmApiUrl).then(()=> 
   {
-    this.getBPMTaskDetail(this.task.id)
-    this.selectedTask = ''
-    this.getBPMTasks()
+    this.reloadCurrentTask()
   }).catch((error) => {
     console.log("Error", error);
   })
@@ -342,18 +378,17 @@ onClaim() {
 onUnClaim(){ 
   CamundaRest.unclaim(this.token ,this.task.id, this.bpmApiUrl).then(()=> 
   {
-    this.getBPMTaskDetail(this.task.id)
-    this.getBPMTasks()
+    this.reloadCurrentTask()
   }).catch((error) =>{
     console.log("Error", error)
   })
 }
 
-fetchTaskList(filterId: string) {
-  this.filterId = filterId
+fetchTaskList(filterId: string, sortBy: string, sortOrder: string) {
+  this.selectedfilterId = filterId
   CamundaRest.filterTaskList(this.token, filterId, {
     "processVariables":[],"taskVariables":[],"caseInstanceVariables":[],
-    "sorting":[{"sortBy": this.selectSortBy,"sortOrder": this.selectSortOrder }],
+    "sorting":[{"sortBy": sortBy,"sortOrder": sortOrder }],
     "active":true},
   this.bpmApiUrl,).then((result) => {
     this.tasks = result.data;    
@@ -372,7 +407,7 @@ toggleSort() {
 }
 
 fetchOnSorting() {
-  this.fetchTaskList(this.filterId);
+  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
 }
 
 updateFollowUpDate() {
@@ -394,8 +429,7 @@ updateDueDate() {
   referenceobject["due"] = moment(this.setDue).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").replace(timearr[1], replaceTimezone)
   CamundaRest.updateTasksByID(this.token, this.task.id, this.bpmApiUrl, referenceobject).then(()=> {
     console.log("Update due date")
-    this.getBPMTaskDetail(this.task.id)
-    this.getBPMTasks()
+    this.reloadCurrentTask()
   }).catch((error) =>{
     console.log("Error", error)
   })
@@ -425,13 +459,13 @@ created() {
   CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
     this.filterList = response.data;
     const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
-    this.fetchTaskList(key)
+    this.fetchTaskList(key, this.selectSortBy, this.selectSortOrder)
   });
 }
 
 mounted() {
-   if(! this.bpmApiUrl|| this.bpmApiUrl===""){
-     console.error("bpmApiUrl prop not Passed")
+  if(! this.bpmApiUrl|| this.bpmApiUrl===""){
+    console.error("bpmApiUrl prop not Passed")
   }
 
   else if(! this.token || this.token==="") {
