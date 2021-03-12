@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts">
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import CamundaRest from '../services/camunda-rest'
 import { Component, Vue } from 'vue-property-decorator'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -37,8 +37,8 @@ export default class FormList extends Vue{
   private formList: Array<object> = []
   private actualFormNames = []
   private fields = [
-      "formName",
-      "Operations"
+    "formName",
+    "Operations"
   ]
   private perPage = 10
   private currentPage = 1
@@ -48,10 +48,10 @@ export default class FormList extends Vue{
   }
 
   created() {
-      CamundaRest.listForms(localStorage.getItem('authToken'), localStorage.getItem('bpmApiUrl')).then((response) =>
-      {
-          this.formList = response.data;
-      });
+    CamundaRest.listForms(localStorage.getItem('authToken'), localStorage.getItem('bpmApiUrl')).then((response) =>
+    {
+      this.formList = response.data;
+    });
   }
 }
 </script>

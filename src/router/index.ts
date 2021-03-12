@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Tasklist from '@/views/tasklist.vue';
 import FormList from '@/components/formlist.vue';
+import Tasklist from '@/views/tasklist.vue';
 
 Vue.use(VueRouter)
 
