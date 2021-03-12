@@ -2,8 +2,24 @@
   <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-      <TaskListSorting isAsc="true" :filterList="filterList"/>
+      <!-- <TaskListSorting selectSortBy="created" selectSortOrder="desc" isAsc="true" :filterList="filterList" @fetch-on-sorting="fetchOnSorting" @toggle-sorting="toggleSort"/> -->
     <b-list-group class="cft-list-container">
+    <div class="cft-filter-sort"> 
+      <b-col cols="5">
+        <select class="form-select" aria-label="Select sorting options" v-model="selectSortBy" @change="fetchOnSorting">
+          <option selected value="created">Created</option>
+          <option value="dueDate">Due-Date</option>
+          <option value="followUpDate">Follow-up Date</option>
+          <option value="name">Task Name</option>
+          <option value="assignee">Assignee</option>
+        </select>
+        <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
+          <b-icon-chevron-up></b-icon-chevron-up>
+        </a>
+        <a v-else  @click="toggleSort" href="#" title="Descending">
+          <b-icon-chevron-down></b-icon-chevron-down>
+        </a>
+      </b-col>
       <div class="cft-filter-dropdown">
       <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
       <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
@@ -21,7 +37,8 @@
             No Filters found
         </b-list-group-item>
       </b-list-group>
-      </div>    
+      </div>
+    </div>    
         <div class="cft-filter-container">
           <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasks.length}}
@@ -146,7 +163,7 @@
           <b-tabs content-class="mt-3" v-if="showfrom">
           <b-tab title="Form">
             <div  class="ml-4 mr-4">
-              <b-overlay :show="task.assignee !== userName" variant="dark" opacity="0.90" blur="5px" spinner-type="none">
+              <b-overlay :show="task.assignee !== userName" variant="light" opacity="0.75" spinner-type="none" aria-busy="true">
                 <formio :src="formioUrl"
                 :submission="submissionId"
                 :form="formId"

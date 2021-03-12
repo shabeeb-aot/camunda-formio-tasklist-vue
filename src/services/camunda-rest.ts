@@ -66,7 +66,7 @@ const CamundaRest = {
     return bpmAxios(bearerToken, CamundaUrl).post(`/filter/${filterId}/list`, values)
   },
 
-  formTaskSubmit(bearerToken: string, taskId: string, values:object, CamundaUrl: string) {
+  formTaskSubmit(bearerToken: string, taskId: string, values: object, CamundaUrl: string) {
     return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/submit-form`, values)
   }
 }
