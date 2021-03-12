@@ -1,9 +1,23 @@
 <template>
   <b-container fluid>
-    <h5> Form</h5>
-    <b-table :items="formList" :fields="fields" no-provider-paging="true">
-    </b-table>
-    </b-container>
+    <h3 class="cftf-taskhead">Form</h3>
+    <div class="overflow-auto">
+
+      <b-table :items="formList" :fields="fields"
+       head-variant="light" :bordered=true :outlined=true
+       :current-page="currentPage" :per-page="perPage">
+      </b-table>
+
+      <b-pagination
+        v-model="currentPage"
+        :total-rows="totalrows"
+        :per-page="perPage"
+        aria-controls="form-table"
+        ></b-pagination>
+
+      <p> Current page is: {{currentPage}}</p>
+    </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -13,6 +27,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '../camundaFormIOTasklist.scss'
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -25,6 +40,12 @@ export default class FormList extends Vue{
       "formName",
       "Operations"
   ]
+  private perPage = 10
+  private currentPage = 1
+
+  get totalrows() {
+    return this.formList.length;
+  }
 
   created() {
       CamundaRest.listForms(localStorage.getItem('authToken'), localStorage.getItem('bpmApiUrl')).then((response) =>
