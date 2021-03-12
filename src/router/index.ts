@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Tasklist from '@/views/tasklist.vue';
+import FormList from '@/components/formlist.vue';
 
 Vue.use(VueRouter)
 
@@ -11,9 +12,9 @@ const routes: Array<RouteConfig> = [
     component: Tasklist
   },
   {
-    path: '/:taskId',
-    name: 'Tasklist for specific Task',
-    component: Tasklist
+    path: '/form',
+    name: 'Formio forms list',
+    component: FormList
   }
 ]
 
