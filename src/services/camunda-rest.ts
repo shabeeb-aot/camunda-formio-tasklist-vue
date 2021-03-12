@@ -3,71 +3,75 @@ import {bpmAxios} from '../axios';
 const CamundaRest = {   
 
   getProcessDefinitions(bearerToken: string, CamundaUrl: string ) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/process-definition`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/process-definition`);
   },
 
   getProcessDefinitionById: (bearerToken: string, processDefinitionId: string, CamundaUrl: string) => {
-    return bpmAxios(bearerToken, CamundaUrl).get(`process-definition/${processDefinitionId}`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/process-definition/${processDefinitionId}`);
   },   
   
   startProcess(bearerToken: string, processDefinitionKey: string, values: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/process-definition/key/${processDefinitionKey}/start`, values);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/process-definition/key/${processDefinitionKey}/start`, values);
   },
     
   getTaskById(bearerToken: string, taskId: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/task/${taskId}`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/task/${taskId}`);
   },
 
   updateTasksByID(bearerToken: string, taskId: string, CamundaUrl: string, values: any) {
-    return bpmAxios(bearerToken, CamundaUrl).put(`/task/${taskId}`, values);
+    return bpmAxios(bearerToken, CamundaUrl).put(`/engine-rest/task/${taskId}`, values);
   },
 
   getTaskGroupByID(bearerToken: string, taskId: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/task/${taskId}/identity-links?type=candidate`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/task/${taskId}/identity-links?type=candidate`);
   },
 
   createTaskGroupByID(bearerToken: string, taskId: string, CamundaUrl: string, values: any) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/identity-links`, values);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/identity-links`, values);
   },
 
   deleteTaskGroupByID(bearerToken: string, taskId: string, CamundaUrl: string, values: any) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/identity-links/delete`, values);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/identity-links/delete`, values);
   },
     
   complete(bearerToken: string, taskId: string, values: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/complete`, values);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/complete`, values);
   },  
   
   claim(bearerToken: string, taskId: string, values: any, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/claim`, values);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/claim`, values);
   },
     
   unclaim(bearerToken: string, taskId: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/unclaim`);
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/unclaim`);
   },
     
   getVariablesByTaskId(bearerToken: string, taskId: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/task/${taskId}/variables`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/task/${taskId}/variables`);
   },
 
   getVariablesByProcessId(bearerToken: string, processInstanceId: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/process-instance/${processInstanceId}/variables`);
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/process-instance/${processInstanceId}/variables`);
   },
 
   getUsers(bearerToken: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get(`/user`)
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest/user`)
   },
   
   filterList(bearerToken: string, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).get('/filter?resourceType=Task&itemCount=true')
+    return bpmAxios(bearerToken, CamundaUrl).get('/engine-rest/filter?resourceType=Task&itemCount=true')
   },
 
   filterTaskList(bearerToken: string, filterId: string, values: any, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/filter/${filterId}/list`, values)
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/filter/${filterId}/list`, values)
   },
 
   formTaskSubmit(bearerToken: string, taskId: string, values: object, CamundaUrl: string) {
-    return bpmAxios(bearerToken, CamundaUrl).post(`/task/${taskId}/submit-form`, values)
+    return bpmAxios(bearerToken, CamundaUrl).post(`/engine-rest/task/${taskId}/submit-form`, values)
+  },
+
+  listForms(bearerToken: string, CamundaUrl: string) {
+    return bpmAxios(bearerToken, CamundaUrl).get(`/engine-rest-ext/form`)
   }
 }
 
