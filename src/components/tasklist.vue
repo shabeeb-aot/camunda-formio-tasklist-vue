@@ -222,7 +222,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+// import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -230,8 +230,8 @@ import 'formiojs/dist/formio.full.min.css'
 import '../camundaFormIOTasklist.scss'
 import 'vue2-datepicker/index.css';
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
+// Vue.use(BootstrapVue)
+// Vue.use(IconsPlugin)
 
 @Component({
     components: {
