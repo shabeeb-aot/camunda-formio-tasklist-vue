@@ -5,26 +5,25 @@
       <!-- <TaskListSorting selectSortBy="created" selectSortOrder="desc" isAsc="true" :filterList="filterList" @fetch-on-sorting="fetchOnSorting" @toggle-sorting="toggleSort"/> -->
     <b-list-group class="cft-list-container">
     <div class="cft-filter-sort"> 
-      <b-col cols="5">
-        <select class="form-select" aria-label="Select sorting options" v-model="selectSortBy" @change="fetchOnSorting">
-          <option selected value="created">Created</option>
-          <option value="dueDate">Due-Date</option>
-          <option value="followUpDate">Follow-up Date</option>
-          <option value="name">Task Name</option>
-          <option value="assignee">Assignee</option>
+      <header>
+        <div class="d-flex flex-wrap" v-for="(sort, idx) in sortList" :key="sort.label">
+        <select class="form-select" aria-label="Select Sorting Options" @change="updateSort($event, idx)">
+          <option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
         </select>
-        <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
-          <b-icon-chevron-up></b-icon-chevron-up>
-        </a>
-        <a v-else  @click="toggleSort" href="#" title="Descending">
-          <b-icon-chevron-down></b-icon-chevron-down>
-        </a>
-      </b-col>
+        <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
+                    <b-icon-chevron-up></b-icon-chevron-up>
+                </a>
+                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
+                    <b-icon-chevron-down></b-icon-chevron-down>
+                </a>
+        </div>
+        <b-icon-plus></b-icon-plus>
+      </header>
       <div class="cft-filter-dropdown">
       <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
       <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
         <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-        @click="fetchTaskList(filter.id, sortBy, sortOrder); togglefilter(idx)"
+        @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
         :class="{'cft-selected': idx == activefilter}">
         <div class="col-12">
           {{filter.name}} ({{filter.itemCount}})
@@ -198,7 +197,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {getTaskFromList, findFilterKeyOfAllTask} from "../services/utils";
+import {getTaskFromList, findFilterKeyOfAllTask, TASK_FILTER_LIST_DEFAULT_PARAM, sortingList} from "../services/utils";
 import TaskListSorting from '../components/tasklist-sorting.vue'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -257,13 +256,57 @@ private applicationId = ''
 private groupList = []
 private groupListNames: any = null
 private groupListItems: string[] = []
-// private userName = ''
 private userEmail = 'external'
-// private formIOUserRoles = ''
-private selectSortBy = 'created'
-private selectSortOrder = 'desc'
-private isAsc = false
 private selectedfilterId = ''
+private sortList = TASK_FILTER_LIST_DEFAULT_PARAM
+private updatesortList: any = TASK_FILTER_LIST_DEFAULT_PARAM;
+private sortOptions: any = []
+private updateSortOptions: any = []
+private setSortOptions: any = []
+private payload = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
+  "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
+}
+
+checkPropsIsPassedAndSetValue() {
+  if(! this.bpmApiUrl|| this.bpmApiUrl===""){
+    console.error("bpmApiUrl prop not Passed")
+  }
+
+  else if(! this.token || this.token==="") {
+    console.error("token prop not Passed")
+  }
+
+  else if(! this.formIOResourceId|| this.formIOResourceId==="") {
+    console.error("formIOResourceId prop not passed")
+  }
+
+  else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
+    console.error("formIOReviewerId prop not passed")
+  }
+
+  else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
+    console.error("formIOApiUrl prop not passed")
+  }
+
+  else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+    console.error("formsflow.ai API url prop not passed")
+  }
+
+  else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
+    console.error("formsflow.ai URL prop not passed")
+  }
+
+  localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
+  localStorage.setItem("authToken", this.token);
+  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
+  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+
+  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
+  this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
+  this.userEmail = decodeToken["email"] || "external"
+  this.formIOUserRoles = !this.formIOUserRoles ? String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"]) : this.formIOUserRoles
+  localStorage.setItem("UserDetails", decodeToken);
+}
 
 timedifference(date: Date)  {
   return moment(date).fromNow();
@@ -338,9 +381,8 @@ onBPMTaskFormSubmit(taskId: string){
   };
   CamundaRest.formTaskSubmit(this.token, taskId, formRequestFormat, this.bpmApiUrl).then(() => {
     this.reloadCurrentTask()
-  })
-  .catch((error) => {
-        console.log("Error", error);
+  }).catch((error) => {
+    console.log("Error", error);
   })
 }
 
@@ -362,25 +404,25 @@ getBPMTaskDetail(taskId: string) {
 
 oncustomEventCallback = (customEvent: any) => {
   switch(customEvent.type){
-    case "reloadTasks":
-      this.reloadTasks();
-      break;
-    case "reloadCurrentTask":
-      this.reloadCurrentTask();
-      break;
+  case "reloadTasks":
+    this.reloadTasks();
+    break;
+  case "reloadCurrentTask":
+    this.reloadCurrentTask();
+    break;
   }
 }
 
 reloadTasks() {
   //used to unSelect the task and refresh taskList
   this.selectedTask = ''
-  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
+  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 reloadCurrentTask() {
   //used to refresh selected task and taskList
   this.getBPMTaskDetail(this.task.id)
-  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
+  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 onClaim() {
@@ -401,30 +443,40 @@ onUnClaim(){
   })
 }
 
-fetchTaskList(filterId: string, sortBy: string, sortOrder: string) {
+fetchTaskList(filterId: string, requestData: object) {
   this.selectedfilterId = filterId
-  CamundaRest.filterTaskList(this.token, filterId, {
-    "processVariables":[],"taskVariables":[],"caseInstanceVariables":[],
-    "sorting":[{"sortBy": sortBy,"sortOrder": sortOrder }],
-    "active":true},
-  this.bpmApiUrl,).then((result) => {
+  CamundaRest.filterTaskList(this.token, filterId, requestData,
+    this.bpmApiUrl,).then((result) => {
     this.tasks = result.data;    
   }); 
 }
 
-toggleSort() {
-  this.isAsc = !this.isAsc;
-  if (this.isAsc){
-    this.selectSortOrder = 'asc'
-  }
-  else {
-    this.selectSortOrder = 'desc'
-  }
-  this.fetchOnSorting()
+getOptions(options: any){
+  const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
+  sortingList.forEach(sortOption=>{
+    if(!options.some((option: { sortBy: string })=>option.sortBy===sortOption.sortBy)){
+      optionsArray.push({...sortOption})
+    }
+  });
+  return optionsArray;
 }
 
-fetchOnSorting() {
-  this.fetchTaskList(this.selectedfilterId, this.selectSortBy, this.selectSortOrder);
+updateSort(event: any, index: number) {
+  this.sortList[index].sortBy = event?.target.value;
+  this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text
+  this.payload["sorting"] = this.sortList
+  this.fetchTaskList(this.selectedfilterId, this.payload)
+}
+
+toggleSort(index: number) {
+  if(this.sortList[index].sortOrder === "asc")
+    this.sortList[index].sortOrder = "desc"
+  
+  else{
+    this.sortList[index].sortOrder = "asc"
+  }
+  this.payload["sorting"] = this.sortList
+  this.fetchTaskList(this.selectedfilterId, this.payload)
 }
 
 updateFollowUpDate() {
@@ -476,50 +528,16 @@ created() {
   CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
     this.filterList = response.data;
     const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
-    this.fetchTaskList(key, this.selectSortBy, this.selectSortOrder)
+    this.fetchTaskList(key, this.payload)
   });
 }
 
 mounted() {
-  if(! this.bpmApiUrl|| this.bpmApiUrl===""){
-    console.error("bpmApiUrl prop not Passed")
-  }
-
-  else if(! this.token || this.token==="") {
-    console.error("token prop not Passed")
-  }
-
-  else if(! this.formIOResourceId|| this.formIOResourceId==="") {
-    console.error("formIOResourceId prop not passed")
-  }
-
-  else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
-    console.error("formIOReviewerId prop not passed")
-  }
-
-  else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
-    console.error("formIOApiUrl prop not passed")
-  }
-
-  else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
-    console.error("formsflow.ai API url prop not passed")
-  }
-
-  else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
-    console.error("formsflow.ai URL prop not passed")
-  }
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
-  localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
-  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
-  this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
-  this.userEmail = decodeToken["email"] || "external"
-  // this.formIOUserRoles = String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"])
-  localStorage.setItem("UserDetails", decodeToken);
+  this.checkPropsIsPassedAndSetValue()
   authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
   this.fetchData();
+  this.sortOptions = this.getOptions([])
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
     this.getProcessDefinitions = response.data;
   });
