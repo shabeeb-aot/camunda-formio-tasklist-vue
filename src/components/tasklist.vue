@@ -1,4 +1,4 @@
-<template>
+https://github.com/kurianbenoy-aot/camunda-formio-tasklist-vue<template>
   <b-container fluid class="task-outer-container">
     <b-row class="cft-service-task-list">
   
@@ -13,10 +13,10 @@
                     <option value="assignee">Assignee</option>
                 </select>
                 <a v-if="isAsc" @click="toggleSort" href="#" title="Ascending">
-                    <b-icon-chevron-up></b-icon-chevron-up>
+                    <i class="bi bi-chevron-up"></i>
                 </a>
                 <a v-else  @click="toggleSort" href="#" title="Descending">
-                    <b-icon-chevron-down></b-icon-chevron-down>
+                    <i class="bi bi-chevron-down"></i>
                 </a>
             </b-col>
             <div class="cft-filter-dropdown">
@@ -99,7 +99,7 @@
           </b-col>
         <b-col cols="4" v-else> 
           <b-row class="cft-not-selected mt-2 ml-1 row">
-                    <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+                    <i class=" bi bi-exclamation-circle-fill" variant="secondary" scale="1"></i>
                     <p>No tasks found in the list.</p>
           </b-row>
         </b-col>
@@ -129,8 +129,8 @@
                     </DatePicker>
                   </b-col>
                   <b-col>
-                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
-                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
+                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><i class="bi bi-grid-3x3-gap-fill"></i> {{String(groupListNames)}} </b-button>
+                    <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><i class="bi bi-grid-3x3-gap-fill"></i> Add Groups</b-button>
                     <b-modal
                       id="AddGroupModal"
                       ref="modal"
@@ -139,13 +139,13 @@
                       ok-only
                     >
                       <div class="modal-text">
-                          <b-icon icon="exclamation-circle"></b-icon>
+                          <i class="bi bi-exclamation-circle"></i>
                           You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
                           <b-row class="mt-3 mb-3">
                               <b-col>
                                   <b-button variant="primary" @click="addGroup">
                                       <span>Add a group</span>
-                                      <span><b-icon-plus></b-icon-plus></span>
+                                      <span><i class="bi bi-plus"></i></span>
                                   </b-button>
                               </b-col>
                               <b-col>
@@ -156,7 +156,7 @@
                               <b-col v-if="groupList.length">
                                   <ul v-for="g in groupList" :key="g.groupId">
                                       <div class="mt-1">
-                                          <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
+                                          <i class="bi bi-x" scale="1.5" @click="deleteGroup(g.groupId)"></i>
                                           <span>{{g.groupId}}</span>
                                       </div>
                                   </ul>
@@ -168,10 +168,10 @@
                   <b-col>
                       <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
                           {{task.assignee}}
-                        <b-icon-person-x-fill></b-icon-person-x-fill>
+                        <i class="bi bi-person-x-fill"></i>
                       </b-button>
                       <b-button variant="outline-primary" v-else @click="onClaim">
-                        <b-icon-person-fill></b-icon-person-fill>
+                        <i class="bi bi-person-fill"></i>
                         Claim
                       </b-button>
                   </b-col>
@@ -208,7 +208,7 @@
           </div>     
         </b-col>
         <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
-            <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+            <i class="bi bi-exclamation-circle-fill" scale="1"></i>
         <p>Select a task in the list.</p>
             </b-row></b-col>
     </b-row>
