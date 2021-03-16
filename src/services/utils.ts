@@ -23,4 +23,5 @@ export const sortingList = [
   {"sortOrder": "desc" ,"label": "Follow-up Date" , "sortBy": "followUpDate"},
   {"sortOrder": "desc" ,"label": "Task Name" , "sortBy": "name"},
   {"sortOrder": "desc" ,"label": "Assignee" , "sortBy": "assignee"},
+  {"sortOrder": "desc", "label": "Priority", "sortBy": "priority"}
 ]
