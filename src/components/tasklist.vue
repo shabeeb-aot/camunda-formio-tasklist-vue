@@ -40,7 +40,7 @@
     </div>    
         <div class="cft-filter-container">
           <input type="text" class="cft-filter" placeholder="Filter Tasks"/>
-            {{tasks.length}}
+            {{tasklength}}
         </div>
         <b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
           v-on:click="toggle(idx)"
@@ -77,7 +77,7 @@
           </div>
           </b-list-group-item>
         </b-list-group>
-        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages()" v-model="currentPage" />
+        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages" v-model="currentPage" />
       </b-col>
     <b-col cols="4" v-else> 
       <b-row class="cft-not-selected mt-2 ml-1 row">
@@ -244,6 +244,8 @@ private selectedTask = ''
 private showfrom = false
 private currentPage= 1
 private perPage= 5
+private numPages=5
+private tasklength=0
 private readoption = {readOnly: true,}
 private options =  {
   noAlerts: false,
@@ -454,13 +456,17 @@ fetchTaskList(filterId: string, requestData: object) {
     this.bpmApiUrl,).then((result) => {
     this.tasks = result.data.slice((this.currentPage - 1) * this.perPage,
         this.currentPage * this.perPage);
+        this.tasklength = result.data.length;
+     this.numPages = Math.ceil(result.data.length/this.perPage);
   }); 
 }
   numPages () {
-      if(Math.ceil(this.task / this.perPage)>1)
-        return Math.ceil(this.task / this.perPage);
+      console.log(this.tasks.length);
+      if(Math.ceil(this.tasks.length / this.perPage)>1)
+        return Math.ceil(this.tasks.length / this.perPage);
         else
         {
+        console.log('entering here');
      return 5;
         }
     }
