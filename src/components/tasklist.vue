@@ -77,6 +77,7 @@
           </div>
           </b-list-group-item>
         </b-list-group>
+        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages()" v-model="currentPage" />
       </b-col>
     <b-col cols="4" v-else> 
       <b-row class="cft-not-selected mt-2 ml-1 row">
@@ -205,7 +206,7 @@ import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
 import {getTaskFromList, findFilterKeyOfAllTask, TASK_FILTER_LIST_DEFAULT_PARAM, sortingList} from "../services/utils";
-import TaskListSorting from '../components/tasklist-sorting.vue'
+
 
 Vue.use(BootstrapVue)
 
@@ -214,7 +215,6 @@ Vue.use(BootstrapVue)
   components: {
     formio: Form,
     DatePicker,
-    TaskListSorting
   }
 })
 export default class Tasklist extends Vue {
@@ -242,6 +242,8 @@ private setDue = null
 private setGroup = null
 private selectedTask = ''
 private showfrom = false
+private currentPage= 1
+private perPage= 5
 private readoption = {readOnly: true,}
 private options =  {
   noAlerts: false,
@@ -450,10 +452,21 @@ fetchTaskList(filterId: string, requestData: object) {
   this.selectedfilterId = filterId
   CamundaRest.filterTaskList(this.token, filterId, requestData,
     this.bpmApiUrl,).then((result) => {
-    this.tasks = result.data;    
+    this.tasks = result.data.slice((this.currentPage - 1) * this.perPage,
+        this.currentPage * this.perPage);
   }); 
 }
-
+  numPages () {
+      if(Math.ceil(this.task / this.perPage)>1)
+        return Math.ceil(this.task / this.perPage);
+        else
+        {
+     return 5;
+        }
+    }
+ linkGen (pageNum) {
+      this.fetchTaskList(this.selectedfilterId, this.payload);
+    }
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
