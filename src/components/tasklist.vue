@@ -149,10 +149,10 @@
           <b-col>
             <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
               {{task.assignee}}
-            <b-icon :icon="'person-x-fill'"></b-icon>
+            <b-icon-person-x-fill></b-icon-person-x-fill>
             </b-button>
             <b-button variant="outline-primary" v-else @click="onClaim">
-            <b-icon :icon="'person-fill'"></b-icon>
+            <b-icon-person-fill></b-icon-person-fill>
             Claim
             </b-button>
           </b-col>
