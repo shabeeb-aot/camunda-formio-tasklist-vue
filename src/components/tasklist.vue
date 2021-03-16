@@ -11,13 +11,13 @@
           <option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
         </select>
         <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-                    <i class="bi bi-chevron-up"></i>
-                </a>
-                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-                    <i class="bi bi-chevron-down"></i>
-                </a>
+          <i class="bi bi-chevron-up"></i>
+        </a>
+        <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
+          <i class="bi bi-chevron-down"></i>
+        </a>
+        <i class="bi bi-plus" @click="showSortListDropdown=!showSortListDropdown"></i>
         </div>
-        <i class="bi bi-plus"></i>
       </header>
       <div class="cft-filter-dropdown">
       <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"/></button>
@@ -264,6 +264,8 @@ private updatesortList: any = TASK_FILTER_LIST_DEFAULT_PARAM;
 private sortOptions: any = []
 private updateSortOptions: any = []
 private setSortOptions: any = []
+private showSortListDropdown = false
+private setShowSortListDropdown = false
 private payload = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
   "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
 }
@@ -305,7 +307,7 @@ checkPropsIsPassedAndSetValue() {
   const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
   this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
   this.userEmail = decodeToken["email"] || "external"
-  this.formIOUserRoles = !this.formIOUserRoles ? String(decodeToken["resource_access"][decodeToken["aud"][0]]["roles"]) : this.formIOUserRoles
+  this.formIOUserRoles = !this.formIOUserRoles ? decodeToken["resource_access"][decodeToken["aud"][0]]["roles"] : this.formIOUserRoles
   localStorage.setItem("UserDetails", decodeToken);
 }
 

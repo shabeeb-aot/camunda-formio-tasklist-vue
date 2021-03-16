@@ -13,10 +13,18 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
   ];
 
   let roles: any[] = [];
-  const roleData = ROLES.find((x) => x.title === UserRoles);
-  if (roleData) {
-    roles = roles.concat(roleData.id);
+  for(let i=0; i<UserRoles.length; i++) {
+    const roleData = ROLES.find((x) => x.title === UserRoles[i]);
+    if (roleData) {
+      roles = roles.concat(roleData.id);
+    }
   }
+
+  if(roles===[]){
+    console.error("Null roles");
+    roles = [STAFF_REVIEWER_ID];
+  }
+  
   const USER_RESOURCE_FORM_ID = formIOResourceId || process.env.VUE_APP_USER_RESOURCE_ID;
 
   const FORMIO_TOKEN = jwt.sign(
