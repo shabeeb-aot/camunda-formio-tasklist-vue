@@ -20,7 +20,7 @@
                 </a>
             </b-col>
             <div class="cft-filter-dropdown">
-                <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"></button>
+                <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"/></button>
                 <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
                 <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
                 @click="fetchTaskList(filter.id); togglefilter(idx)"
