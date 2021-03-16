@@ -11,16 +11,16 @@
           <option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
         </select>
         <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-                    <b-icon-chevron-up></b-icon-chevron-up>
+                    <i class="bi bi-chevron-up"></i>
                 </a>
                 <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-                    <b-icon-chevron-down></b-icon-chevron-down>
+                    <i class="bi bi-chevron-down"></i>
                 </a>
         </div>
-        <b-icon-plus></b-icon-plus>
+        <i class="bi bi-plus"></i>
       </header>
       <div class="cft-filter-dropdown">
-      <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
+      <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"/></button>
       <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
         <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
         @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
@@ -32,7 +32,7 @@
       </b-list-group>
       <b-list-group v-else>
         <b-list-group-item>
-            <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+            <i class="bi bi-exclamation-circle-fill"></i>
             No Filters found
         </b-list-group-item>
       </b-list-group>
@@ -80,7 +80,7 @@
       </b-col>
     <b-col cols="4" v-else> 
       <b-row class="cft-not-selected mt-2 ml-1 row">
-          <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+          <i class="bi bi-exclamation-circle-fill" scale="1"></i>
           <p>No tasks found in the list.</p>
       </b-row>
     </b-col>
@@ -110,8 +110,8 @@
           </DatePicker>
           </b-col>
           <b-col>
-          <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><b-icon :icon="'grid3x3-gap-fill'"></b-icon> {{String(groupListNames)}} </b-button>
-          <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><b-icon :icon="'grid3x3-gap-fill'"></b-icon> Add Groups</b-button>
+          <b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames"><i class="bi bi-grid-3x3-gap-fill"></i> {{String(groupListNames)}} </b-button>
+          <b-button variant="outline-primary" v-b-modal.AddGroupModal v-else><i class="bi bi-grid-3x3-gap-fill"></i> Add Groups</b-button>
           <b-modal
             id="AddGroupModal"
             ref="modal"
@@ -120,13 +120,13 @@
             ok-only
           >
             <div class="modal-text">
-              <b-icon icon="exclamation-circle"></b-icon>
+              <i class="bi bi-exclamation-circle"></i>
               You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
               <b-row class="mt-3 mb-3">
                 <b-col>
                   <b-button variant="primary" @click="addGroup">
                     <span>Add a group</span>
-                    <span><b-icon-plus></b-icon-plus></span>
+                    <span><i class="bi bi-plus"></i></span>
                   </b-button>
                 </b-col>
                 <b-col>
@@ -137,7 +137,7 @@
                 <b-col v-if="groupList.length">
                   <ul v-for="g in groupList" :key="g.groupId">
                     <div class="mt-1">
-                      <b-icon-x variant="danger" font-scale="1.5" @click="deleteGroup(g.groupId)"></b-icon-x>
+                      <i class="bi bi-x" @click="deleteGroup(g.groupId)"></i>
                       <span>{{g.groupId}}</span>
                     </div>
                   </ul>
@@ -149,10 +149,10 @@
           <b-col>
             <b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
               {{task.assignee}}
-            <b-icon-person-x-fill></b-icon-person-x-fill>
+            <i class="bi bi-person-x-fill"/>
             </b-button>
             <b-button variant="outline-primary" v-else @click="onClaim">
-            <b-icon-person-fill></b-icon-person-fill>
+            <i class="bi bi-person-fill"/>
             Claim
             </b-button>
           </b-col>
@@ -182,14 +182,21 @@
       </div>   
     </b-col>
     <b-col v-else><b-row class="cft-not-selected mt-2 ml-1 row">
-      <b-icon icon="exclamation-circle-fill" variant="secondary" scale="1"></b-icon>
+      <i class="bi bi-exclamation-circle-fill" variant="secondary" scale="1"></i>
     <p>Select a task in the list.</p>
       </b-row></b-col>
   </b-row>
   </b-container>
 </template>
+
 <script lang="ts">
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'formiojs/dist/formio.full.min.css'
+import '../camundaFormIOTasklist.scss'
+import 'vue2-datepicker/index.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { BootstrapVue} from 'bootstrap-vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
@@ -200,14 +207,8 @@ import moment from "moment";
 import {getTaskFromList, findFilterKeyOfAllTask, TASK_FILTER_LIST_DEFAULT_PARAM, sortingList} from "../services/utils";
 import TaskListSorting from '../components/tasklist-sorting.vue'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import 'formiojs/dist/formio.full.min.css'
-import '../camundaFormIOTasklist.scss'
-import 'vue2-datepicker/index.css';
-
 Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
+
 
 @Component({
   components: {
