@@ -205,7 +205,6 @@ import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
 import {getTaskFromList, findFilterKeyOfAllTask, TASK_FILTER_LIST_DEFAULT_PARAM, sortingList} from "../services/utils";
-import TaskListSorting from '../components/tasklist-sorting.vue'
 
 Vue.use(BootstrapVue)
 
@@ -214,7 +213,6 @@ Vue.use(BootstrapVue)
   components: {
     formio: Form,
     DatePicker,
-    TaskListSorting
   }
 })
 export default class Tasklist extends Vue {
