@@ -20,7 +20,7 @@
                 </a>
             </b-col>
             <div class="cft-filter-dropdown">
-                <button class="cft-filter-dropbtn mr-0"><b-icon-filter-square></b-icon-filter-square></button>
+                <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"></button>
                 <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
                 <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
                 @click="fetchTaskList(filter.id); togglefilter(idx)"
@@ -215,23 +215,23 @@
   </b-container>
 </template>
 <script lang="ts">
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'formiojs/dist/formio.full.min.css'
+import '../camundaFormIOTasklist.scss'
+import 'vue2-datepicker/index.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import BootstrapVue from 'bootstrap-vue'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-// import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import 'formiojs/dist/formio.full.min.css'
-import '../camundaFormIOTasklist.scss'
-import 'vue2-datepicker/index.css';
-
-// Vue.use(BootstrapVue)
-// Vue.use(IconsPlugin)
+Vue.use(BootstrapVue)
 
 @Component({
     components: {

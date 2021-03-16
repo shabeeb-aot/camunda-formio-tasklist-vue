@@ -9,12 +9,13 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-package":"vue-cli-service build --target lib --name camunda-formio-tasklist-vue ./src/components/index.js"
+    "build-package": "vue-cli-service build --target lib --name camunda-formio-tasklist-vue ./src/components/index.js"
   },
   "dependencies": {
     "@types/vue-moment": "^4.0.2",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "bootstrap-icons": "^1.4.0",
     "bootstrap-vue": "^2.21.2",
     "jsonwebtoken": "^8.5.1",
     "keycloak-js": "^12.0.2",
