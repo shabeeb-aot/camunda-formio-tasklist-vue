@@ -181,7 +181,12 @@
           </b-tab>
           <b-tab title="History"></b-tab>
           <b-tab title="Diagram">
-            Welcome diagram
+            <vue-bpmn
+    xml="preLoadedDiagramXML"
+    v-on:error="handleError"
+    v-on:shown="handleShown"
+    v-on:loading="handleLoading"
+  ></vue-bpmn>
           </b-tab>
           </b-tabs>
         </div>
