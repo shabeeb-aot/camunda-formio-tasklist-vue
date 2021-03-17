@@ -316,9 +316,13 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
 
   const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
-  this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
+  this.userName = !this.userName ? decodeToken && decodeToken["preferred_username"] : this.userName
   this.userEmail = decodeToken["email"] || "external"
-  this.formIOUserRoles = !this.formIOUserRoles ? decodeToken["resource_access"][decodeToken["aud"][0]]["roles"] : this.formIOUserRoles
+  const resourceacess = decodeToken && decodeToken["resource_access"]
+  if(resourceacess[decodeToken["aud"][0]]==="formsflow-web"){
+    const Resourceroles = 'forms-flow-web'
+  }
+  this.formIOUserRoles = !this.formIOUserRoles ? decodeToken["resource_access"]["forms-flow-web"]["roles"] : this.formIOUserRoles
   localStorage.setItem("UserDetails", decodeToken);
 }
 
@@ -589,10 +593,12 @@ created() {
 
 mounted() {
   this.checkPropsIsPassedAndSetValue()
+  console.log(this.formIOUserRoles)
   authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
   this.fetchData();
   this.sortOptions = this.getOptions([])
+  console.log(this.sortOptions)
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
     this.getProcessDefinitions = response.data;
   });
