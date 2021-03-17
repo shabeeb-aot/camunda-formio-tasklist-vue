@@ -20,11 +20,11 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
     }
   }
 
-  if(roles===[]){
+  if(roles.length === 0){
     console.error("Null roles");
     roles = [STAFF_REVIEWER_ID];
   }
-  
+  //  roles = ['604be2f34c71022e29c03603'] // change it 
   const USER_RESOURCE_FORM_ID = formIOResourceId || process.env.VUE_APP_USER_RESOURCE_ID;
 
   const FORMIO_TOKEN = jwt.sign(

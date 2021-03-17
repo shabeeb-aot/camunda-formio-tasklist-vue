@@ -197,7 +197,7 @@ import 'formiojs/dist/formio.full.min.css'
 import '../camundaFormIOTasklist.scss'
 import 'vue2-datepicker/index.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { BootstrapVue} from 'bootstrap-vue'
+import  BootstrapVue from 'bootstrap-vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
@@ -205,7 +205,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {getTaskFromList, findFilterKeyOfAllTask, TASK_FILTER_LIST_DEFAULT_PARAM, sortingList} from "../services/utils";
+import {TASK_FILTER_LIST_DEFAULT_PARAM, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
 
 Vue.use(BootstrapVue)
 
@@ -269,7 +269,7 @@ private updateSortOptions: any = []
 private setSortOptions: any = []
 private showSortListDropdown = false
 private setShowSortListDropdown = false
-private payload = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
+private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
   "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
 }
 
@@ -454,24 +454,24 @@ fetchTaskList(filterId: string, requestData: object) {
   CamundaRest.filterTaskList(this.token, filterId, requestData,
     this.bpmApiUrl,).then((result) => {
     this.tasks = result.data.slice((this.currentPage - 1) * this.perPage,
-        this.currentPage * this.perPage);
-        this.tasklength = result.data.length;
-     this.numPages = Math.ceil(result.data.length/this.perPage);
+      this.currentPage * this.perPage);
+    this.tasklength = result.data.length;
+    this.numPages = Math.ceil(result.data.length/this.perPage);
   }); 
 }
-  numberOfPages () {
-      console.log(this.tasks.length);
-      if(Math.ceil(this.tasks.length / this.perPage)>1)
-        return Math.ceil(this.tasks.length / this.perPage);
-        else
-        {
-        console.log('entering here');
-     return 5;
-        }
-    }
- linkGen (pageNum: any) {
-      this.fetchTaskList(this.selectedfilterId, this.payload);
-    }
+numberOfPages () {
+  console.log(this.tasks.length);
+  if(Math.ceil(this.tasks.length / this.perPage)>1)
+    return Math.ceil(this.tasks.length / this.perPage);
+  else
+  {
+    console.log('entering here');
+    return 5;
+  }
+}
+linkGen (pageNum: any) {
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
@@ -483,10 +483,11 @@ getOptions(options: any){
 }
 
 updateSort(event: any, index: number) {
-  this.sortList[index].sortBy = event?.target.value;
-  this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text
-  this.payload["sorting"] = this.sortList
-  this.fetchTaskList(this.selectedfilterId, this.payload)
+
+//   this.sortList[index].sortBy = event?.target.value;
+//   this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text
+//   this.payload["sorting"] = this.sortList
+//   this.fetchTaskList(this.selectedfilterId, this.payload)
 }
 
 toggleSort(index: number) {
