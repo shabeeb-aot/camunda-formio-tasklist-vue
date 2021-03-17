@@ -20,7 +20,7 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
     }
   }
 
-  if(roles===[]){
+  if(roles.length === 0){
     console.error("Null roles");
     roles = [STAFF_REVIEWER_ID];
   }
