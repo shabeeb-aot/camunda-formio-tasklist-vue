@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 
-export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any, formIOReviewer: any ,userEmail: any, UserRoles: any) => {
+export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any, formIOReviewer: any ,userEmail: any, formIOUserRoles: any) => {
   const STAFF_REVIEWER_ID = formIOReviewereId ||  process.env.VUE_APP_REVIEWER_ROLE_ID
   const STAFF_REVIEWER = formIOReviewer ||  process.env.VUE_APP_REVIEWER_ROLE
 
@@ -13,13 +13,13 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
   ];
 
   let roles: any[] = [];
-  for(let i=0; i<UserRoles.length; i++) {
-    const roleData = ROLES.find((x) => x.title === UserRoles[i]);
+  for(let i=0; i<formIOUserRoles.length; i++) {
+    const roleData = ROLES.find((x) => x.title === formIOUserRoles[i]);
     if (roleData) {
       roles = roles.concat(roleData.id);
     }
   }
-
+  console.log(roles)
   if(roles.length === 0){
     console.error("Null roles");
     roles = [STAFF_REVIEWER_ID];
