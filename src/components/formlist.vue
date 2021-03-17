@@ -3,10 +3,26 @@
     <h3 class="cftf-taskhead">Form</h3>
     <div class="overflow-auto">
 
-      <b-table :items="formList" :fields="fields"
+      <!-- <b-table :items="formList" :fields="fields"
        head-variant="light" :bordered=true :outlined=true
        :current-page="currentPage" :per-page="perPage">
-      </b-table>
+      </b-table> -->
+
+      <b-table-simple hover small caption-top responsive :bordered=true :outlined=true
+      :per-page="perPage">
+        <b-thead>
+          <b-tr>
+            <b-th>Form Name</b-th>
+            <b-th>Operations</b-th>
+          </b-tr>
+        </b-thead>
+        <b-tbody>
+          <b-tr v-for="form in formList" :key="form.formId">
+            <b-th> {{form.formName}}</b-th>
+            <b-th><b-button variant="primary">Submit New</b-button> </b-th>
+          </b-tr>
+        </b-tbody>
+      </b-table-simple>
 
       <b-pagination
         v-model="currentPage"
@@ -48,10 +64,12 @@ export default class FormList extends Vue{
   }
 
   created() {
-    CamundaRest.listForms(localStorage.getItem('authToken'), localStorage.getItem('bpmApiUrl')).then((response) =>
+    const token = localStorage.getItem('authToken')
+    const bpmUrl = localStorage.getItem('bpmApiUrl')
+    CamundaRest.listForms(token, bpmUrl).then((response) =>
     {
       this.formList = response.data;
     });
+    }
   }
-}
 </script>
