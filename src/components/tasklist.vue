@@ -2,11 +2,10 @@
   <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-      <!-- <TaskListSorting selectSortBy="created" selectSortOrder="desc" isAsc="true" :filterList="filterList" @fetch-on-sorting="fetchOnSorting" @toggle-sorting="toggleSort"/> -->
     <b-list-group class="cft-list-container">
     <div class="cft-filter-sort"> 
-      <div v-for="(sort, idx) in sortList" :key="sort.sortBy">
-        <div class="mr-3" :key="idx">
+      <div class="d-flex" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+          <div>
         <span v-if="sortList.length>1" class="font-weight-bold click-element" title="Remove Sorting" @click="deleteSort(sort, index)">x</span>
         <select class="form-select" aria-label="Select Sorting Options" @change="updateSort($event, idx)">
           <option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
@@ -19,8 +18,6 @@
         </a>
         <button v-if="sortOptions.length"><i class="bi bi-plus" @click="showSortListOptions"></i></button>
         <TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions>
-        <!-- <button @click="addSort">Add</button>
-        <TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions> -->
         </div>
       </div>
       <div class="cft-filter-dropdown">
@@ -211,7 +208,7 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {TASK_FILTER_LIST_DEFAULT_PARAM, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
+import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 
 Vue.use(BootstrapVue)
@@ -315,15 +312,8 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
 
-  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
-  this.userName = !this.userName ? decodeToken && decodeToken["preferred_username"] : this.userName
-  this.userEmail = decodeToken["email"] || "external"
-  const resourceacess = decodeToken && decodeToken["resource_access"]
-  if(resourceacess[decodeToken["aud"][0]]==="formsflow-web"){
-    const Resourceroles = 'forms-flow-web'
-  }
-  this.formIOUserRoles = !this.formIOUserRoles ? decodeToken["resource_access"]["forms-flow-web"]["roles"] : this.formIOUserRoles
-  localStorage.setItem("UserDetails", decodeToken);
+  const val = decodeTokenValues(this.token, this.userName, this.formIOUserRoles);
+  this.userName = val.userName;this.userEmail = val.userEmail;this.formIOUserRoles = val.formIOUserRoles;
 }
 
 timedifference(date: Date)  {
@@ -351,7 +341,6 @@ togglefilter(index: number) {
 
 addGroup() {
   CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
-    console.log("Create group", result.data);
     this.getGroupDetails();
     this.reloadCurrentTask()
   })
@@ -374,14 +363,12 @@ getGroupDetails() {
 deleteGroup(groupid: string) {
   CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
     this.getGroupDetails();
-    // this.getBPMTaskDetail(this.task.id);
     this.reloadCurrentTask()
   })
 }
 
 onFormSubmitCallback() {
   if(this.task.id){
-    console.log("Form submitted")
     this.onBPMTaskFormSubmit(this.task.id)
   }
 }
@@ -472,18 +459,17 @@ fetchTaskList(filterId: string, requestData: object) {
   }); 
 }
 numberOfPages () {
-  console.log(this.tasks.length);
   if(Math.ceil(this.tasks.length / this.perPage)>1)
     return Math.ceil(this.tasks.length / this.perPage);
-  else
-  {
-    console.log('entering here');
-    return 5;
+  else {
+    return 15;
   }
 }
-linkGen (pageNum: any) {
+
+linkGen () {
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
+
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
@@ -593,12 +579,10 @@ created() {
 
 mounted() {
   this.checkPropsIsPassedAndSetValue()
-  console.log(this.formIOUserRoles)
   authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
   this.fetchData();
   this.sortOptions = this.getOptions([])
-  console.log(this.sortOptions)
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
     this.getProcessDefinitions = response.data;
   });
