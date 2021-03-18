@@ -16,7 +16,7 @@
         <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
           <i class="bi bi-chevron-down"></i>
         </a>
-        <button v-if="sortOptions.length"><i class="bi bi-plus" @click="showSortListOptions"></i></button>
+        <button v-if="updateSortOptions.length===0"><i class="bi bi-plus" @click="showSortListOptions"></i></button>
         <TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions>
         </div>
       </div>
@@ -484,7 +484,12 @@ addSort(sort: any){
   this.sortList.push(sort)
   console.log(this.sortList)
   this.updatesortList = this.sortList
+  if(this.sortList.length === sortingList.length){
+    this.updateSortOptions = this.sortOptions;
+  }
+  else{
   this.sortOptions = this.getOptions(this.sortList);
+  }
   this.showSortListDropdown = false;
 }
 
@@ -507,7 +512,7 @@ updateSort(event: any, index: number) {
 deleteSort(sort: any, index: number) {
   this.sortList.splice(index, 1);
   this.updatesortList = this.sortList;
-
+  this.updateSortOptions = []
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList
   this.fetchTaskList(this.selectedfilterId, this.payload);
