@@ -147,6 +147,9 @@
   .tabs {
     display: block;
   }
+  [aria-busy=true] {
+    cursor: unset !important;
+}
 
 }
 

@@ -488,7 +488,7 @@ addSort(sort: any){
     this.updateSortOptions = this.sortOptions;
   }
   else{
-  this.sortOptions = this.getOptions(this.sortList);
+    this.sortOptions = this.getOptions(this.sortList);
   }
   this.showSortListDropdown = false;
 }
@@ -499,14 +499,14 @@ showSortListOptions() {
 }
 
 updateSort(event: any, index: number) {
-  const value = event?.target.value;
-  const label = event?.target.options[event.target.options.selectedIndex].text;
-  this.sortList[index].sortBy = event?.target.value;
-  this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text;
+  // const value = event?.target.value;
+  // const label = event?.target.options[event.target.options.selectedIndex].text;
+  // this.sortList[index].sortBy = event?.target.value;
+  // this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text;
 
-  this.sortOptions = this.getOptions(this.sortList);
-  this.payload["sorting"] = this.sortList
-  this.fetchTaskList(this.selectedfilterId, this.payload)
+  // this.sortOptions = this.getOptions(this.sortList);
+  // this.payload["sorting"] = this.sortList
+  // this.fetchTaskList(this.selectedfilterId, this.payload)
 }
 
 deleteSort(sort: any, index: number) {
