@@ -19,9 +19,8 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
       roles = roles.concat(roleData.id);
     }
   }
-  console.log(roles)
   if(roles.length === 0){
-    console.error("Null roles");
+    console.error("Null roles - unable to set formio token");
     roles = [STAFF_REVIEWER_ID];
   }
   
@@ -40,6 +39,5 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
     "--- change me now ---"
   );
 
-  sessionStorage.setItem("formioToken", FORMIO_TOKEN);
   localStorage.setItem("formioToken", FORMIO_TOKEN)
 };

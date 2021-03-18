@@ -78,7 +78,7 @@ const CamundaRest = {
   },
   
   getProcessDiagramXML(bearerToken: any, processDefinitionId: string, CamundaUrl: any) {
-    return bpmAxios(bearerToken, CamundaRest).get(`/${engine}/process-definition/${processDefinitionId}/xml`)
+    return bpmAxios(bearerToken, CamundaUrl).get(`/${engine}/process-definition/${processDefinitionId}/xml`)
   }
 }
 
