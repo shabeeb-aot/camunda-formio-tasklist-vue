@@ -2,11 +2,11 @@
   <b-container fluid class="task-outer-container">
   <b-row class="cft-service-task-list">
     <b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-      <!-- <TaskListSorting selectSortBy="created" selectSortOrder="desc" isAsc="true" :filterList="filterList" @fetch-on-sorting="fetchOnSorting" @toggle-sorting="toggleSort"/> -->
     <b-list-group class="cft-list-container">
     <div class="cft-filter-sort"> 
-      <header>
-        <div class="d-flex flex-wrap" v-for="(sort, idx) in sortList" :key="sort.label">
+      <div class="d-flex" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+          <div>
+        <span v-if="sortList.length>1" class="font-weight-bold click-element" title="Remove Sorting" @click="deleteSort(sort, index)">x</span>
         <select class="form-select" aria-label="Select Sorting Options" @change="updateSort($event, idx)">
           <option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
         </select>
@@ -16,9 +16,10 @@
         <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
           <i class="bi bi-chevron-down"></i>
         </a>
-        <i class="bi bi-plus" @click="showSortListDropdown=!showSortListDropdown"></i>
+        <button v-if="updateSortOptions.length===0"><i class="bi bi-plus" @click="showSortListOptions"></i></button>
+        <TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions>
         </div>
-      </header>
+      </div>
       <div class="cft-filter-dropdown">
       <button class="cft-filter-dropbtn mr-0"><i class="bi bi-filter-square"/></button>
       <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
@@ -176,7 +177,9 @@
             </div>
           </b-tab>
           <b-tab title="History"></b-tab>
-          <b-tab title="Diagram"></b-tab>
+          <b-tab title="Diagram">
+            Welcome diagram
+          </b-tab>
           </b-tabs>
         </div>
       </div>
@@ -205,7 +208,8 @@ import { Form } from 'vue-formio';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {TASK_FILTER_LIST_DEFAULT_PARAM, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
+import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
+import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 
 Vue.use(BootstrapVue)
 
@@ -214,6 +218,7 @@ Vue.use(BootstrapVue)
   components: {
     formio: Form,
     DatePicker,
+    TaskSortOptions
   }
 })
 export default class Tasklist extends Vue {
@@ -242,7 +247,7 @@ private setGroup = null
 private selectedTask = ''
 private showfrom = false
 private currentPage= 1
-private perPage= 5
+private perPage= 15
 private numPages=5
 private tasklength=0
 private readoption = {readOnly: true,}
@@ -307,11 +312,8 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
 
-  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
-  this.userName = !this.userName ? decodeToken["preferred_username"] : this.userName
-  this.userEmail = decodeToken["email"] || "external"
-  this.formIOUserRoles = !this.formIOUserRoles ? decodeToken["resource_access"][decodeToken["aud"][0]]["roles"] : this.formIOUserRoles
-  localStorage.setItem("UserDetails", decodeToken);
+  const val = decodeTokenValues(this.token, this.userName, this.formIOUserRoles);
+  this.userName = val.userName;this.userEmail = val.userEmail;this.formIOUserRoles = val.formIOUserRoles;
 }
 
 timedifference(date: Date)  {
@@ -339,7 +341,6 @@ togglefilter(index: number) {
 
 addGroup() {
   CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
-    console.log("Create group", result.data);
     this.getGroupDetails();
     this.reloadCurrentTask()
   })
@@ -362,14 +363,12 @@ getGroupDetails() {
 deleteGroup(groupid: string) {
   CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"groupId": groupid, "type": "candidate"}).then(()=> {
     this.getGroupDetails();
-    // this.getBPMTaskDetail(this.task.id);
     this.reloadCurrentTask()
   })
 }
 
 onFormSubmitCallback() {
   if(this.task.id){
-    console.log("Form submitted")
     this.onBPMTaskFormSubmit(this.task.id)
   }
 }
@@ -460,18 +459,17 @@ fetchTaskList(filterId: string, requestData: object) {
   }); 
 }
 numberOfPages () {
-  console.log(this.tasks.length);
   if(Math.ceil(this.tasks.length / this.perPage)>1)
     return Math.ceil(this.tasks.length / this.perPage);
-  else
-  {
-    console.log('entering here');
-    return 5;
+  else {
+    return 15;
   }
 }
-linkGen (pageNum: any) {
+
+linkGen () {
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
+
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
@@ -482,12 +480,42 @@ getOptions(options: any){
   return optionsArray;
 }
 
-updateSort(event: any, index: number) {
+addSort(sort: any){
+  this.sortList.push(sort)
+  console.log(this.sortList)
+  this.updatesortList = this.sortList
+  if(this.sortList.length === sortingList.length){
+    this.updateSortOptions = this.sortOptions;
+  }
+  else{
+  this.sortOptions = this.getOptions(this.sortList);
+  }
+  this.showSortListDropdown = false;
+}
 
-//   this.sortList[index].sortBy = event?.target.value;
-//   this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text
-//   this.payload["sorting"] = this.sortList
-//   this.fetchTaskList(this.selectedfilterId, this.payload)
+showSortListOptions() {
+  this.showSortListDropdown = ! this.showSortListDropdown;
+  this.sortOptions = this.getOptions(this.sortList);
+}
+
+updateSort(event: any, index: number) {
+  const value = event?.target.value;
+  const label = event?.target.options[event.target.options.selectedIndex].text;
+  this.sortList[index].sortBy = event?.target.value;
+  this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text;
+
+  this.sortOptions = this.getOptions(this.sortList);
+  this.payload["sorting"] = this.sortList
+  this.fetchTaskList(this.selectedfilterId, this.payload)
+}
+
+deleteSort(sort: any, index: number) {
+  this.sortList.splice(index, 1);
+  this.updatesortList = this.sortList;
+  this.updateSortOptions = []
+  this.sortOptions = this.getOptions(this.sortList);
+  this.payload["sorting"] = this.sortList
+  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 toggleSort(index: number) {
