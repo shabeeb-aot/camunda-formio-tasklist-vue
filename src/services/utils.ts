@@ -31,9 +31,9 @@ export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: an
   userName = !userName ? decodeToken && decodeToken["preferred_username"] : userName
   const userEmail = decodeToken["email"] || "external"
   const resourceacess = decodeToken && decodeToken["resource_access"]
-  let Resourceaud = null;
+  let Resourceaud: any = null;
   if(resourceacess && resourceacess[decodeToken["aud"]]&&resourceacess[decodeToken["aud"][0]]==="forms-flow-web"){
-     Resourceaud= resourceacess[decodeToken["aud"][0]];
+    Resourceaud= resourceacess[decodeToken["aud"][0]];
   }
   else if(resourceacess){
     Resourceaud = resourceacess['forms-flow-web']
