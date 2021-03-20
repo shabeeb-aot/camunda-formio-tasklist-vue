@@ -292,32 +292,32 @@ private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVa
 }
 
 checkPropsIsPassedAndSetValue() {
-  if(! this.bpmApiUrl|| this.bpmApiUrl===""){
-    console.error("bpmApiUrl prop not Passed")
+  if(!this.bpmApiUrl || this.bpmApiUrl===""){
+    console.warn("bpmApiUrl prop not Passed")
   }
 
-  else if(! this.token || this.token==="") {
-    console.error("token prop not Passed")
+  if(!this.token || this.token==="") {
+    console.warn("token prop not Passed")
   }
 
-  else if(! this.formIOResourceId|| this.formIOResourceId==="") {
-    console.error("formIOResourceId prop not passed")
+  if(!this.formIOResourceId || this.formIOResourceId==="") {
+    console.warn("formIOResourceId prop not passed")
   }
 
-  else if(! this.formIOReviewerId|| this.formIOReviewerId==="") {
-    console.error("formIOReviewerId prop not passed")
+  if(!this.formIOReviewerId || this.formIOReviewerId==="") {
+    console.warn("formIOReviewerId prop not passed")
   }
 
-  else if(! this.formIOApiUrl|| this.formIOApiUrl==="") {
-    console.error("formIOApiUrl prop not passed")
+  if(!this.formIOApiUrl || this.formIOApiUrl === "") {
+    console.warn("formIOApiUrl prop not passed")
   }
 
-  else if(! this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
-    console.error("formsflow.ai API url prop not passed")
+  if(!this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+    console.warn("formsflow.ai API url prop not passed")
   }
 
-  else if(! this.formsflowaiUrl || this.formsflowaiUrl==="") {
-    console.error("formsflow.ai URL prop not passed")
+  if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
+    console.warn("formsflow.ai URL prop not passed")
   }
 
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
@@ -597,7 +597,9 @@ created() {
 }
 
 mounted() {
+  console.log('formsflowaiApiUrl', this.formsflowaiApiUrl)
   this.checkPropsIsPassedAndSetValue()
+  console.log('after formsflowaiApiUrl', this.formsflowaiApiUrl)
   authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
   this.fetchData();

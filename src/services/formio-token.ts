@@ -20,7 +20,7 @@ export const authenticateFormio = (formIOResourceId: any, formIOReviewereId: any
     }
   }
   if(roles.length === 0){
-    console.error("Null roles - unable to set formio token");
+    console.warn("Null roles - unable to set formio token");
     roles = [STAFF_REVIEWER_ID];
   }
   
