@@ -150,6 +150,11 @@
   [aria-busy=true] {
     cursor: unset !important;
 }
+.cft-paginate{
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
 
 }
 
