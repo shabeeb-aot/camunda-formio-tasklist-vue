@@ -1,13 +1,13 @@
 <template>
-    <b-list-group v-if="showSortListDropdown" class="cft-sortlist-options-dropdown">
-        <b-list-group-item v-for="s in sortOptions" :key="s.sortBy" @click="addSort(s)">
-        <div class="col-12"> {{s.label}}</div>
-        </b-list-group-item>
-    </b-list-group>
+    <div v-if="showSortListDropdown" class="cft-sort-items">
+        <div v-for="s in sortOptions" :key="s.sortBy" @click="addSort(s)">
+            {{s.label}}
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Emit, Component } from 'vue-property-decorator';
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class TaskSortOptions extends Vue {
@@ -16,7 +16,7 @@ export default class TaskSortOptions extends Vue {
 
     @Emit()
     addSort(sort: any){
-        return sort
+      return sort
     }
 
 }

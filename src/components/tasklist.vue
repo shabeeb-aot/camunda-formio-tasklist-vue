@@ -2,28 +2,46 @@
   
 <b-container fluid class="task-outer-container">
 	<b-row class="cft-service-task-list">
-		<b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
-			<b-list-group class="cft-list-container">
-				<div class="cft-filter-sort">
-					<div class="d-flex" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-						<div>
-							<span v-if="sortList.length>1" class="font-weight-bold click-element" title="Remove Sorting" @click="deleteSort(sort, index)">x</span>
-							<select class="form-select" aria-label="Select Sorting Options" @change="updateSort($event, idx)">
-								<option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
-							</select>
+		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+      <div>
+        <!-- Sorting section -->
+				<div id='cftf-dpdown-container'>
+					<div class="mr-3 cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+              <span v-if="sortList.length>1" class="cftf-exit-button" title="Remove Sorting" @click="deleteSort(sort, index)"><i class="bi bi-x"></i></span>
+							<span class="cftf-span-element" @click="showUpdateSortOptions(idx)">{{sortList[idx]["label"]}}</span>
+              <div v-if="showUpdateSortListDropdown[idx]" class="cft-sort-items">
+                <div v-for="s in sortOptions" :key="s.sortBy"
+                 @click="updateSort(s,idx)"
+                 class="mb-2 cft-sort-element"
+                >
+                  {{s.label}}
+                </div>
+            </div>
 							<a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-								<i class="bi bi-chevron-up"></i>
+								<i class="bi bi-chevron-up cftf-arrow"></i>
 							</a>
 							<a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-								<i class="bi bi-chevron-down"></i>
+								<i class="bi bi-chevron-down cftf-arrow"></i>
 							</a>
-							<button v-if="updateSortOptions.length===0">
-								<i class="bi bi-plus" @click="showSortListOptions"></i>
-							</button>
-							<TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions>
-						</div>
-					</div>
-					<div class="cft-filter-dropdown">
+            </div>
+          <i v-if="updateSortOptions.length===0"
+           class="fa fa-plus fa-sm click-element cftf-add-sorting"
+           @click="showaddSortListOptions"
+           title="Add sorting"></i>
+          <TaskSortOptions
+           :sortOptions="sortOptions"
+           :showSortListDropdown="showaddNewSortListDropdown"
+           @add-sort="addSort"
+          >
+          </TaskSortOptions>
+          </div>
+				</div>
+        <div class="cft-filter-search">
+          <div class="cft-filter-dropdown">
+				<div class="cft-filter-container">
+					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
+            {{tasklength}}
+				</div>
 						<button class="cft-filter-dropbtn mr-0">
 							<i class="bi bi-filter-square"/>
 						</button>
@@ -31,9 +49,7 @@
 							<b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
               @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
               :class="{'cft-selected': idx == activefilter}">
-                      <div class="col-12">
                 {{filter.name}}
-        </div>
 							</b-list-group-item>
 						</b-list-group>
 						<b-list-group v-else>
@@ -44,12 +60,9 @@
 							</b-list-group-item>
 						</b-list-group>
 					</div>
-				</div>
-				<div class="cft-filter-container">
-					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
-            {{tasklength}}
-        
-				</div>
+        </div>
+        <!-- Task list section -->
+        <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
 				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
           v-on:click="toggle(idx)"
           :class="{'cft-selected': idx == activeIndex}">
@@ -83,19 +96,22 @@
 						</div>
 					</div>
 				</b-list-group-item>
+        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages" v-model="currentPage" class="cft-paginate" />
 			</b-list-group>
-			<b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages" v-model="currentPage" class="cft-paginate" />
+      <b-list-group cols="3" v-else>
+        <b-row class="cft-not-selected mt-2 ml-1 row">
+          <i class="bi bi-exclamation-circle-fill" scale="1"></i>
+          <p>No tasks found in the list.</p>
+        </b-row>
+      </b-list-group>
 		</b-col>
-		<b-col cols="4" v-else>
-			<b-row class="cft-not-selected mt-2 ml-1 row">
-				<i class="bi bi-exclamation-circle-fill" scale="1"></i>
-				<p>No tasks found in the list.</p>
-			</b-row>
-		</b-col>
+    <!-- Task Detail section -->
 		<b-col  v-if="selectedTask"  lg="8" md="8" sm="12">
 			<div class="service-task-details">
 				<b-row class="ml-0 task-header"> {{task.name}}</b-row>
+        <br>
 				<b-row class="ml-0 task-name">{{taskProcess}}</b-row>
+        <br>
 				<b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
 				<div>
 					<b-row class="cft-actionable">
@@ -208,30 +224,35 @@
 
 <script lang="ts">
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'formiojs/dist/formio.full.min.css'
-import '../camundaFormIOTasklist.scss'
-import 'vue2-datepicker/index.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-// import  BootstrapVue from 'bootstrap-vue'
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import "font-awesome/scss/font-awesome.scss";
+import 'formiojs/dist/formio.full.min.css'
+import 'vue2-datepicker/index.css';
+import 'semantic-ui-css/semantic.min.css';
+import '../user-styles.css'
+import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import {TASK_FILTER_LIST_DEFAULT_PARAM,
+  decodeTokenValues,
+  findFilterKeyOfAllTask,
+  getTaskFromList,
+  sortingList
+} from "../services/utils";
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
+import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
-import TaskSortOptions from '../components/tasklist-sortoptions.vue';
-
-// Vue.use(BootstrapVue)
 
 
 @Component({
   components: {
     formio: Form,
     DatePicker,
-    TaskSortOptions
+    TaskSortOptions,
   }
 })
 export default class Tasklist extends Vue {
@@ -281,12 +302,11 @@ private groupListItems: string[] = []
 private userEmail = 'external'
 private selectedfilterId = ''
 private sortList = TASK_FILTER_LIST_DEFAULT_PARAM
-private updatesortList: any = TASK_FILTER_LIST_DEFAULT_PARAM;
 private sortOptions: any = []
 private updateSortOptions: any = []
-private setSortOptions: any = []
-private showSortListDropdown = false
-private setShowSortListDropdown = false
+private showUpdateSortListDropdown = [false, false, false, false, false, false]
+private showaddNewSortListDropdown = false
+private optionsList: any = ['created',]
 private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
   "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
 }
@@ -319,8 +339,8 @@ checkPropsIsPassedAndSetValue() {
   if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
     console.warn("formsflow.ai URL prop not passed")
   }
-
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
+  const engine = '/engine-rest'
+  localStorage.setItem("bpmApiUrl", this.bpmApiUrl+engine);
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
@@ -462,7 +482,6 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string, requestData: object) {
-  console.log('fetchTaskList')
   this.selectedfilterId = filterId
   CamundaRest.filterTaskList(this.token, filterId, requestData,
     this.bpmApiUrl,).then((result) => {
@@ -496,36 +515,37 @@ getOptions(options: any){
 
 addSort(sort: any){
   this.sortList.push(sort)
-  console.log(this.sortList)
-  this.updatesortList = this.sortList
   if(this.sortList.length === sortingList.length){
     this.updateSortOptions = this.sortOptions;
   }
   else{
     this.sortOptions = this.getOptions(this.sortList);
   }
-  this.showSortListDropdown = false;
+  this.showaddNewSortListDropdown = false;
 }
 
-showSortListOptions() {
-  this.showSortListDropdown = ! this.showSortListDropdown;
+showaddSortListOptions() {
+  this.showaddNewSortListDropdown = ! this.showaddNewSortListDropdown;
   this.sortOptions = this.getOptions(this.sortList);
 }
 
-updateSort(event: any, index: number) {
-  // const value = event?.target.value;
-  // const label = event?.target.options[event.target.options.selectedIndex].text;
-  // this.sortList[index].sortBy = event?.target.value;
-  // this.sortList[index].label = event?.target.options[event.target.options.selectedIndex].text;
+showUpdateSortOptions(index: number) {
+  this.showUpdateSortListDropdown[index] = !this.showUpdateSortListDropdown[index];
+  this.sortOptions = this.getOptions(this.sortList);
+}
 
-  // this.sortOptions = this.getOptions(this.sortList);
-  // this.payload["sorting"] = this.sortList
-  // this.fetchTaskList(this.selectedfilterId, this.payload)
+updateSort(sort: any, index: number) {
+  this.sortList[index].label = sort.label
+  this.sortList[index].sortBy = sort.sortBy;
+
+  this.sortOptions = this.getOptions(this.sortList);
+  this.showUpdateSortListDropdown[index] = false;
+  this.payload["sorting"] = this.sortList;
+  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 deleteSort(sort: any, index: number) {
   this.sortList.splice(index, 1);
-  this.updatesortList = this.sortList;
   this.updateSortOptions = []
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList
@@ -588,19 +608,15 @@ fetchData() {
   }
 }
 
-created() {
+
+mounted() {
+  this.checkPropsIsPassedAndSetValue();
+  authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles);
   CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
     this.filterList = response.data;
     const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks")
     this.fetchTaskList(key, this.payload)
   });
-}
-
-mounted() {
-  console.log('formsflowaiApiUrl', this.formsflowaiApiUrl)
-  this.checkPropsIsPassedAndSetValue()
-  console.log('after formsflowaiApiUrl', this.formsflowaiApiUrl)
-  authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles)
 
   this.fetchData();
   this.sortOptions = this.getOptions([])
