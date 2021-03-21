@@ -1,6 +1,7 @@
 .task-outer-container{
   max-width: 100vw;
   background-color: white;
+  text-align: left;
   
   .bg-default {
     background-color: #38598a !important;
@@ -63,10 +64,12 @@
   .task-header {
     font-size: 30px;
     font-weight: 600;
+    color: #212529;
   }
   .task-name {
     font-size: 20px;
     font-weight: 400;
+    color: #212529;
   }
 
   .cft-selected {

@@ -115,7 +115,9 @@
 		<b-col  v-if="selectedTask"  lg="8" md="8" sm="12">
 			<div class="service-task-details">
 				<b-row class="ml-0 task-header"> {{task.name}}</b-row>
+        <br>
 				<b-row class="ml-0 task-name">{{taskProcess}}</b-row>
+        <br>
 				<b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
 				<div>
 					<b-row class="cft-actionable">
@@ -228,24 +230,29 @@
 
 <script lang="ts">
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'formiojs/dist/formio.full.min.css'
-import '../camundaFormIOTasklist.scss'
-import 'vue2-datepicker/index.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-// import  BootstrapVue from 'bootstrap-vue'
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import "font-awesome/scss/font-awesome.scss";
+import 'formiojs/dist/formio.full.min.css'
+import 'vue2-datepicker/index.css';
+import 'semantic-ui-css/semantic.min.css';
+import '../user-styles.css'
+import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import {TASK_FILTER_LIST_DEFAULT_PARAM,
+  decodeTokenValues,
+  findFilterKeyOfAllTask,
+  getTaskFromList,
+  sortingList
+} from "../services/utils";
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
+import TaskSortOptions from '../components/tasklist-sortoptions.vue';
+import TaskUpdateSortOptions from '../components/tasklist-updatesort-options.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
-import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
-import TaskSortOptions from '../components/tasklist-sortoptions.vue';
-import TaskUpdateSortOptions from '../components/tasklist-updatesort-options.vue';
-
-// Vue.use(BootstrapVue)
 
 
 @Component({
@@ -483,7 +490,6 @@ onUnClaim(){
 }
 
 fetchTaskList(filterId: string, requestData: object) {
-  console.log('fetchTaskList')
   this.selectedfilterId = filterId
   CamundaRest.filterTaskList(this.token, filterId, requestData,
     this.bpmApiUrl,).then((result) => {
@@ -508,10 +514,8 @@ linkGen () {
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
-    console.log("Looping through each option",sortOption);
     if(!options.some((option: { sortBy: string })=>option.sortBy===sortOption.sortBy)){
       optionsArray.push({...sortOption})
-      console.log("options arrays", optionsArray);
     }
   });
   return optionsArray;
