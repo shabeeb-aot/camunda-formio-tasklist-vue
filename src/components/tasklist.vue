@@ -92,7 +92,7 @@
 				<p>No tasks found in the list.</p>
 			</b-row>
 		</b-col>
-		<b-col  v-if="selectedTask">
+		<b-col  v-if="selectedTask"  lg="8" md="8" sm="12">
 			<div class="service-task-details">
 				<b-row class="ml-0 task-header"> {{task.name}}</b-row>
 				<b-row class="ml-0 task-name">{{taskProcess}}</b-row>
