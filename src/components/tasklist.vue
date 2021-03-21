@@ -213,7 +213,7 @@ import 'formiojs/dist/formio.full.min.css'
 import '../camundaFormIOTasklist.scss'
 import 'vue2-datepicker/index.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import  BootstrapVue from 'bootstrap-vue'
+// import  BootstrapVue from 'bootstrap-vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
@@ -224,7 +224,7 @@ import moment from "moment";
 import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 
-Vue.use(BootstrapVue)
+// Vue.use(BootstrapVue)
 
 
 @Component({
