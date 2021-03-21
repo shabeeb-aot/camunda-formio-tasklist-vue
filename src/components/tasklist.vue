@@ -2,27 +2,47 @@
   
 <b-container fluid class="task-outer-container">
 	<b-row class="cft-service-task-list">
-		<b-col cols="*" xl="4" lg="4" md="4" sm="12" v-if="tasks && tasks.length" class="cft-first">
+		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first" v-if="tasks && tasks.length">
 			<b-list-group class="cft-list-container">
-				<div class="cft-filter-sort">
-					<div class="d-flex" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-						<div>
-							<span v-if="sortList.length>1" class="font-weight-bold click-element" title="Remove Sorting" @click="deleteSort(sort, index)">x</span>
-							<select class="form-select" aria-label="Select Sorting Options" @change="updateSort($event, idx)">
+				<div id='cftf-dpdown-container'>
+					<div class="cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+						<div id='cftf-dpdown-container'>
+							<div>
+              <span v-if="sortList.length>1" class="font-weight-bold click-element" title="Remove Sorting" @click="deleteSort(sort, index)">x</span>
+							<span class="font-weight-bold click-element" @click="showUpdateSortOptions">{{sortList[idx]["label"]}}</span>
+              {{showUpdateSortListDropdown}}
+              <TaskUpdateSortOptions
+               :sortOptions="sortOptions" 
+               :showSortListDropdown="showUpdateSortListDropdown"
+               @update-sort="updateSort"
+              >
+              </TaskUpdateSortOptions>
+              <!-- <select
+               class="form-select"
+               aria-label="Select Sorting Options"
+               v-model="optionsList[idx]"
+               @click="updateSort(idx)"
+              >
 								<option v-for="s in sortOptions" :value="s.sortBy" :key="s.sortBy">{{s.label}}</option>
-							</select>
+							</select> -->
 							<a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
 								<i class="bi bi-chevron-up"></i>
 							</a>
 							<a v-else @click="toggleSort(idx)"  href="#" title="Descending">
 								<i class="bi bi-chevron-down"></i>
 							</a>
-							<button v-if="updateSortOptions.length===0">
-								<i class="bi bi-plus" @click="showSortListOptions"></i>
-							</button>
-							<TaskSortOptions :sortOptions="sortOptions" :showSortListDropdown="showSortListDropdown" @add-sort="addSort"></TaskSortOptions>
+              </div>
 						</div>
-					</div>
+          </div>
+          <button v-if="updateSortOptions.length===0">
+								<i class="bi bi-plus" @click="showaddSortListOptions"></i>
+							</button>
+          <TaskSortOptions
+           :sortOptions="sortOptions"
+           :showSortListDropdown="showaddNewSortListDropdown"
+           @add-sort="addSort"
+          >
+          </TaskSortOptions>
 					<div class="cft-filter-dropdown">
 						<button class="cft-filter-dropbtn mr-0">
 							<i class="bi bi-filter-square"/>
@@ -223,6 +243,7 @@ import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
 import {TASK_FILTER_LIST_DEFAULT_PARAM, decodeTokenValues, findFilterKeyOfAllTask, getTaskFromList, sortingList} from "../services/utils";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
+import TaskUpdateSortOptions from '../components/tasklist-updatesort-options.vue';
 
 // Vue.use(BootstrapVue)
 
@@ -231,7 +252,8 @@ import TaskSortOptions from '../components/tasklist-sortoptions.vue';
   components: {
     formio: Form,
     DatePicker,
-    TaskSortOptions
+    TaskSortOptions,
+    TaskUpdateSortOptions,
   }
 })
 export default class Tasklist extends Vue {
@@ -281,12 +303,11 @@ private groupListItems: string[] = []
 private userEmail = 'external'
 private selectedfilterId = ''
 private sortList = TASK_FILTER_LIST_DEFAULT_PARAM
-private updatesortList: any = TASK_FILTER_LIST_DEFAULT_PARAM;
 private sortOptions: any = []
 private updateSortOptions: any = []
-private setSortOptions: any = []
-private showSortListDropdown = false
-private setShowSortListDropdown = false
+private showUpdateSortListDropdown = false
+private showaddNewSortListDropdown = false
+private optionsList: any = ['created',]
 private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
   "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
 }
@@ -319,8 +340,8 @@ checkPropsIsPassedAndSetValue() {
   if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
     console.warn("formsflow.ai URL prop not passed")
   }
-
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl);
+  const engine = '/engine-rest'
+  localStorage.setItem("bpmApiUrl", this.bpmApiUrl+engine);
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
@@ -487,8 +508,10 @@ linkGen () {
 getOptions(options: any){
   const optionsArray: { sortOrder: string; label: string; sortBy: string }[] = [];
   sortingList.forEach(sortOption=>{
+    console.log("Looping through each option",sortOption);
     if(!options.some((option: { sortBy: string })=>option.sortBy===sortOption.sortBy)){
       optionsArray.push({...sortOption})
+      console.log("options arrays", optionsArray);
     }
   });
   return optionsArray;
@@ -497,22 +520,42 @@ getOptions(options: any){
 addSort(sort: any){
   this.sortList.push(sort)
   console.log(this.sortList)
-  this.updatesortList = this.sortList
   if(this.sortList.length === sortingList.length){
     this.updateSortOptions = this.sortOptions;
   }
   else{
     this.sortOptions = this.getOptions(this.sortList);
   }
-  this.showSortListDropdown = false;
+  this.showaddNewSortListDropdown = false;
 }
 
-showSortListOptions() {
-  this.showSortListDropdown = ! this.showSortListDropdown;
+showaddSortListOptions() {
+  this.showaddNewSortListDropdown = ! this.showaddNewSortListDropdown;
   this.sortOptions = this.getOptions(this.sortList);
 }
 
-updateSort(event: any, index: number) {
+showUpdateSortOptions() {
+  this.showUpdateSortListDropdown = ! this.showUpdateSortListDropdown;
+  this.sortOptions = this.getOptions(this.sortList);
+}
+
+updateSort(sort: any, index: number) {
+  this.sortList[index].label = sort.label
+  this.sortList[index].sortBy = sort.sortBy;
+
+  this.sortOptions = this.getOptions(this.sortList);
+
+  // for(let i=0; i<sortingList.length; i++){
+  //   if(sortingList[i]["sortBy"]===this.optionsList[index]){
+  //     this.sortList[index] = sortingList[i];
+  //   }
+  // }
+  // console.log(this.optionsList[index])
+  // this.sortOptions = this.getOptions(this.sortList);
+  // console.log("option list", this.optionsList);
+  this.payload["sorting"] = this.sortList;
+  console.log(this.payload)
+  this.fetchTaskList(this.selectedfilterId, this.payload);
   // const value = event?.target.value;
   // const label = event?.target.options[event.target.options.selectedIndex].text;
   // this.sortList[index].sortBy = event?.target.value;
@@ -525,7 +568,6 @@ updateSort(event: any, index: number) {
 
 deleteSort(sort: any, index: number) {
   this.sortList.splice(index, 1);
-  this.updatesortList = this.sortList;
   this.updateSortOptions = []
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList
