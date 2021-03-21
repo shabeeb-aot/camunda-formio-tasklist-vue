@@ -159,7 +159,7 @@
 											</b-button>
 										</b-col>
 										<b-col>
-											<input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup">
+											<input type="text" placeholder="Group ID" v-model="setGroup" v-on:keyup.enter="addGroup"/>
 											</b-col>
 										</b-row>
 										<b-row>
@@ -378,7 +378,7 @@ togglefilter(index: number) {
 }
 
 addGroup() {
-  CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then((result) => {
+  CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then(() => {
     this.getGroupDetails();
     this.reloadCurrentTask()
   })
