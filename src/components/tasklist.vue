@@ -204,9 +204,9 @@
 									</div>
 								</b-tab>
 								<b-tab title="History"></b-tab>
-								<b-tab title="Diagram">
-            Welcome diagram
-          </b-tab>
+                <b-tab  style="height:100%;" id="diagramContainer" title="Diagram">
+                  <div  style="height:100%;" id="canvas"></div>
+                </b-tab>
 							</b-tabs>
 						</div>
 					</div>
@@ -242,10 +242,12 @@ import {TASK_FILTER_LIST_DEFAULT_PARAM,
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
+import Modeler from 'bpmn-js/lib/Modeler';
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
 import moment from "moment";
+import vueBpmn from "vue-bpmn";
 
 
 @Component({
@@ -253,6 +255,8 @@ import moment from "moment";
     formio: Form,
     DatePicker,
     TaskSortOptions,
+    vueBpmn,
+    Modeler
   }
 })
 export default class Tasklist extends Vue {
@@ -301,6 +305,7 @@ private groupListNames: any = null
 private groupListItems: string[] = []
 private userEmail = 'external'
 private selectedfilterId = ''
+  private xmlData: any;
 private sortList = TASK_FILTER_LIST_DEFAULT_PARAM
 private sortOptions: any = []
 private updateSortOptions: any = []
@@ -596,7 +601,20 @@ fetchData() {
       CamundaRest.getProcessDefinitionById(this.token, result.data.processDefinitionId, this.bpmApiUrl).then((res) => {
         this.taskProcess = res.data.name;
       });
+      CamundaRest.getProcessDiagramXML(
+        this.token,
+        result.data.processDefinitionId,
+        this.bpmApiUrl
+      ).then(async (res) => {
+        this.xmlData = res.data.bpmn20Xml;
+        const modeler = new Modeler({ container: '#canvas' });
+        await modeler.importXML(this.xmlData);
+        // const { warnings } = await viewer.importXML(this.xmlData);
+        // viewer.attachTo('#diagramContainer');
+        console.log("xml", res.data.bpmn20Xml);
+      });
     })
+    
     this.showfrom = false
     CamundaRest.getVariablesByTaskId(this.token, this.selectedTask, this.bpmApiUrl).then((result)=> {
       this.applicationId = result.data["applicationId"].value;
