@@ -1,8 +1,33 @@
 <template>
   
 <b-container fluid class="task-outer-container">
-	<b-row class="cft-service-task-list">
-		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+  <b-row>
+    <!-- Filter section begins -->
+    <b-col cols="*" xl="1" lg="1" md="1" sm="12" class="cft-filter-dropdown">
+        <button class="cft-filter-dropbtn mr-0">
+          <i class="bi bi-filter-square"/>
+        </button>
+        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+          <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+          @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
+          :class="{'cft-selected': idx == activefilter}">
+            {{filter.name}}
+          </b-list-group-item>
+        </b-list-group>
+        <b-list-group v-else>
+          <b-list-group-item>
+            <i class="bi bi-exclamation-circle-fill"></i>
+        No Filters found
+    
+          </b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <b-col cols="*" xl="2" lg="2" md="2" sm="12">
+        <h1> <i class="fa fa-wpforms"></i> Forms</h1>
+      </b-col>
+  </b-row>
+  <b-row>
+    <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
       <div>
         <!-- Sorting section -->
 				<div id='cftf-dpdown-container'>
@@ -36,33 +61,16 @@
           </TaskSortOptions>
           </div>
 				</div>
-        <div class="cft-filter-search">
-          <div class="cft-input-filter">
-				<div class="cft-filter-container">
+    </b-col>
+  </b-row>
+	<b-row class="cft-service-task-list">
+		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+        <b-row class="cft-input-filter">
+          <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
-				</div>
-          <div class="cft-filter-dropdown">
-              <button class="cft-filter-dropbtn mr-0">
-                <i class="bi bi-filter-square"/>
-              </button>
-              <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-                <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-                @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-                :class="{'cft-selected': idx == activefilter}">
-                  {{filter.name}}
-                </b-list-group-item>
-              </b-list-group>
-              <b-list-group v-else>
-                <b-list-group-item>
-                  <i class="bi bi-exclamation-circle-fill"></i>
-              No Filters found
-          
-                </b-list-group-item>
-              </b-list-group>
-            </div>
-					</div>
-        </div>
+          </b-col>
+          </b-row>
         <!-- Task list section -->
         <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
 				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
