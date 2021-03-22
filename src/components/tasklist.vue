@@ -6,7 +6,7 @@
       <div>
         <!-- Sorting section -->
 				<div id='cftf-dpdown-container'>
-					<div class="mr-3 cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+					<div class="cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
               <span v-if="sortList.length>1" class="cftf-exit-button" title="Remove Sorting" @click="deleteSort(sort, index)"><i class="bi bi-x"></i></span>
 							<span class="cftf-span-element" @click="showUpdateSortOptions(idx)">{{sortList[idx]["label"]}}</span>
               <div v-if="showUpdateSortListDropdown[idx]" class="cft-sort-items">
@@ -37,28 +37,30 @@
           </div>
 				</div>
         <div class="cft-filter-search">
-          <div class="cft-filter-dropdown">
+          <div class="cft-input-filter">
 				<div class="cft-filter-container">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
 				</div>
-						<button class="cft-filter-dropbtn mr-0">
-							<i class="bi bi-filter-square"/>
-						</button>
-						<b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-							<b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-              @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-              :class="{'cft-selected': idx == activefilter}">
-                {{filter.name}}
-							</b-list-group-item>
-						</b-list-group>
-						<b-list-group v-else>
-							<b-list-group-item>
-								<i class="bi bi-exclamation-circle-fill"></i>
-            No Filters found
-        
-							</b-list-group-item>
-						</b-list-group>
+          <div class="cft-filter-dropdown">
+              <button class="cft-filter-dropbtn mr-0">
+                <i class="bi bi-filter-square"/>
+              </button>
+              <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+                <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+                @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
+                :class="{'cft-selected': idx == activefilter}">
+                  {{filter.name}}
+                </b-list-group-item>
+              </b-list-group>
+              <b-list-group v-else>
+                <b-list-group-item>
+                  <i class="bi bi-exclamation-circle-fill"></i>
+              No Filters found
+          
+                </b-list-group-item>
+              </b-list-group>
+            </div>
 					</div>
         </div>
         <!-- Task list section -->
@@ -106,7 +108,7 @@
       </b-list-group>
 		</b-col>
     <!-- Task Detail section -->
-		<b-col  v-if="selectedTask"  lg="8" md="8" sm="12">
+		<b-col  v-if="selectedTask"  lg="9" md="9" sm="12">
 			<div class="service-task-details">
 				<b-row class="ml-0 task-header"> {{task.name}}</b-row>
         <br>
