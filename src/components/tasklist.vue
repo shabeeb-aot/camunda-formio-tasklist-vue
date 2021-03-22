@@ -260,6 +260,9 @@ import moment from "moment";
 import vueBpmn from "vue-bpmn";
 
 
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
+
 @Component({
   components: {
     formio: Form,
