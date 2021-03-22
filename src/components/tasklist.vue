@@ -23,9 +23,10 @@
           </b-list-group-item>
         </b-list-group>
       </b-col>
+      <!-- Forms list & fill section -->
       <b-col cols="*" xl="2" lg="2" md="2" sm="12">
-        <b-button v-b-modal.modal-multi-1>
-        <h1> <i class="fa fa-wpforms"></i> Forms</h1>
+        <b-button class="cft-form-title" v-b-modal.modal-multi-1>
+        <h3> <i class="fa fa-wpforms"></i> Forms</h3>
         </b-button>
         <b-modal
           id="modal-multi-1"
@@ -51,7 +52,7 @@
                 <b-tr v-for="form in formList" :key="form.formId">
                   <b-th> {{form.formName}}</b-th>
                   <b-th>
-                    <b-button `
+                    <b-button
                       variant="primary"
                       v-b-modal.modal-multi-2
                       @click="storeFormValue(form.formId, form.formName)"

@@ -68,6 +68,7 @@
     font-size: 30px;
     font-weight: 600;
     color: #212529;
+    padding-top: 5px;
   }
   .task-name {
     font-size: 20px;
@@ -252,6 +253,13 @@
 
   p{
     white-space: normal;
+  }
+
+  .cft-form-title{
+    cursor: pointer;
+    color: #4d61fc;
+    border-bottom: 1px solid #4d61fc;
+    background-color: transparent;
   }
 
 }
