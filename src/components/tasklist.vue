@@ -12,7 +12,7 @@
         <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
           <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
           @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-          :class="{'cft-selected': idx == activefilter}">
+          :class="{'cft-filter-selected': idx == activefilter}">
             {{filter.name}}
           </b-list-group-item>
         </b-list-group>
