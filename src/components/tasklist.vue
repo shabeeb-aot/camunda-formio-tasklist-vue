@@ -3,7 +3,9 @@
 <b-container fluid class="task-outer-container">
   <b-row>
     <!-- Filter section begins -->
-    <b-col cols="*" xl="1" lg="1" md="1" sm="12" class="cft-filter-dropdown">
+    <b-col cols="*" xl="1" lg="1" md="1" sm="12"
+      class="cft-filter-dropdown"
+    >
         <button class="cft-filter-dropbtn mr-0">
           <i class="bi bi-filter-square"/>
         </button>
@@ -17,13 +19,66 @@
         <b-list-group v-else>
           <b-list-group-item>
             <i class="bi bi-exclamation-circle-fill"></i>
-        No Filters found
-    
+              No Filters found  
           </b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col cols="*" xl="2" lg="2" md="2" sm="12">
+        <b-button v-b-modal.modal-multi-1>
         <h1> <i class="fa fa-wpforms"></i> Forms</h1>
+        </b-button>
+        <b-modal
+          id="modal-multi-1"
+          title="Forms"
+        >
+          <div class="overflow-auto">
+            <b-table-simple
+              hover
+              small
+              caption-top
+              responsive
+              :bordered=true
+              :outlined=true
+              :per-page="perPage"
+            >
+              <b-thead>
+                <b-tr>
+                  <b-th>Form Name</b-th>
+                  <b-th>Operations</b-th>
+                </b-tr>
+              </b-thead>
+              <b-tbody>
+                <b-tr v-for="form in formList" :key="form.formId">
+                  <b-th> {{form.formName}}</b-th>
+                  <b-th>
+                    <b-button `
+                      variant="primary"
+                      v-b-modal.modal-multi-2
+                      @click="storeFormValue(form.formId, form.formName)"
+                    >Submit New
+                    </b-button>
+                  </b-th>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+                <b-pagination-nav
+                :link-gen="linkFormGen"
+                :number-of-pages="formNumPages"
+                v-model="formcurrentPage"
+              />
+          </div>
+        </b-modal>
+        <b-modal
+          id="modal-multi-2"
+          size="lg"
+          title="Create forms"
+        >
+          Enter and submit form
+          <h4>{{formTitle}}</h4>
+          <formio :src="formValueId">
+          </formio>
+        </b-modal>
       </b-col>
   </b-row>
   <b-row>
@@ -124,6 +179,7 @@
         <br>
 				<b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
 				<div>
+          <!-- four buttons -->
 					<b-row class="cft-actionable">
 						<b-col>
 							<DatePicker 
@@ -142,26 +198,29 @@
           ></DatePicker>
 						</b-col>
 						<b-col>
-							<b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames">
+							<b-button variant="primary" v-b-modal.AddGroupModal v-if="groupListNames">
 								<i class="bi bi-grid-3x3-gap-fill"></i> {{String(groupListNames)}} 
 							</b-button>
-							<b-button variant="outline-primary" v-b-modal.AddGroupModal v-else>
+							<b-button variant="primary" v-b-modal.AddGroupModal v-else>
 								<i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
 							</b-button>
 							<b-modal
-            id="AddGroupModal"
-            ref="modal"
-            title="Manage Groups"
-            ok-title="Close"
-            ok-only
-          >
+                id="AddGroupModal"
+                ref="modal"
+                title="Manage Groups"
+                ok-title="Close"
+                ok-only
+              >
 								<div class="modal-text">
 									<i class="bi bi-exclamation-circle"></i>
-              You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
-              
+              You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.      
 									<b-row class="mt-3 mb-3">
 										<b-col>
-											<b-button variant="primary" @click="addGroup">
+											<b-button
+                        variant="primary"
+                        @click="addGroup"
+                        :disabled='!setGroup'
+                      >
 												<span>Add a group</span>
 												<span>
 													<i class="bi bi-plus"></i>
@@ -176,7 +235,7 @@
 											<b-col v-if="groupList.length">
 												<ul v-for="g in groupList" :key="g.groupId">
 													<div class="mt-1">
-														<i class="bi bi-x" @click="deleteGroup(g.groupId)"></i>
+														<i class="fa fa-times mr-2 click-element" @click="deleteGroup(g.groupId)"></i>
 														<span>{{g.groupId}}</span>
 													</div>
 												</ul>
@@ -186,19 +245,20 @@
 								</b-modal>
 							</b-col>
 							<b-col>
-								<b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
+								<b-button variant="primary" v-if="task.assignee" @click="onUnClaim">
               {{task.assignee}}
             
 									<i class="bi bi-person-x-fill"/>
 								</b-button>
-								<b-button variant="outline-primary" v-else @click="onClaim">
+								<b-button variant="primary" v-else @click="onClaim">
 									<i class="bi bi-person-fill"/>
-            Claim
+                  Claim
             
 								</b-button>
 							</b-col>
 						</b-row>
 						<div>
+              <!-- form section -->
 							<b-tabs content-class="mt-3" v-if="showfrom">
 								<b-tab title="Form">
 									<div  class="ml-4 mr-4">
@@ -214,6 +274,7 @@
 									</div>
 								</b-tab>
 								<b-tab title="History"></b-tab>
+                <!-- Process diagram -->
                 <b-tab  style="height:100%;" id="diagramContainer" title="Diagram">
                   <div  style="height:100%;" id="canvas"></div>
                 </b-tab>
@@ -260,9 +321,6 @@ import moment from "moment";
 import vueBpmn from "vue-bpmn";
 
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-
 @Component({
   components: {
     formio: Form,
@@ -292,6 +350,7 @@ private submissionId = ''
 private formioUrl = ''
 private activeIndex = 0
 private task: any
+private formList: Array<object> = []
 private setFollowup = null
 private setDue = null
 private setGroup = null
@@ -300,6 +359,11 @@ private showfrom = false
 private currentPage= 1
 private perPage= 15
 private numPages=5
+private formperPage=10
+private formNumPages=5
+private formcurrentPage=1
+private formValueId = ''
+private formTitle = ''
 private tasklength=0
 private readoption = {readOnly: true,}
 private options =  {
@@ -371,7 +435,7 @@ timedifference(date: Date)  {
   return moment(date).fromNow();
 }
 
-getProcessDataFromList(processList: any[] ,processId: any,dataKey: string) {
+getProcessDataFromList(processList: any[] ,processId: any, dataKey: string) {
   const process = processList.find(process=>process.id===processId);
   return process && process[dataKey] ;
 }
@@ -391,10 +455,12 @@ togglefilter(index: number) {
 }
 
 addGroup() {
-  CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask()
-  })
+  if(!this.setGroup){
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then(() => {
+      this.getGroupDetails();
+      this.reloadCurrentTask()
+    })
+  }
 }
 
 getGroupDetails() {
@@ -624,7 +690,7 @@ fetchData() {
         await modeler.importXML(this.xmlData);
         // const { warnings } = await viewer.importXML(this.xmlData);
         // viewer.attachTo('#diagramContainer');
-        console.log("xml", res.data.bpmn20Xml);
+        // console.log("xml", res.data.bpmn20Xml);
       });
     })
     
@@ -639,6 +705,32 @@ fetchData() {
   }
 }
 
+linkFormGen() {
+  this.formListItems();
+}
+
+formListItems() {
+  console.log("start", (this.formcurrentPage-1)*this.formperPage)
+  console.log("end", this.formcurrentPage* this.formperPage)
+  CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
+  {
+    this.formNumPages = Math.ceil(response.data.length/this.formperPage);
+    this.formList = response.data.splice(
+      (this.formcurrentPage - 1) * this.formperPage,
+      this.formcurrentPage * this.formperPage
+    );
+    console.log("Current Page, num page", this.formcurrentPage, this.formperPage)
+    console.log("end length", this.formcurrentPage*this.formperPage)
+    console.log("length of response", this.formList.length);
+  });
+}
+
+storeFormValue(val: string, name: string){
+  const forms = localStorage.getItem('formioApiUrl') + '/form/';
+  this.formValueId = forms.concat(val);
+  this.formTitle = name;
+}
+
 
 mounted() {
   this.checkPropsIsPassedAndSetValue();
@@ -649,6 +741,7 @@ mounted() {
     this.fetchTaskList(key, this.payload)
   });
 
+  this.formListItems();
   this.fetchData();
   this.sortOptions = this.getOptions([])
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
