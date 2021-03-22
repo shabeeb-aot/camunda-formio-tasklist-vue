@@ -25,61 +25,7 @@
       </b-col>
       <!-- Forms list & fill section -->
       <b-col cols="*" xl="2" lg="2" md="2" sm="12">
-        <b-button class="cft-form-title" v-b-modal.modal-multi-1>
-        <h3> <i class="fa fa-wpforms"></i> Forms</h3>
-        </b-button>
-        <b-modal
-          id="modal-multi-1"
-          title="Forms"
-        >
-          <div class="overflow-auto">
-            <b-table-simple
-              hover
-              small
-              caption-top
-              responsive
-              :bordered=true
-              :outlined=true
-              :per-page="perPage"
-            >
-              <b-thead>
-                <b-tr>
-                  <b-th>Form Name</b-th>
-                  <b-th>Operations</b-th>
-                </b-tr>
-              </b-thead>
-              <b-tbody>
-                <b-tr v-for="form in formList" :key="form.formId">
-                  <b-th> {{form.formName}}</b-th>
-                  <b-th>
-                    <b-button
-                      variant="primary"
-                      v-b-modal.modal-multi-2
-                      @click="storeFormValue(form.formId, form.formName)"
-                    >Submit New
-                    </b-button>
-                  </b-th>
-                </b-tr>
-              </b-tbody>
-            </b-table-simple>
-
-                <b-pagination-nav
-                :link-gen="linkFormGen"
-                :number-of-pages="formNumPages"
-                v-model="formcurrentPage"
-              />
-          </div>
-        </b-modal>
-        <b-modal
-          id="modal-multi-2"
-          size="lg"
-          title="Create forms"
-        >
-          Enter and submit form
-          <h4>{{formTitle}}</h4>
-          <formio :src="formValueId">
-          </formio>
-        </b-modal>
+        <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
       </b-col>
   </b-row>
   <b-row>
@@ -314,6 +260,7 @@ import {TASK_FILTER_LIST_DEFAULT_PARAM,
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
+import FormList from '../components/formlist.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -326,9 +273,10 @@ import vueBpmn from "vue-bpmn";
   components: {
     formio: Form,
     DatePicker,
+    FormList,
     TaskSortOptions,
     vueBpmn,
-    Modeler
+    Modeler,
   }
 })
 export default class Tasklist extends Vue {
@@ -351,7 +299,6 @@ private submissionId = ''
 private formioUrl = ''
 private activeIndex = 0
 private task: any
-private formList: Array<object> = []
 private setFollowup = null
 private setDue = null
 private setGroup = null
@@ -360,11 +307,6 @@ private showfrom = false
 private currentPage= 1
 private perPage= 15
 private numPages=5
-private formperPage=10
-private formNumPages=5
-private formcurrentPage=1
-private formValueId = ''
-private formTitle = ''
 private tasklength=0
 private readoption = {readOnly: true,}
 private options =  {
@@ -397,29 +339,17 @@ private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVa
 checkPropsIsPassedAndSetValue() {
   if(!this.bpmApiUrl || this.bpmApiUrl===""){
     console.warn("bpmApiUrl prop not Passed")
-  }
-
-  if(!this.token || this.token==="") {
+  } if(!this.token || this.token==="") {
     console.warn("token prop not Passed")
-  }
-
-  if(!this.formIOResourceId || this.formIOResourceId==="") {
+  } if(!this.formIOResourceId || this.formIOResourceId==="") {
     console.warn("formIOResourceId prop not passed")
-  }
-
-  if(!this.formIOReviewerId || this.formIOReviewerId==="") {
+  } if(!this.formIOReviewerId || this.formIOReviewerId==="") {
     console.warn("formIOReviewerId prop not passed")
-  }
-
-  if(!this.formIOApiUrl || this.formIOApiUrl === "") {
+  } if(!this.formIOApiUrl || this.formIOApiUrl === "") {
     console.warn("formIOApiUrl prop not passed")
-  }
-
-  if(!this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+  } if(!this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
     console.warn("formsflow.ai API url prop not passed")
-  }
-
-  if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
+  } if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
     console.warn("formsflow.ai URL prop not passed")
   }
   const engine = '/engine-rest'
@@ -691,7 +621,6 @@ fetchData() {
         await modeler.importXML(this.xmlData);
         // const { warnings } = await viewer.importXML(this.xmlData);
         // viewer.attachTo('#diagramContainer');
-        // console.log("xml", res.data.bpmn20Xml);
       });
     })
     
@@ -706,33 +635,6 @@ fetchData() {
   }
 }
 
-linkFormGen() {
-  this.formListItems();
-}
-
-formListItems() {
-  console.log("start", (this.formcurrentPage-1)*this.formperPage)
-  console.log("end", this.formcurrentPage* this.formperPage)
-  CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
-  {
-    this.formNumPages = Math.ceil(response.data.length/this.formperPage);
-    this.formList = response.data.splice(
-      (this.formcurrentPage - 1) * this.formperPage,
-      this.formcurrentPage * this.formperPage
-    );
-    console.log("Current Page, num page", this.formcurrentPage, this.formperPage)
-    console.log("end length", this.formcurrentPage*this.formperPage)
-    console.log("length of response", this.formList.length);
-  });
-}
-
-storeFormValue(val: string, name: string){
-  const forms = localStorage.getItem('formioApiUrl') + '/form/';
-  this.formValueId = forms.concat(val);
-  this.formTitle = name;
-}
-
-
 mounted() {
   this.checkPropsIsPassedAndSetValue();
   authenticateFormio(this.formIOResourceId, this.formIOReviewerId, this.formIOReviewer,this.userEmail, this.formIOUserRoles);
@@ -742,7 +644,6 @@ mounted() {
     this.fetchTaskList(key, this.payload)
   });
 
-  this.formListItems();
   this.fetchData();
   this.sortOptions = this.getOptions([])
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then((response) => {
