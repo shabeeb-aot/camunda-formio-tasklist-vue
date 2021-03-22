@@ -28,7 +28,7 @@ export const sortingList = [
 
 export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: any) =>{
   const decodeToken = JSON.parse(atob(token.split('.')[1]))
-  localStorage.setItem("UserDetails", decodeToken);
+  localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
   userName = !userName ? decodeToken && decodeToken["preferred_username"] : userName
   const userEmail = decodeToken["email"] || "external"
   const resourceacess = decodeToken && decodeToken["resource_access"]

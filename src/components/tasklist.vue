@@ -34,22 +34,34 @@
         <!-- Sorting section -->
 				<div id='cftf-dpdown-container'>
 					<div class="cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-              <span v-if="sortList.length>1" class="cftf-exit-button" title="Remove Sorting" @click="deleteSort(sort, index)"><i class="bi bi-x"></i></span>
-							<span class="cftf-span-element" @click="showUpdateSortOptions(idx)">{{sortList[idx]["label"]}}</span>
-              <div v-if="showUpdateSortListDropdown[idx]" class="cft-sort-items">
+              <span v-if="sortList.length>1"
+                class="cftf-exit-button"
+                title="Remove Sorting" 
+                @click="deleteSort(sort, index)"
+              >
+                  <i class="bi bi-x"></i>
+              </span>
+							<span
+               class="cftf-span-element"
+                @click="showUpdateSortOptions(idx)"
+              >{{sortList[idx]["label"]}}</span>
+              <div
+                v-if="showUpdateSortListDropdown[idx]"
+                class="cft-sort-items"
+              >
                 <div v-for="s in sortOptions" :key="s.sortBy"
                  @click="updateSort(s,idx)"
                  class="mb-2 cft-sort-element"
                 >
                   {{s.label}}
                 </div>
-            </div>
-							<a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-								<i class="bi bi-chevron-up cftf-arrow"></i>
-							</a>
-							<a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-								<i class="bi bi-chevron-down cftf-arrow"></i>
-							</a>
+              </div>
+                <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
+                  <i class="bi bi-chevron-up cftf-arrow"></i>
+                </a>
+                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
+                  <i class="bi bi-chevron-down cftf-arrow"></i>
+                </a>
             </div>
           <i v-if="updateSortOptions.length===0"
            class="fa fa-plus fa-sm click-element cftf-add-sorting"

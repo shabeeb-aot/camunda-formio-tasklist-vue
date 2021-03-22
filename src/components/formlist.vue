@@ -15,7 +15,7 @@
               responsive
               :bordered=true
               :outlined=true
-              :per-page="perPage"
+              :per-page="formperPage"
             >
               <b-thead>
                 <b-tr>
@@ -52,10 +52,10 @@
         >
           Enter and submit form
           <h4>{{formTitle}}</h4>
-          <formio 
+          <Form 
             :src="formValueId"
           >
-          </formio>
+          </Form>
         </b-modal>
     </div>
 </template>
@@ -66,8 +66,13 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
+import { Form } from 'vue-formio';
 
-@Component
+@Component({
+  components: {
+    Form
+  }
+})
 export default class FormList extends Vue{
   private formList: Array<object> = []
   private formperPage=10
@@ -84,8 +89,6 @@ export default class FormList extends Vue{
   }
 
   formListItems() {
-    console.log("start", (this.formcurrentPage-1)*this.formperPage)
-    console.log("end", this.formcurrentPage* this.formperPage)
     CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
     {
       this.formNumPages = Math.ceil(response.data.length/this.formperPage);
