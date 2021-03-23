@@ -51,3 +51,9 @@ export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: an
   }
   return {userName, userEmail, formIOUserRoles};
 }
+
+export const getFormattedDateAndTime = (date: Date)=>{
+
+  return new Date(date).toLocaleDateString('en-us',  {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour: '2-digit', minute: '2-digit', hour12: true});
+
+};
