@@ -1,7 +1,7 @@
 <template>
   <div>
    <b-button class="cft-form-title" v-b-modal.modal-multi-1>
-        <h3> <i class="fa fa-wpforms"></i> Forms</h3>
+        <h4> <i class="fa fa-wpforms"></i> Forms</h4>
         </b-button>
         <b-modal
           id="modal-multi-1"
