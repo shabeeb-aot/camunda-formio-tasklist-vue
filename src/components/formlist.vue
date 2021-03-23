@@ -1,11 +1,17 @@
 <template>
-  <div>
+  <div class="cftf-form-conatiner">
    <b-button class="cft-form-title" v-b-modal.modal-multi-1>
-        <h4> <i class="fa fa-wpforms"></i> Forms</h4>
+        <h4 ref="btn-show"> <i class="fa fa-wpforms"></i> Forms</h4>
         </b-button>
         <b-modal
+          ref="modal-1"
           id="modal-multi-1"
-          title="Forms"
+          hide-header
+          no-close-on-backdrop
+          no-close-on-esc
+          ok-only
+          ok-title="Cancel"
+          ok-variant="danger"
         >
           <div class="overflow-auto">
             <b-table-simple
@@ -42,15 +48,22 @@
                 :link-gen="linkFormGen"
                 :number-of-pages="formNumPages"
                 v-model="formcurrentPage"
+                class="cft-form-list-paginate"
               />
           </div>
         </b-modal>
         <b-modal
+          ref="modal-2"
           id="modal-multi-2"
           size="lg"
-          title="Create forms"
+          title="SUBMIT FORM"
+          no-close-on-backdrop
+          no-close-on-esc
+          ok-only
+          ok-title="Cancel"
+          ok-variant="danger"
         >
-          Enter and submit form
+          <i class="bi bi-arrow-left" @click="backClick"></i>
           <h4>{{formTitle}}</h4>
           <Form 
             :src="formValueId"
@@ -80,6 +93,7 @@ export default class FormList extends Vue{
   private formcurrentPage=1
   private formValueId = ''
   private formTitle = ''
+  private showForms = true
 
   @Prop({}) private token !: any;
   @Prop() private bpmApiUrl !: string;
@@ -91,21 +105,24 @@ export default class FormList extends Vue{
   formListItems() {
     CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
     {
-      this.formNumPages = Math.ceil(response.data.length/this.formperPage);
       this.formList = response.data.splice(
-        (this.formcurrentPage - 1) * this.formperPage,
-        this.formcurrentPage * this.formperPage
+        ((this.formcurrentPage - 1) * this.formperPage),
+        (this.formcurrentPage * this.formperPage)
       );
-      console.log("Current Page, num page", this.formcurrentPage, this.formperPage)
-      console.log("end length", this.formcurrentPage*this.formperPage)
-      console.log("length of response", this.formList.length);
+      this.formNumPages = Math.ceil(response.data.length/this.formperPage);
     });
   }
 
   storeFormValue(val: string, name: string){
+    this.$bvModal.hide('modal-multi-1')
     const forms = localStorage.getItem('formioApiUrl') + '/form/';
     this.formValueId = forms.concat(val);
     this.formTitle = name;
+  }
+
+  backClick() {
+    this.$bvModal.show('modal-multi-1')
+    this.$bvModal.hide('modal-multi-2')
   }
 
   mounted() {
