@@ -100,16 +100,18 @@
                 </div>
 						</div>
 						<div class="cft-task-details-assign font-11" >
-							<div >
-								<span v-if="task.due">
-                  Due {{ timedifference(task.due) }},
-                </span>
-								<span v-if="task.followUp">
-                  Follow-up {{ timedifference(task.followUp) }},
-                </span>
-								<span v-if="task.created">
-                  Created {{ timedifference(task.created) }}     
-                </span>
+							<div class="created-details">
+                <div>
+                  <span v-if="task.due">
+                    Due {{ timedifference(task.due) }},
+                  </span>
+                  <span v-if="task.followUp">
+                    Follow-up {{ timedifference(task.followUp) }},
+                  </span>
+                  <span v-if="task.created">
+                    Created {{ timedifference(task.created) }}     
+                  </span>
+                </div>
 								<div title="Task assignee" >
                  {{ task.priority }}
                 </div>
