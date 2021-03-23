@@ -105,11 +105,11 @@ export default class FormList extends Vue{
   formListItems() {
     CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
     {
+      this.formNumPages = Math.ceil(response.data.length/this.formperPage);
       this.formList = response.data.splice(
         ((this.formcurrentPage - 1) * this.formperPage),
         (this.formcurrentPage * this.formperPage)
       );
-      this.formNumPages = Math.ceil(response.data.length/this.formperPage);
     });
   }
 
