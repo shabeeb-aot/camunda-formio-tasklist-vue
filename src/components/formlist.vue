@@ -1,75 +1,118 @@
 <template>
-  <b-container fluid>
-    <h3 class="cftf-taskhead">Form</h3>
-    <div class="overflow-auto">
+  <div>
+   <b-button class="cft-form-title" v-b-modal.modal-multi-1>
+        <h3> <i class="fa fa-wpforms"></i> Forms</h3>
+        </b-button>
+        <b-modal
+          id="modal-multi-1"
+          title="Forms"
+        >
+          <div class="overflow-auto">
+            <b-table-simple
+              hover
+              small
+              caption-top
+              responsive
+              :bordered=true
+              :outlined=true
+              :per-page="formperPage"
+            >
+              <b-thead>
+                <b-tr>
+                  <b-th>Form Name</b-th>
+                  <b-th>Operations</b-th>
+                </b-tr>
+              </b-thead>
+              <b-tbody>
+                <b-tr v-for="form in formList" :key="form.formId">
+                  <b-th> {{form.formName}}</b-th>
+                  <b-th>
+                    <b-button
+                      variant="primary"
+                      v-b-modal.modal-multi-2
+                      @click="storeFormValue(form.formId, form.formName)"
+                    >Submit New
+                    </b-button>
+                  </b-th>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
 
-      <!-- <b-table :items="formList" :fields="fields"
-       head-variant="light" :bordered=true :outlined=true
-       :current-page="currentPage" :per-page="perPage">
-      </b-table> -->
-
-      <b-table-simple hover small caption-top responsive :bordered=true :outlined=true
-      :per-page="perPage">
-        <b-thead>
-          <b-tr>
-            <b-th>Form Name</b-th>
-            <b-th>Operations</b-th>
-          </b-tr>
-        </b-thead>
-        <b-tbody>
-          <b-tr v-for="form in formList" :key="form.formId">
-            <b-th> {{form.formName}}</b-th>
-            <b-th><b-button variant="primary">Submit New</b-button> </b-th>
-          </b-tr>
-        </b-tbody>
-      </b-table-simple>
-
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="totalrows"
-        :per-page="perPage"
-        aria-controls="form-table"
-        ></b-pagination>
-
-      <p> Current page is: {{currentPage}}</p>
+                <b-pagination-nav
+                :link-gen="linkFormGen"
+                :number-of-pages="formNumPages"
+                v-model="formcurrentPage"
+              />
+          </div>
+        </b-modal>
+        <b-modal
+          id="modal-multi-2"
+          size="lg"
+          title="Create forms"
+        >
+          Enter and submit form
+          <h4>{{formTitle}}</h4>
+          <Form 
+            :src="formValueId"
+          >
+          </Form>
+        </b-modal>
     </div>
-  </b-container>
 </template>
 
 <script lang="ts">
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import CamundaRest from '../services/camunda-rest'
-import { Component, Vue } from 'vue-property-decorator'
-
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '../camundaFormIOTasklist.scss'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import CamundaRest from '../services/camunda-rest'
+import { Form } from 'vue-formio';
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-
-@Component
+@Component({
+  components: {
+    Form
+  }
+})
 export default class FormList extends Vue{
   private formList: Array<object> = []
-  private actualFormNames = []
-  private fields = [
-    "formName",
-    "Operations"
-  ]
-  private perPage = 10
-  private currentPage = 1
+  private formperPage=10
+  private formNumPages=5
+  private formcurrentPage=1
+  private formValueId = ''
+  private formTitle = ''
 
-  get totalrows() {
-    return this.formList.length;
+  @Prop({}) private token !: any;
+  @Prop() private bpmApiUrl !: string;
+
+  linkFormGen() {
+    this.formListItems();
   }
 
-  created() {
-    const token = localStorage.getItem('authToken')
-    const bpmUrl = localStorage.getItem('bpmApiUrl')
-    CamundaRest.listForms(token, bpmUrl).then((response) =>
+  formListItems() {
+    CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
+    {
+      this.formNumPages = Math.ceil(response.data.length/this.formperPage);
+      this.formList = response.data.splice(
+        (this.formcurrentPage - 1) * this.formperPage,
+        this.formcurrentPage * this.formperPage
+      );
+      console.log("Current Page, num page", this.formcurrentPage, this.formperPage)
+      console.log("end length", this.formcurrentPage*this.formperPage)
+      console.log("length of response", this.formList.length);
+    });
+  }
+
+  storeFormValue(val: string, name: string){
+    const forms = localStorage.getItem('formioApiUrl') + '/form/';
+    this.formValueId = forms.concat(val);
+    this.formTitle = name;
+  }
+
+  mounted() {
+    CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
     {
       this.formList = response.data;
     });
-    }
   }
+}
 </script>

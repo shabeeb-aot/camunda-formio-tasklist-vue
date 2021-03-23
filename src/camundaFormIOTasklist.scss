@@ -35,9 +35,6 @@
     font-style: italic;
   }
 
-  .cft-filter-search{
-    width: 100%;
-  }
   .cft-filter:focus{
     outline: none;
   }
@@ -71,6 +68,7 @@
     font-size: 30px;
     font-weight: 600;
     color: #212529;
+    padding-top: 5px;
   }
   .task-name {
     font-size: 20px;
@@ -79,6 +77,10 @@
   }
 
   .cft-selected {
+    border-left: 5px solid #003366 !important;
+  }
+
+  .cft-filter-selected {
     border-left: 2px solid #003366 !important;
   }
 
@@ -228,10 +230,12 @@
   .cftf-add-sorting {
     padding-top: 5px;
     margin-top: 5px;
+    position: relative;
+    float: left;
   }
 
   .cftf-arrow {
-    font-size: 1.3333em;
+    padding-top: 5px;
     line-height: 0.75em;
     display: inline-block;
     font-weight: 700  !important;
@@ -244,6 +248,13 @@
 
   p{
     white-space: normal;
+  }
+
+  .cft-form-title{
+    cursor: pointer;
+    color: #4d61fc;
+    border-bottom: 1px solid #4d61fc;
+    background-color: transparent;
   }
 
 }

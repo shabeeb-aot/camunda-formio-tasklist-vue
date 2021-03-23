@@ -1,28 +1,67 @@
 <template>
   
 <b-container fluid class="task-outer-container">
-	<b-row class="cft-service-task-list">
-		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+  <b-row>
+    <!-- Filter section begins -->
+    <b-col cols="*" xl="1" lg="1" md="1" sm="12"
+      class="cft-filter-dropdown"
+    >
+        <button class="cft-filter-dropbtn mr-0">
+          <i class="bi bi-filter-square"/>
+        </button>
+        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
+          <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+          @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
+          :class="{'cft-filter-selected': idx == activefilter}">
+            {{filter.name}}
+          </b-list-group-item>
+        </b-list-group>
+        <b-list-group v-else>
+          <b-list-group-item>
+            <i class="bi bi-exclamation-circle-fill"></i>
+              No Filters found  
+          </b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <!-- Forms list & fill section -->
+      <b-col cols="*" xl="2" lg="2" md="2" sm="12">
+        <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
+      </b-col>
+  </b-row>
+  <b-row>
+    <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
       <div>
         <!-- Sorting section -->
 				<div id='cftf-dpdown-container'>
 					<div class="cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-              <span v-if="sortList.length>1" class="cftf-exit-button" title="Remove Sorting" @click="deleteSort(sort, index)"><i class="bi bi-x"></i></span>
-							<span class="cftf-span-element" @click="showUpdateSortOptions(idx)">{{sortList[idx]["label"]}}</span>
-              <div v-if="showUpdateSortListDropdown[idx]" class="cft-sort-items">
+              <span v-if="sortList.length>1"
+                class="cftf-exit-button"
+                title="Remove Sorting" 
+                @click="deleteSort(sort, index)"
+              >
+                  <i class="bi bi-x"></i>
+              </span>
+							<span
+               class="cftf-span-element"
+                @click="showUpdateSortOptions(idx)"
+              >{{sortList[idx]["label"]}}</span>
+              <div
+                v-if="showUpdateSortListDropdown[idx]"
+                class="cft-sort-items"
+              >
                 <div v-for="s in sortOptions" :key="s.sortBy"
                  @click="updateSort(s,idx)"
                  class="mb-2 cft-sort-element"
                 >
                   {{s.label}}
                 </div>
-            </div>
-							<a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-								<i class="bi bi-chevron-up cftf-arrow"></i>
-							</a>
-							<a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-								<i class="bi bi-chevron-down cftf-arrow"></i>
-							</a>
+              </div>
+                <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
+                  <i class="bi bi-chevron-up cftf-arrow"></i>
+                </a>
+                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
+                  <i class="bi bi-chevron-down cftf-arrow"></i>
+                </a>
             </div>
           <i v-if="updateSortOptions.length===0"
            class="fa fa-plus fa-sm click-element cftf-add-sorting"
@@ -36,33 +75,16 @@
           </TaskSortOptions>
           </div>
 				</div>
-        <div class="cft-filter-search">
-          <div class="cft-input-filter">
-				<div class="cft-filter-container">
+    </b-col>
+  </b-row>
+	<b-row class="cft-service-task-list">
+		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+        <b-row class="cft-input-filter">
+          <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
-				</div>
-          <div class="cft-filter-dropdown">
-              <button class="cft-filter-dropbtn mr-0">
-                <i class="bi bi-filter-square"/>
-              </button>
-              <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-                <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-                @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-                :class="{'cft-selected': idx == activefilter}">
-                  {{filter.name}}
-                </b-list-group-item>
-              </b-list-group>
-              <b-list-group v-else>
-                <b-list-group-item>
-                  <i class="bi bi-exclamation-circle-fill"></i>
-              No Filters found
-          
-                </b-list-group-item>
-              </b-list-group>
-            </div>
-					</div>
-        </div>
+          </b-col>
+          </b-row>
         <!-- Task list section -->
         <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
 				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
@@ -116,6 +138,7 @@
         <br>
 				<b-row class="ml-0" title="application-id">Application # {{ applicationId}}</b-row>
 				<div>
+          <!-- four buttons -->
 					<b-row class="cft-actionable">
 						<b-col>
 							<DatePicker 
@@ -134,26 +157,29 @@
           ></DatePicker>
 						</b-col>
 						<b-col>
-							<b-button variant="outline-primary" v-b-modal.AddGroupModal v-if="groupListNames">
+							<b-button variant="primary" v-b-modal.AddGroupModal v-if="groupListNames">
 								<i class="bi bi-grid-3x3-gap-fill"></i> {{String(groupListNames)}} 
 							</b-button>
-							<b-button variant="outline-primary" v-b-modal.AddGroupModal v-else>
+							<b-button variant="primary" v-b-modal.AddGroupModal v-else>
 								<i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
 							</b-button>
 							<b-modal
-            id="AddGroupModal"
-            ref="modal"
-            title="Manage Groups"
-            ok-title="Close"
-            ok-only
-          >
+                id="AddGroupModal"
+                ref="modal"
+                title="Manage Groups"
+                ok-title="Close"
+                ok-only
+              >
 								<div class="modal-text">
 									<i class="bi bi-exclamation-circle"></i>
-              You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.
-              
+              You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.      
 									<b-row class="mt-3 mb-3">
 										<b-col>
-											<b-button variant="primary" @click="addGroup">
+											<b-button
+                        variant="primary"
+                        @click="addGroup"
+                        :disabled='!setGroup'
+                      >
 												<span>Add a group</span>
 												<span>
 													<i class="bi bi-plus"></i>
@@ -168,7 +194,7 @@
 											<b-col v-if="groupList.length">
 												<ul v-for="g in groupList" :key="g.groupId">
 													<div class="mt-1">
-														<i class="bi bi-x" @click="deleteGroup(g.groupId)"></i>
+														<i class="fa fa-times mr-2 click-element" @click="deleteGroup(g.groupId)"></i>
 														<span>{{g.groupId}}</span>
 													</div>
 												</ul>
@@ -178,19 +204,20 @@
 								</b-modal>
 							</b-col>
 							<b-col>
-								<b-button variant="outline-primary" v-if="task.assignee" @click="onUnClaim">
+								<b-button variant="primary" v-if="task.assignee" @click="onUnClaim">
               {{task.assignee}}
             
 									<i class="bi bi-person-x-fill"/>
 								</b-button>
-								<b-button variant="outline-primary" v-else @click="onClaim">
+								<b-button variant="primary" v-else @click="onClaim">
 									<i class="bi bi-person-fill"/>
-            Claim
+                  Claim
             
 								</b-button>
 							</b-col>
 						</b-row>
 						<div>
+              <!-- form section -->
 							<b-tabs content-class="mt-3" v-if="showfrom">
 								<b-tab title="Form">
 									<div  class="ml-4 mr-4">
@@ -206,6 +233,7 @@
 									</div>
 								</b-tab>
 								<b-tab title="History"></b-tab>
+                <!-- Process diagram -->
                 <b-tab  style="height:100%;" id="diagramContainer" title="Diagram">
                   <div  style="height:100%;" id="canvas"></div>
                 </b-tab>
@@ -244,6 +272,7 @@ import {TASK_FILTER_LIST_DEFAULT_PARAM,
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
+import FormList from '../components/formlist.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -256,9 +285,10 @@ import vueBpmn from "vue-bpmn";
   components: {
     formio: Form,
     DatePicker,
+    FormList,
     TaskSortOptions,
     vueBpmn,
-    Modeler
+    Modeler,
   }
 })
 export default class Tasklist extends Vue {
@@ -321,29 +351,17 @@ private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVa
 checkPropsIsPassedAndSetValue() {
   if(!this.bpmApiUrl || this.bpmApiUrl===""){
     console.warn("bpmApiUrl prop not Passed")
-  }
-
-  if(!this.token || this.token==="") {
+  } if(!this.token || this.token==="") {
     console.warn("token prop not Passed")
-  }
-
-  if(!this.formIOResourceId || this.formIOResourceId==="") {
+  } if(!this.formIOResourceId || this.formIOResourceId==="") {
     console.warn("formIOResourceId prop not passed")
-  }
-
-  if(!this.formIOReviewerId || this.formIOReviewerId==="") {
+  } if(!this.formIOReviewerId || this.formIOReviewerId==="") {
     console.warn("formIOReviewerId prop not passed")
-  }
-
-  if(!this.formIOApiUrl || this.formIOApiUrl === "") {
+  } if(!this.formIOApiUrl || this.formIOApiUrl === "") {
     console.warn("formIOApiUrl prop not passed")
-  }
-
-  if(!this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
+  } if(!this.formsflowaiApiUrl || this.formsflowaiApiUrl==="") {
     console.warn("formsflow.ai API url prop not passed")
-  }
-
-  if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
+  } if(!this.formsflowaiUrl || this.formsflowaiUrl==="") {
     console.warn("formsflow.ai URL prop not passed")
   }
   const engine = '/engine-rest'
@@ -360,7 +378,7 @@ timedifference(date: Date)  {
   return moment(date).fromNow();
 }
 
-getProcessDataFromList(processList: any[] ,processId: any,dataKey: string) {
+getProcessDataFromList(processList: any[] ,processId: any, dataKey: string) {
   const process = processList.find(process=>process.id===processId);
   return process && process[dataKey] ;
 }
@@ -380,10 +398,12 @@ togglefilter(index: number) {
 }
 
 addGroup() {
-  CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask()
-  })
+  if(!this.setGroup){
+    CamundaRest.createTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {"userId": null, "groupId": this.setGroup, "type": "candidate"}).then(() => {
+      this.getGroupDetails();
+      this.reloadCurrentTask()
+    })
+  }
 }
 
 getGroupDetails() {
@@ -613,7 +633,6 @@ fetchData() {
         await modeler.importXML(this.xmlData);
         // const { warnings } = await viewer.importXML(this.xmlData);
         // viewer.attachTo('#diagramContainer');
-        console.log("xml", res.data.bpmn20Xml);
       });
     })
     
@@ -627,7 +646,6 @@ fetchData() {
     });
   }
 }
-
 
 mounted() {
   this.checkPropsIsPassedAndSetValue();

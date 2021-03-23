@@ -28,6 +28,7 @@ export const sortingList = [
 
 export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: any) =>{
   const decodeToken = JSON.parse(atob(token.split('.')[1]))
+  localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
   userName = !userName ? decodeToken && decodeToken["preferred_username"] : userName
   const userEmail = decodeToken["email"] || "external"
   const resourceacess = decodeToken && decodeToken["resource_access"]
@@ -48,6 +49,5 @@ export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: an
   else{
     console.error("Unable to set formioUserRoles")
   }
-  localStorage.setItem("UserDetails", decodeToken);
   return {userName, userEmail, formIOUserRoles};
 }
