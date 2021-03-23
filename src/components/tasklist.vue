@@ -1,10 +1,10 @@
 <template>
   
 <b-container fluid class="task-outer-container">
-  <b-row>
+  <div class="main-filters my-2 mb-1">
     <!-- Filter section begins -->
-    <b-col cols="*" xl="1" lg="1" md="1" sm="12"
-      class="cft-filter-dropdown"
+    <div 
+      class="cft-filter-dropdown mx-2"
     >
         <button class="cft-filter-dropbtn mr-0">
           <i class="bi bi-filter-square"/>
@@ -22,18 +22,15 @@
               No Filters found  
           </b-list-group-item>
         </b-list-group>
-      </b-col>
+      </div>
       <!-- Forms list & fill section -->
-      <b-col cols="*" xl="2" lg="2" md="2" sm="12">
         <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
-      </b-col>
-  </b-row>
-  <b-row>
-    <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <div>
+
+    <!-- <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first"> -->
+      <div class="cft-first">
         <!-- Sorting section -->
-				<div id='cftf-dpdown-container'>
-					<div class="cftf-dpdown-box" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+				<div id="cftf-dpdown-container" class="mx-2">
+					<div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
               <span v-if="sortList.length>1"
                 class="cftf-exit-button"
                 title="Remove Sorting" 
@@ -75,25 +72,25 @@
           </TaskSortOptions>
           </div>
 				</div>
-    </b-col>
-  </b-row>
-	<b-row class="cft-service-task-list">
+    <!-- </b-col> -->
+  </div>
+	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-        <b-row class="cft-input-filter">
+        <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
           </b-col>
-          </b-row>
+          </div>
         <!-- Task list section -->
         <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
 				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
           v-on:click="toggle(idx)"
           :class="{'cft-selected': idx == activeIndex}">
 					<div @click="setselectedTask(task.id)" class="cft-select-task">
-						<div class="col-12">
-							<h5>{{ task.name }}</h5>
-						</div>
+						
+							<h5 class="task-title">{{ task.name }}</h5>
+					
 						<div class="cft-task-details-assign assigne-details ">
 							<div >
                   {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}     

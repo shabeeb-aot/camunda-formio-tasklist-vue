@@ -159,10 +159,10 @@
     font-size: 11px;
   }
   .assigne-details{
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    margin-bottom: 3px;
-    margin-top: 15px;
+    // margin-bottom: 3px;
+    margin-top: 10px;
 
   }
   .cft-filter-sort{
@@ -186,7 +186,7 @@
     flex-wrap: wrap;
     padding: calc(6px + 2px) 15px calc(6px - 2px) 15px;
     box-shadow: 0 2px 6px -4px #555;
-    margin-bottom: 0.5rem;
+    // margin-bottom: 0.5rem;
     background-color: #fafafa;
   }
   
@@ -255,6 +255,16 @@
     color: #4d61fc;
     border-bottom: 1px solid #4d61fc;
     background-color: transparent;
+  }
+
+  .main-filters{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .task-title{
+    font-size: 16px;
+    margin: 0;
   }
 
 }
