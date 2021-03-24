@@ -91,6 +91,24 @@
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
         <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
+            <div class="cft-search-criteria" v-if="searchList.length">
+              <b-button
+                squared
+                variant="outline-secondary"
+                @click="searchAllCriteria"
+              >
+                {{searchA}}
+              </b-button>
+                <span class="cft-search-item-criteria"> of the criteria are met.</span>
+            </div>
+            <div v-if="searchList&&searchList.length">
+              <div
+                v-for="item in searchList"
+                :key="item"  
+              >
+                {{item}}
+              </div>
+            </div>
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"
           @click="cftshowSearchListElements"/>
             {{tasklength}}
@@ -101,7 +119,7 @@
           <b-list-group-item button
             v-for="(s, index) in searchListElements"
             :key="s"
-            @click="setActiveSearchItem(index)"
+            @click="addSearchElementItem(s);setActiveSearchItem(index)"
             :class="{'cft-search-item-selected': index ==activeSearchItem }"
           >
           {{s}}
@@ -432,7 +450,9 @@ export default class Tasklist extends Vue {
   };
   private activeSearchItem = 0;
   private searchListElements: Array<string> = searchData;
+  private searchA = 'ALL';
   private showSearchList = false;
+  private searchList = [];
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -502,6 +522,19 @@ export default class Tasklist extends Vue {
     this.showSearchList = !this.showSearchList;
   }
 
+  searchAllCriteria() {
+    if(this.searchA === "ALL") {
+      this.searchA = "ANY"
+    }
+    else {
+      this.searchA = "ALL"
+    }
+  }
+
+  addSearchElementItem(item: string) {
+    this.searchList.push(item);
+    this.showSearchList = false;
+  }
   addGroup() {
     if (!this.setGroup) {
       CamundaRest.createTaskGroupByID(

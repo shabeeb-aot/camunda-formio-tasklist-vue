@@ -73,6 +73,17 @@ export const searchData = [
   "Created",
 ]
 
+export const searchDataValue = [
+  "processDefinitionNameLike",
+  "nameLike",
+  "descriptionLike",
+  "followUpDate",
+  "dueDate",
+  "candidateGroup",
+  "assigneeLike",
+  "createdOn"
+]
+
 // Process Variable
 // Task variable
 // Process definition name - processDefinitionNameLike
