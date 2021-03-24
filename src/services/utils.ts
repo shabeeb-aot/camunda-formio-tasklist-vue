@@ -57,3 +57,31 @@ export const getFormattedDateAndTime = (date: Date)=>{
   return new Date(date).toLocaleDateString('en-us',  {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour: '2-digit', minute: '2-digit', hour12: true});
 
 };
+
+export const searchData = [
+  "Process Variables",
+  "Task Variables",
+  "Process Definition Name",
+  "Assignee",
+  "Candidate Group",
+  "Candidate User",
+  "Name",
+  "Description",
+  "Priority",
+  "Due Date",
+  "Follow up Date",
+  "Created",
+]
+
+// Process Variable
+// Task variable
+// Process definition name - processDefinitionNameLike
+// Task name- nameLike
+// Priority
+// Task Description - descriptionLike
+// Due date - dueDate
+//  follow up date - followUpDate
+// Candidate group -  candidateGroup, withCandidateGroups
+// Candidate user - candidateUser
+// Assignee- assigneeLike
+// Created - createdOn

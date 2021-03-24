@@ -91,8 +91,22 @@
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
         <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
-					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
+					<input type="text" class="cft-filter" placeholder="Filter Tasks"
+          @click="cftshowSearchListElements"/>
             {{tasklength}}
+          <b-list-group
+            v-if="showSearchList"
+            class="cft-search-items"
+          >
+          <b-list-group-item button
+            v-for="(s, index) in searchListElements"
+            :key="s"
+            @click="setActiveSearchItem(index)"
+            :class="{'cft-search-item-selected': index ==activeSearchItem }"
+          >
+          {{s}}
+          </b-list-group-item>
+          </b-list-group>
           </b-col>
           </div>
         <!-- Task list section -->
@@ -147,12 +161,14 @@
       <!-- Task Detail section -->
       <b-col v-if="selectedTask" lg="9" md="9" sm="12">
         <div class="cft-service-task-details">
-          <b-row class="ml-0 task-header"> {{ task.name }}</b-row>
+          <b-row class="ml-0 task-header" title="Task Name">
+            {{ task.name }}</b-row>
           <br />
-          <b-row class="ml-0 task-name">{{ taskProcess }}</b-row>
+          <b-row class="ml-0 task-name" title="Process Name">
+            {{ taskProcess }}</b-row>
           <br />
-          <b-row class="ml-0" title="application-id"
-            >Application # {{ applicationId }}</b-row
+          <b-row class="ml-0" title="application ID" 
+            >Application ID # {{ applicationId }}</b-row
           >
           <div style="height:100%;">
             <!-- four buttons -->
@@ -178,6 +194,7 @@
                   variant="primary"
                   v-b-modal.AddGroupModal
                   v-if="groupListNames"
+                  title="groups"
                 >
                   <i class="bi bi-grid-3x3-gap-fill"></i>
                   {{ String(groupListNames) }}
@@ -239,6 +256,7 @@
                   variant="primary"
                   v-if="task.assignee"
                   @click="onUnClaim"
+                  title="Reset assignee"
                 >
                   {{ task.assignee }}
 
@@ -319,8 +337,10 @@ import {
   decodeTokenValues,
   findFilterKeyOfAllTask,
   getTaskFromList,
-  sortingList,
+  searchData,
+  sortingList
 } from "../services/utils";
+import BpmnJS from "bpmn-js";
 import CamundaRest from "../services/camunda-rest";
 import DatePicker from "vue2-datepicker";
 import { Form } from "vue-formio";
@@ -331,7 +351,6 @@ import { authenticateFormio } from "../services/formio-token";
 import { getFormDetails } from "../services/get-formio";
 import moment from "moment";
 import vueBpmn from "vue-bpmn";
-import BpmnJS from "bpmn-js";
 
 @Component({
   components: {
@@ -411,6 +430,9 @@ export default class Tasklist extends Vue {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
+  private activeSearchItem = 0;
+  private searchListElements: Array<string> = searchData;
+  private showSearchList = false;
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -470,6 +492,14 @@ export default class Tasklist extends Vue {
 
   togglefilter(index: number) {
     this.activefilter = index;
+  }
+
+  setActiveSearchItem(index: number){
+    this.activeSearchItem = index;
+  }
+
+  cftshowSearchListElements() {
+    this.showSearchList = !this.showSearchList;
   }
 
   addGroup() {
@@ -783,10 +813,6 @@ export default class Tasklist extends Vue {
         ).then(async (res) => {
           this.xmlData = res.data.bpmn20Xml;
           const modeler = new Modeler({ container: "#canvas" });
-          // const viewer = new BpmnJS();
-          //  viewer.attachTo('#canvas');
-          // const { warnings } = await viewer.importXML(this.xmlData);
-          // viewer.get('canvas').zoom('fit-viewport', 'auto');
           await modeler.importXML(this.xmlData);
          
         });

@@ -133,6 +133,37 @@
     width: 13rem;
   }
 
+  .cft-search-items {
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border: 1px solid #949494;
+    border-radius: 3%;
+    position: absolute;
+    background-color: #fff;
+    background-clip: padding-box;
+    z-index: 10;
+    width: 15rem;
+    font-size: medium;
+    text-align: left;
+    cursor: pointer;
+    color: #333;
+    font-weight: 400;
+    padding: 2px 9px;
+    min-width: 250px;
+  }
+
+  .cft-search-item-selected {
+    border-left: 2px solid #c44023 !important;
+  }
+
+  // .cft-search-item{
+  //   font-size: medium;
+  //   text-align: left;
+  //   cursor: pointer;
+  //   color: #333;
+  //   font-weight: 400;
+  //   padding: 2px 9px;
+  // }
+
   .cft-filter-dropdown-content 
   {
     display: none;
