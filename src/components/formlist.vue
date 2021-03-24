@@ -67,6 +67,10 @@
           <h4>{{formTitle}}</h4>
           <Form 
             :src="formValueId"
+            form=""
+            submission=""
+            options=""
+            v-on:submit="onSubmit"
           >
           </Form>
         </b-modal>
@@ -80,6 +84,7 @@ import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
+import router from '@/router'
 
 @Component({
   components: {
@@ -92,6 +97,7 @@ export default class FormList extends Vue{
   private formNumPages=5
   private formcurrentPage=1
   private formValueId = ''
+  private formId =  ''
   private formTitle = ''
   private showForms = true
 
@@ -116,6 +122,7 @@ export default class FormList extends Vue{
   storeFormValue(val: string, name: string){
     this.$bvModal.hide('modal-multi-1')
     const forms = localStorage.getItem('formioApiUrl') + '/form/';
+    this.formId = val;
     this.formValueId = forms.concat(val);
     this.formTitle = name;
   }
@@ -123,6 +130,16 @@ export default class FormList extends Vue{
   backClick() {
     this.$bvModal.show('modal-multi-1')
     this.$bvModal.hide('modal-multi-2')
+  }
+
+  onSubmit(submission: any) {
+    console.log(submission)
+    console.log(this.formValueId)
+    console.log("SubmissionID", submission._id)
+    console.log("formid", submission.form);
+    // this.$router.push({name: 'routename'})
+    this.$router.push({path: `/form/${submission.form}/submission/${submission._id}`
+    })
   }
 
   mounted() {
