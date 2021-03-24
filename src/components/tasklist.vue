@@ -143,8 +143,9 @@
                 <div title="Task assignee">
                   {{ task.assignee }}
                 </div>
-              </div>
-              <div class="cft-task-details-assign font-11">
+						</div>
+						<div class="cft-task-details-assign font-11" >
+							<div class="created-details">
                 <div>
                   <span v-if="task.due">
                     Due {{ timedifference(task.due) }},
@@ -153,11 +154,11 @@
                     Follow-up {{ timedifference(task.followUp) }},
                   </span>
                   <span v-if="task.created">
-                    Created {{ timedifference(task.created) }}
+                    Created {{ timedifference(task.created) }}     
                   </span>
-                  <div title="Task assignee">
-                    {{ task.priority }}
-                  </div>
+                </div>
+								<div title="Task assignee" >
+                 {{ task.priority }}
                 </div>
               </div>
             </div>
