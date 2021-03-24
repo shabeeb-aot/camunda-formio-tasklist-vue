@@ -140,8 +140,8 @@
 							<div >
                   {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}     
                 </div>
-                <div title="Task assignee">
-                  {{ task.assignee }}
+							<div title="Task assignee" >
+                {{task.assignee}}
                 </div>
 						</div>
 						<div class="cft-task-details-assign font-11" >
@@ -160,16 +160,12 @@
 								<div title="Task assignee" >
                  {{ task.priority }}
                 </div>
-              </div>
-            </div>
-          </b-list-group-item>
-          <b-pagination-nav
-            :link-gen="linkGen"
-            :number-of-pages="numPages"
-            v-model="currentPage"
-            class="cft-paginate"
-          />
-        </b-list-group>
+							</div>
+						</div>
+					</div>
+				</b-list-group-item>
+        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages" v-model="currentPage" class="cft-paginate" />
+			</b-list-group>
         <b-list-group cols="3" v-else>
           <b-row class="cft-not-selected mt-2 ml-1 row">
             <i class="bi bi-exclamation-circle-fill" scale="1"></i>
