@@ -47,7 +47,7 @@
                 >{{ sortList[idx]["label"] }}</span
               >
               <div
-                v-if="showUpdateSortListDropdown[idx]"
+                v-if="showSortListDropdown[idx]"
                 class="cft-sort-items"
               >
                 <div
@@ -102,11 +102,42 @@
                 <span class="cft-search-item-criteria"> of the criteria are met.</span>
             </div>
             <div v-if="searchList&&searchList.length">
-              <div
-                v-for="item in searchList"
-                :key="item"  
+              <div class="cftf-search-item-box mr-2"
+                v-for="(item, index) in searchList"
+                :key="item.label"  
               >
-                {{item}}
+              <span @click="deleteSearchListElement(index)"><i class="bi bi-x"></i></span>
+                <span title="type" @click="showUpdateSearchList">{{item.label}}</span>
+
+                <div
+                v-if="showUpdatesearch"
+                class="cft-sort-items"
+              >
+                <div
+                  v-for="s in searchListElements"
+                  :key="s.label"
+                  @click="updateSearchListElement(s, index)"
+                  class="mb-2 cft-sort-element"
+                >
+                  {{ s.label }}
+                </div>
+              </div>
+
+                <br>
+                <p v-if="!showOperators" title="operator" @click="showOperatorList"> {{item.compares[0]}}</p>
+                <p v-else title="operator">{{operator}}</p>
+                <div v-if="showOperators&&item.compares.length>1">
+                  <div v-for="x in item.compares" :key="x">
+                    <span @click="updateOperators(x)">{{x}}</span>
+                  </div>
+                </div>
+                <!-- <p v-for="x in item.compares" :key="x" title="operator">{{x}}</p> -->
+                <span>??</span>
+                <input v-model="searchItem[index]"/>
+                {{searchItem}}
+                <span @click="callSearchApi(searchItem[index], item)">
+                  <i class="bi bi-check"></i>
+                </span>
               </div>
             </div>
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"
@@ -118,11 +149,11 @@
           >
           <b-list-group-item button
             v-for="(s, index) in searchListElements"
-            :key="s"
+            :key="s.label"
             @click="addSearchElementItem(s);setActiveSearchItem(index)"
             :class="{'cft-search-item-selected': index ==activeSearchItem }"
           >
-          {{s}}
+          {{s.label}}
           </b-list-group-item>
           </b-list-group>
           </b-col>
@@ -353,6 +384,7 @@ import {
   findFilterKeyOfAllTask,
   getTaskFromList,
   searchData,
+  searchQuery,
   sortingList
 } from "../services/utils";
 import BpmnJS from "bpmn-js";
@@ -428,7 +460,9 @@ export default class Tasklist extends Vue {
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: any = [];
   private updateSortOptions: any = [];
-  private showUpdateSortListDropdown = [
+  private setSortListDropdown = false;
+  private setSortListDropdownindex: any = null;
+  private showSortListDropdown = [
     false,
     false,
     false,
@@ -439,9 +473,6 @@ export default class Tasklist extends Vue {
   private showaddNewSortListDropdown = false;
   private optionsList: any = ["created"];
   private payload: any = {
-    processVariables: [],
-    taskVariables: [],
-    caseInstanceVariables: [],
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
@@ -449,7 +480,12 @@ export default class Tasklist extends Vue {
   private searchListElements: Array<string> = searchData;
   private searchA = 'ALL';
   private showSearchList = false;
-  private searchList = [];
+  private searchList: any = [];
+  private showUpdatesearch = false;
+  private setshowUpdatesearch = false;
+  private showOperators = false;
+  private searchItem = []
+  private operator = ''
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -528,10 +564,51 @@ export default class Tasklist extends Vue {
     }
   }
 
-  addSearchElementItem(item: string) {
+  addSearchElementItem(item: any) {
     this.searchList.push(item);
+    this.operator = item["compares"][0]
     this.showSearchList = false;
   }
+
+  deleteSearchListElement(index: any) {
+    this.searchList.splice(index, 1);
+  }
+
+  showUpdateSearchList() {
+    this.showUpdatesearch = !this.showUpdatesearch;
+  }
+
+  updateSearchListElement(searchitem: any, index: number) {
+    this.searchList[index].label = searchitem.label;
+    this.searchList[index].compares = searchitem.compares;
+    this.searchList[index].values = searchitem.values;
+
+    this.showUpdatesearch = false;
+  }
+
+  callSearchApi(item: any, searchItem: any) {
+    console.log("Value to search", searchItem["values"])
+    console.log("Search value", item);
+    searchQuery[0][searchItem["values"][0]] = item;
+    // console.log(searchQuery[0]["nameLike"]);
+
+
+    // console.log(searchQuery[this.searchListElements["values"][0]])
+    this.payload["andQueries"] = searchQuery;
+    // item
+    this.fetchTaskList(this.selectedfilterId, this.payload);
+  }
+
+  showOperatorList() {
+    this.showOperators = !this.showOperators;
+  }
+
+  updateOperators(operator: any) {
+    this.operator = operator;
+
+    this.showOperators = false;
+  }
+
   addGroup() {
     if (!this.setGroup) {
       CamundaRest.createTaskGroupByID(
@@ -739,6 +816,14 @@ export default class Tasklist extends Vue {
   }
 
   showUpdateSortOptions(index: number) {
+    console.log("state of list", this.showSortListDropdown)
+    console.log(index);
+    this.showSortListDropdown[index] = true;
+    if (!this.setSortListDropdownindex){
+      this.showSortListDropdown[this.setSortListDropdownindex] = !this.showSortListDropdown[this.setSortListDropdownindex];
+      this.setSortListDropdownindex = index;
+    }
+    console.log("set index", this.setSortListDropdownindex)
     this.showUpdateSortListDropdown[index] = !this.showUpdateSortListDropdown[
       index
     ];
@@ -750,7 +835,7 @@ export default class Tasklist extends Vue {
     this.sortList[index].sortBy = sort.sortBy;
 
     this.sortOptions = this.getOptions(this.sortList);
-    this.showUpdateSortListDropdown[index] = false;
+    this.showSortListDropdown[index] = false;
     this.payload["sorting"] = this.sortList;
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
