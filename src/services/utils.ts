@@ -61,7 +61,7 @@ export const getFormattedDateAndTime = (date: Date)=>{
 export const searchData = [
   {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
   {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
-  {"label": "Process Definition Name", "compares": ["likes", "="], "values": ["processDefinitionNameLike", "processDefinitionName"]},
+  {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"]},
   {"label": "Assignee", "compares": ["like", "="], "values": ["assigneeLike", "assignee"]},
   {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"]},
   {"label":"Candidate User", "compares": ["="], "values": ["candidateUser"]},

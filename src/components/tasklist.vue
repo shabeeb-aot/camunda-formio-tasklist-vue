@@ -124,20 +124,17 @@
               </div>
 
                 <br>
-                <p v-if="!showOperators" title="operator" @click="showOperatorList"> {{item.compares[0]}}</p>
-                <p v-else title="operator">{{operator}}</p>
+                <p title="operator" @click="showOperatorList">{{operator}}</p>
                 <div v-if="showOperators&&item.compares.length>1">
                   <div v-for="x in item.compares" :key="x">
                     <span @click="updateOperators(x)">{{x}}</span>
                   </div>
                 </div>
-                <!-- <p v-for="x in item.compares" :key="x" title="operator">{{x}}</p> -->
-                <span>??</span>
                 <input v-model="searchItem[index]"/>
-                {{searchItem}}
-                <span @click="callSearchApi(searchItem[index], item)">
+                <span @click="callSearchApi(searchItem[index], item, operator)">
                   <i class="bi bi-check"></i>
                 </span>
+                <i class="bi bi-x"></i>
               </div>
             </div>
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"
@@ -477,7 +474,7 @@ export default class Tasklist extends Vue {
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private activeSearchItem = 0;
-  private searchListElements: Array<string> = searchData;
+  private searchListElements: any = searchData;
   private searchA = 'ALL';
   private showSearchList = false;
   private searchList: any = [];
@@ -582,20 +579,35 @@ export default class Tasklist extends Vue {
     this.searchList[index].label = searchitem.label;
     this.searchList[index].compares = searchitem.compares;
     this.searchList[index].values = searchitem.values;
+    this.operator = searchitem.compares[0];
 
     this.showUpdatesearch = false;
   }
 
-  callSearchApi(item: any, searchItem: any) {
+  callSearchApi(item: any, searchItem: any, comparator: string) {
     console.log("Value to search", searchItem["values"])
     console.log("Search value", item);
-    searchQuery[0][searchItem["values"][0]] = item;
-    // console.log(searchQuery[0]["nameLike"]);
+    console.log("comparator", comparator);
+    let index = 0;
+    for(let i=0; i<searchItem["compares"].length; i++) {
+      if(searchItem["compares"][i]===comparator){
+        index = i;
+        break;
+      }
+    }
+    console.log("index", searchItem["compares"][index]);
+    if(searchItem["compares"][index]==="like") {
+      searchQuery[0][searchItem["values"][index]] = '%' + item+ '%';
+    }
 
+    else{
+      searchQuery[0][searchItem["values"][index]] = item;
+    }
 
     // console.log(searchQuery[this.searchListElements["values"][0]])
-    this.payload["andQueries"] = searchQuery;
+    this.payload["orQueries"] = searchQuery;
     // item
+    console.log(this.payload)
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
@@ -816,15 +828,15 @@ export default class Tasklist extends Vue {
   }
 
   showUpdateSortOptions(index: number) {
-    console.log("state of list", this.showSortListDropdown)
-    console.log(index);
-    this.showSortListDropdown[index] = true;
-    if (!this.setSortListDropdownindex){
-      this.showSortListDropdown[this.setSortListDropdownindex] = !this.showSortListDropdown[this.setSortListDropdownindex];
-      this.setSortListDropdownindex = index;
-    }
-    console.log("set index", this.setSortListDropdownindex)
-    this.showUpdateSortListDropdown[index] = !this.showUpdateSortListDropdown[
+    // console.log("state of list", this.showSortListDropdown)
+    // console.log(index);
+    // this.showSortListDropdown[index] = true;
+    // if (!this.setSortListDropdownindex){
+    //   this.showSortListDropdown[this.setSortListDropdownindex] = !this.showSortListDropdown[this.setSortListDropdownindex];
+    //   this.setSortListDropdownindex = index;
+    // }
+    // console.log("set index", this.setSortListDropdownindex)
+    this.showSortListDropdown[index] = !this.showSortListDropdown[
       index
     ];
     this.sortOptions = this.getOptions(this.sortList);
