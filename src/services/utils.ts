@@ -59,40 +59,37 @@ export const getFormattedDateAndTime = (date: Date)=>{
 };
 
 export const searchData = [
-  "Process Variables",
-  "Task Variables",
-  "Process Definition Name",
-  "Assignee",
-  "Candidate Group",
-  "Candidate User",
-  "Name",
-  "Description",
-  "Priority",
-  "Due Date",
-  "Follow up Date",
-  "Created",
+  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
+  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
+  {"label": "Process Definition Name", "compares": ["likes", "="], "values": ["processDefinitionNameLike", "processDefinitionName"]},
+  {"label": "Assignee", "compares": ["likes", "="], "values": ["assigneeLike", "assignee"]},
+  {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"]},
+  {"label":"Candidate User", "compares": ["="], "values": ["candidateUser"]},
+  {"label":"Name", "compares": ["likes", "="], "values": ["nameLike", "name"]},
+  {"label": "Description","compares": ["likes", "="], "values": ["descriptionLike", "description"] },
+  {"label":"Priority", "compares": ["="], "values": ["priority"]},
+  {"label":"Due Date", "compares": ["="], "values": ["due"]},
+  {"label":"Follow up Date", "compares": ["="], "values": ["followUp"]},
+  {"label":"Created", "compares": ["="], "values": ["created"]},
 ]
 
-export const searchDataValue = [
-  "processDefinitionNameLike",
-  "nameLike",
-  "descriptionLike",
-  "followUpDate",
-  "dueDate",
-  "candidateGroup",
-  "assigneeLike",
-  "createdOn"
+export const searchQuery = [
+  {
+    "assignee": null,
+    "assigneeLike": null,
+    "created": null,
+    "followUp": null,
+    "due": null,
+    "description": null,
+    "descriptionLike": null,
+    "processVariables": [],
+    "taskVariables": [],
+    "processDefinitionNameLike": null,
+    "processDefinitionName": null,
+    "priority": null,
+    "name": null,
+    "nameLike": null,
+    "candidateGroup":null,
+    "candidateUser": null
+  }
 ]
-
-// Process Variable
-// Task variable
-// Process definition name - processDefinitionNameLike
-// Task name- nameLike
-// Priority
-// Task Description - descriptionLike
-// Due date - dueDate
-//  follow up date - followUpDate
-// Candidate group -  candidateGroup, withCandidateGroups
-// Candidate user - candidateUser
-// Assignee- assigneeLike
-// Created - createdOn
