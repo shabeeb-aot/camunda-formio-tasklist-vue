@@ -7,13 +7,10 @@
         <br>
         {{sId}}
         <br>
-        <formio
-            :src="formioUrlLink"
-            :submission="sId"
-            :form="fId"
-            :options="readoption"
-        >
-        </formio>
+        <formio 
+        :src="formioUrlLink"
+        :form="fId"
+        :submission="sId"></formio>
     </div>
 </template>
 
@@ -35,6 +32,7 @@ export default class FormViewSubmission extends Vue {
   private readoption = { readOnly: true };
   private fId = ''
   private sId = ''
+  private test="https://forms2.aot-technologies.com/form/604a542a3a94803fbcf8289b/submission/605c174913e06b30c50c0408"
 
   mounted() {
     this.formUrl = window.location.href;
@@ -44,6 +42,7 @@ export default class FormViewSubmission extends Vue {
       localStorage.getItem('formioApiUrl')
     );
 
+    console.log(submissionId, formId)
     this.formioUrlLink = formioUrl.replace("http", "https");
     console.log(this.formioUrlLink)
     this.fId = formId;

@@ -84,7 +84,6 @@ import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
-import router from '@/router'
 
 @Component({
   components: {
@@ -133,10 +132,6 @@ export default class FormList extends Vue{
   }
 
   onSubmit(submission: any) {
-    console.log(submission)
-    console.log(this.formValueId)
-    console.log("SubmissionID", submission._id)
-    console.log("formid", submission.form);
     // this.$router.push({name: 'routename'})
     this.$router.push({path: `/form/${submission.form}/submission/${submission._id}`
     })
