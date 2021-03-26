@@ -48,6 +48,10 @@ const CamundaRest = {
   unclaim(bearerToken: string, taskId: string, CamundaUrl: string) {
     return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/task/${taskId}/unclaim`);
   },
+
+  setassignee(bearerToken: string, taskId: string, values: any,  CamundaUrl: string) {
+    return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/task/${taskId}/assignee`, values)
+  },
     
   getVariablesByTaskId(bearerToken: string, taskId: string, CamundaUrl: string) {
     return bpmAxios(bearerToken, CamundaUrl).get(`/${engine}/task/${taskId}/variables`);

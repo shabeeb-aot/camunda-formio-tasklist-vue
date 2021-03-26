@@ -329,7 +329,13 @@
                   <i class="bi bi-person-fill cft-person-fill" />
                   <!--   <span>{{ task.assignee }}</span>-->
                   <span class="cft-user-span">
-                  <b-form-select class="cft-user-select" v-model="userSelected" :options="userList"></b-form-select>
+                  <b-form-select
+                    class="cft-user-select"
+                    v-model="userSelected"
+                    :options="userList"
+                    @change="onSetassignee"
+                    >
+                  </b-form-select>
                     <i class="bi bi-x cft-user-close" @click="onUnClaim" />
                   </span>
                 
@@ -597,8 +603,6 @@ export default class Tasklist extends Vue {
     if (this.searchList === []) {
       this.operator[0] = item["compares"][0];
     } else {
-      console.log(this.searchList.length);
-      console.log("item", item["compares"][0]);
       this.operator[this.searchList.length - 1] = item["compares"][0];
     }
     this.showSearchList = false;
@@ -624,9 +628,6 @@ export default class Tasklist extends Vue {
   }
 
   callSearchApi(item: any, searchItem: any, comparator: string) {
-    console.log("Value to search", searchItem["values"]);
-    console.log("Search value", item);
-    console.log("comparator", comparator);
     let index = 0;
     for (let i = 0; i < searchItem["compares"].length; i++) {
       if (searchItem["compares"][i] === comparator) {
@@ -634,7 +635,6 @@ export default class Tasklist extends Vue {
         break;
       }
     }
-    console.log("index", searchItem["compares"][index]);
     if (searchItem["compares"][index] === "like") {
       searchQuery[0][searchItem["values"][index]] = "%" + item + "%";
     } else {
@@ -642,7 +642,6 @@ export default class Tasklist extends Vue {
     }
 
     this.payload["orQueries"] = searchQuery;
-    console.log(this.payload);
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
@@ -721,7 +720,7 @@ export default class Tasklist extends Vue {
         this.reloadCurrentTask();
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.error("Error", error);
       });
   }
 
@@ -785,7 +784,7 @@ export default class Tasklist extends Vue {
         this.reloadCurrentTask();
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.error("Error", error);
       });
   }
 
@@ -795,8 +794,20 @@ export default class Tasklist extends Vue {
         this.reloadCurrentTask();
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.error("Error", error);
       });
+  }
+
+  onSetassignee() {
+    CamundaRest.setassignee(this.token, this.task.id,
+      {"userId": this.userSelected},
+      this.bpmApiUrl)
+      .then(() => {
+        this.reloadCurrentTask()
+      })
+      .catch((error) => {
+        console.error("Error", error);
+      })
   }
 
   fetchTaskList(filterId: string, requestData: object) {
@@ -861,14 +872,6 @@ export default class Tasklist extends Vue {
   }
 
   showUpdateSortOptions(index: number) {
-    // console.log("state of list", this.showSortListDropdown)
-    // console.log(index);
-    // this.showSortListDropdown[index] = true;
-    // if (!this.setSortListDropdownindex){
-    //   this.showSortListDropdown[this.setSortListDropdownindex] = !this.showSortListDropdown[this.setSortListDropdownindex];
-    //   this.setSortListDropdownindex = index;
-    // }
-    // console.log("set index", this.setSortListDropdownindex)
     this.showSortListDropdown[index] = !this.showSortListDropdown[index];
     this.sortOptions = this.getOptions(this.sortList);
   }
@@ -906,6 +909,7 @@ export default class Tasklist extends Vue {
     const timearr = moment(this.setFollowup)
       .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
       .split("+");
+      //TODO: set error handling
     const replaceTimezone = timearr[1].replace(":", "");
     referenceobject["followUp"] = moment(this.setFollowup)
       .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
@@ -917,10 +921,10 @@ export default class Tasklist extends Vue {
       referenceobject
     )
       .then(() => {
-        console.log("Updated follow up date");
+        console.warn("Updated follow up date");
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.error("Error", error);
       });
   }
 
@@ -940,11 +944,11 @@ export default class Tasklist extends Vue {
       referenceobject
     )
       .then(() => {
-        console.log("Update due date");
+        console.warn("Update due date");
         this.reloadCurrentTask();
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.error("Error", error);
       });
   }
 
@@ -993,7 +997,6 @@ export default class Tasklist extends Vue {
         this.showfrom = true;
       });
       this.userSelected = this.task.assignee;
-      console.log(this.userSelected); 
     }
   }
 
@@ -1020,7 +1023,6 @@ export default class Tasklist extends Vue {
       }
     );
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      console.log("users:", response.data);
       const result = response.data.map(e => ({ value: e.id,text:e.id }));
       this.userList = result;
     });
