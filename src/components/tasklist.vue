@@ -1,22 +1,26 @@
 <template>
-  
-<b-container fluid class="task-outer-container">
-  <div class="main-filters my-2 mb-1">
-    <!-- Filter section begins -->
-    <div 
-      class="cft-filter-dropdown mx-2"
-    >
+  <b-container fluid class="task-outer-container">
+    <div class="main-filters my-2 mb-1">
+      <!-- Filter section begins -->
+      <div class="cft-filter-dropdown mx-2">
         <button class="cft-filter-dropbtn mr-0">
           <i class="bi bi-filter-square" />
         </button>
-        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-          <b-list-group-item button
+        <b-list-group
+          v-if="filterList && filterList.length"
+          class="cft-filter-dropdown-content"
+        >
+          <b-list-group-item
+            button
             v-for="(filter, idx) in filterList"
             :key="filter.id"
-            @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-            :class="{'cft-filter-selected': idx == activefilter}"
+            @click="
+              fetchTaskList(filter.id, payload);
+              togglefilter(idx);
+            "
+            :class="{ 'cft-filter-selected': idx == activefilter }"
           >
-            {{filter.name}}
+            {{ filter.name }}
           </b-list-group-item>
         </b-list-group>
         <b-list-group v-else>
@@ -27,175 +31,212 @@
         </b-list-group>
       </div>
       <!-- Forms list & fill section -->
-        <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
+      <FormList :token="token" :bpmApiUrl="bpmApiUrl" />
 
       <div class="cft-first">
         <!-- Sorting section -->
-				<div id="cftf-dpdown-container" class="mx-2">
-					<div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-              <span v-if="sortList.length>1"
-                class="cftf-exit-button"
-                title="Remove Sorting"
-                @click="deleteSort(sort, index)"
-              >
-                <i class="bi bi-x"></i>
-              </span>
-              <span
-                class="cftf-span-element"
-                @click="showUpdateSortOptions(idx)"
-                >{{ sortList[idx]["label"] }}</span
-              >
-              <div
-                v-if="showSortListDropdown[idx]"
-                class="cft-sort-items"
-              >
-                <div
-                  v-for="s in sortOptions"
-                  :key="s.sortBy"
-                  @click="updateSort(s, idx)"
-                  class="mb-2 cft-sort-element"
-                >
-                  {{ s.label }}
-                </div>
-              </div>
-              <a
-                v-if="sort.sortOrder === 'asc'"
-                @click="toggleSort(idx)"
-                href="#"
-                title="Ascending"
-              >
-                <i class="bi bi-chevron-up cftf-arrow"></i>
-              </a>
-              <a v-else @click="toggleSort(idx)" href="#" title="Descending">
-                <i class="bi bi-chevron-down cftf-arrow"></i>
-              </a>
-            </div>
-            <i
-              v-if="updateSortOptions.length === 0"
-              class="fa fa-plus fa-sm click-element cftf-add-sorting"
-              @click="showaddSortListOptions"
-              title="Add sorting"
-            ></i>
-            <TaskSortOptions
-              :sortOptions="sortOptions"
-              :showSortListDropdown="showaddNewSortListDropdown"
-              @add-sort="addSort"
+        <div id="cftf-dpdown-container" class="mx-2">
+          <div
+            class="cftf-dpdown-box mr-2"
+            v-for="(sort, idx) in sortList"
+            :key="sort.sortBy"
+          >
+            <span
+              v-if="sortList.length > 1"
+              class="cftf-exit-button"
+              title="Remove Sorting"
+              @click="deleteSort(sort, index)"
             >
-            </TaskSortOptions>
+              <i class="bi bi-x"></i>
+            </span>
+            <span
+              class="cftf-span-element"
+              @click="showUpdateSortOptions(idx)"
+              >{{ sortList[idx]["label"] }}</span
+            >
+            <div v-if="showSortListDropdown[idx]" class="cft-sort-items">
+              <div
+                v-for="s in sortOptions"
+                :key="s.sortBy"
+                @click="updateSort(s, idx)"
+                class="mb-2 cft-sort-element"
+              >
+                {{ s.label }}
+              </div>
+            </div>
+            <a
+              v-if="sort.sortOrder === 'asc'"
+              @click="toggleSort(idx)"
+              href="#"
+              title="Ascending"
+            >
+              <i class="bi bi-chevron-up cftf-arrow"></i>
+            </a>
+            <a v-else @click="toggleSort(idx)" href="#" title="Descending">
+              <i class="bi bi-chevron-down cftf-arrow"></i>
+            </a>
           </div>
-				</div>
-  </div>
-	<b-row class="cft-service-task-list mt-1">
-		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+          <i
+            v-if="updateSortOptions.length === 0"
+            class="fa fa-plus fa-sm click-element cftf-add-sorting"
+            @click="showaddSortListOptions"
+            title="Add sorting"
+          ></i>
+          <TaskSortOptions
+            :sortOptions="sortOptions"
+            :showSortListDropdown="showaddNewSortListDropdown"
+            @add-sort="addSort"
+          >
+          </TaskSortOptions>
+        </div>
+      </div>
+    </div>
+    <b-row class="cft-service-task-list mt-1">
+      <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
         <div class="cft-input-filter">
-          <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
+          <b-col
+            class="cft-filter-container"
+            cols="*"
+            xl="12"
+            lg="12"
+            md="12"
+            sm="12"
+          >
             <div class="cft-search-criteria" v-if="searchList.length">
               <b-button
                 squared
                 variant="outline-secondary"
                 @click="searchAllCriteria"
               >
-                {{searchA}}
+                {{ searchA }}
               </b-button>
-                <span class="cft-search-item-criteria"> of the criteria are met.</span>
+              <span class="cft-search-item-criteria">
+                of the criteria are met.</span
+              >
             </div>
-            <div v-if="searchList&&searchList.length">
-              <div class="cftf-search-item-box mr-2"
+            <div v-if="searchList && searchList.length">
+              <div
+                class="cftf-search-item-box mr-2"
                 v-for="(item, index) in searchList"
-                :key="item.label"  
+                :key="item.label"
               >
-              <span @click="deleteSearchListElement(index)"><i class="bi bi-x"></i></span>
-                <span title="type" @click="showUpdateSearchList">{{item.label}}</span>
+                <span @click="deleteSearchListElement(index)"
+                  ><i class="bi bi-x"></i
+                ></span>
+                <span title="type" @click="showUpdateSearchList">{{
+                  item.label
+                }}</span>
 
-                <div
-                v-if="showUpdatesearch"
-                class="cft-sort-items"
-              >
-                <div
-                  v-for="s in searchListElements"
-                  :key="s.label"
-                  @click="updateSearchListElement(s, index)"
-                  class="mb-2 cft-sort-element"
-                >
-                  {{ s.label }}
+                <div v-if="showUpdatesearch" class="cft-sort-items">
+                  <div
+                    v-for="s in searchListElements"
+                    :key="s.label"
+                    @click="updateSearchListElement(s, index)"
+                    class="mb-2 cft-sort-element"
+                  >
+                    {{ s.label }}
+                  </div>
                 </div>
-              </div>
 
-                <br>
+                <br />
                 <p title="operator" @click="showOperatorList">
-                  {{operator[index]}}
+                  {{ operator[index] }}
                 </p>
-                <div v-if="showOperators&&item.compares.length>1">
+                <div v-if="showOperators && item.compares.length > 1">
                   <div v-for="x in item.compares" :key="x">
-                    <span @click="updateOperators(x, index)">{{x}}</span>
+                    <span @click="updateOperators(x, index)">{{ x }}</span>
                   </div>
                 </div>
                 <input
                   v-model="searchItem[index]"
-                  v-on:keyup.enter="callSearchApi(searchItem[index], item, operator)"/>
+                  v-on:keyup.enter="
+                    callSearchApi(searchItem[index], item, operator)
+                  "
+                />
                 <span @click="callSearchApi(searchItem[index], item, operator)">
                   <i class="bi bi-check"></i>
                 </span>
                 <i class="bi bi-x"></i>
-              </div>            
+              </div>
             </div>
-					<input type="text" class="cft-filter" placeholder="Filter Tasks"
-          @click="cftshowSearchListElements"/>
-            {{tasklength}}
-          <b-list-group
-            v-if="showSearchList"
-            class="cft-search-items"
-          >
-            <b-list-group-item button
-              v-for="(s, idx) in searchListElements"
-              :key="s.label"
-              @click="addSearchElementItem(s, index);setActiveSearchItem(idx)"
-              :class="{'cft-search-item-selected': index ==activeSearchItem }"
-            >
-            {{s.label}}
-            </b-list-group-item>
-          </b-list-group>
-        </b-col>
-      </div>
+            <input
+              type="text"
+              class="cft-filter"
+              placeholder="Filter Tasks"
+              @click="cftshowSearchListElements"
+            />
+            {{ tasklength }}
+            <b-list-group v-if="showSearchList" class="cft-search-items">
+              <b-list-group-item
+                button
+                v-for="(s, idx) in searchListElements"
+                :key="s.label"
+                @click="
+                  addSearchElementItem(s, index);
+                  setActiveSearchItem(idx);
+                "
+                :class="{
+                  'cft-search-item-selected': index == activeSearchItem,
+                }"
+              >
+                {{ s.label }}
+              </b-list-group-item>
+            </b-list-group>
+          </b-col>
+        </div>
         <!-- Task list section -->
-        <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
-				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
-          v-on:click="toggle(idx)"
-          :class="{'cft-selected': idx == activeIndex}">
-					<div @click="setselectedTask(task.id)" class="cft-select-task">
-						
-							<h5 class="task-title">{{ task.name }}</h5>
-					
-						<div class="cft-task-details-assign assigne-details ">
-							<div >
-                  {{ getProcessDataFromList(getProcessDefinitions, task.processDefinitionId, 'name') }}     
-                </div>
-							<div title="Task assignee" >
-                {{task.assignee}}
-                </div>
-						</div>
-						<div class="cft-task-details-assign font-11" >
-							<div class="created-details">
+        <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
+          <b-list-group-item
+            button
+            v-for="(task, idx) in tasks"
+            v-bind:key="task.id"
+            v-on:click="toggle(idx)"
+            :class="{ 'cft-selected': idx == activeIndex }"
+          >
+            <div @click="setselectedTask(task.id)" class="cft-select-task">
+              <h5 class="task-title">{{ task.name }}</h5>
+
+              <div class="cft-task-details-assign assigne-details ">
                 <div>
-                  <span v-if="task.due">
-                    Due {{ timedifference(task.due) }},
-                  </span>
-                  <span v-if="task.followUp">
-                    Follow-up {{ timedifference(task.followUp) }},
-                  </span>
-                  <span v-if="task.created">
-                    Created {{ timedifference(task.created) }}     
-                  </span>
+                  {{
+                    getProcessDataFromList(
+                      getProcessDefinitions,
+                      task.processDefinitionId,
+                      "name"
+                    )
+                  }}
                 </div>
-								<div title="priority" >
-                 {{ task.priority }}
+                <div title="Task assignee">
+                  {{ task.assignee }}
                 </div>
-							</div>
-						</div>
-					</div>
-				</b-list-group-item>
-        <b-pagination-nav :link-gen="linkGen" :number-of-pages="numPages" v-model="currentPage" class="cft-paginate" />
-			</b-list-group>
+              </div>
+              <div class="cft-task-details-assign font-11">
+                <div class="created-details">
+                  <div>
+                    <span v-if="task.due">
+                      Due {{ timedifference(task.due) }},
+                    </span>
+                    <span v-if="task.followUp">
+                      Follow-up {{ timedifference(task.followUp) }},
+                    </span>
+                    <span v-if="task.created">
+                      Created {{ timedifference(task.created) }}
+                    </span>
+                  </div>
+                  <div title="priority">
+                    {{ task.priority }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </b-list-group-item>
+          <b-pagination-nav
+            :link-gen="linkGen"
+            :number-of-pages="numPages"
+            v-model="currentPage"
+            class="cft-paginate"
+          />
+        </b-list-group>
         <b-list-group cols="3" v-else>
           <b-row class="cft-not-selected mt-2 ml-1 row">
             <i class="bi bi-exclamation-circle-fill" scale="1"></i>
@@ -207,12 +248,14 @@
       <b-col v-if="selectedTask" lg="9" md="9" sm="12">
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header" title="Task Name">
-            {{ task.name }}</b-row>
+            {{ task.name }}</b-row
+          >
           <br />
           <b-row class="ml-0 task-name" title="Process Name">
-            {{ taskProcess }}</b-row>
+            {{ taskProcess }}</b-row
+          >
           <br />
-          <b-row class="ml-0" title="application ID" 
+          <b-row class="ml-0" title="application ID"
             >Application ID # {{ applicationId }}</b-row
           >
           <div style="height:100%;">
@@ -296,19 +339,21 @@
                 </b-modal>
               </b-col>
               <b-col>
-                <div class="cft-task-assignee"
+                <div
+                  class="cft-task-assignee"
                   v-if="task.assignee"
                   title="Reset assignee"
                 >
-                  <i class="bi bi-person-fill" />
-                  {{ task.assignee }}
-
-                  <i class="bi bi-x" @click="onUnClaim" />
+                  <i class="bi bi-person-fill cft-person-fill" />
+                  <!--   <span>{{ task.assignee }}</span>-->
+                  <span class="cft-user-span">
+                  <b-form-select class="cft-user-select" v-model="userSelected" :options="userList"></b-form-select>
+                    <i class="bi bi-x cft-user-close" @click="onUnClaim" />
+                  </span>
+                
+                 
                 </div>
-                <div
-                  class="cft-task-assignee"
-                  v-else
-                  @click="onClaim">
+                <div class="cft-task-assignee" v-else @click="onClaim">
                   <i class="bi bi-person-fill" />
                   Claim
                 </div>
@@ -385,7 +430,7 @@ import {
   getTaskFromList,
   searchData,
   searchQuery,
-  sortingList
+  sortingList,
 } from "../services/utils";
 import BpmnJS from "bpmn-js";
 import CamundaRest from "../services/camunda-rest";
@@ -407,7 +452,7 @@ import vueBpmn from "vue-bpmn";
     TaskSortOptions,
     vueBpmn,
     Modeler,
-    BpmnJS
+    BpmnJS,
   },
 })
 export default class Tasklist extends Vue {
@@ -433,7 +478,7 @@ export default class Tasklist extends Vue {
   private setFollowup = null;
   private setDue = null;
   private setGroup = null;
-  private selectedTask = "";
+  private userSelected = null;
   private showfrom = false;
   private currentPage = 1;
   private perPage = 15;
@@ -463,14 +508,7 @@ export default class Tasklist extends Vue {
   private updateSortOptions: any = [];
   private setSortListDropdown = false;
   private setSortListDropdownindex: any = null;
-  private showSortListDropdown = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
+  private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
   private optionsList: any = ["created"];
   private payload: any = {
@@ -479,15 +517,16 @@ export default class Tasklist extends Vue {
   };
   private activeSearchItem = 0;
   private searchListElements: any = searchData;
-  private searchA = 'ANY';
+  private searchA = "ANY";
   private showSearchList = false;
+  private showUserList = false;
   private searchList: any = [];
   private showUpdatesearch = false;
   private setshowUpdatesearch = false;
   private showOperators = false;
-  private searchItem = []
-  private operator: any = []
-  private showSearch = 0
+  private searchItem = [];
+  private operator: any = [];
+  private showSearch = 0;
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -549,32 +588,33 @@ export default class Tasklist extends Vue {
     this.activefilter = index;
   }
 
-  setActiveSearchItem(index: number){
+  setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
   }
 
   cftshowSearchListElements() {
     this.showSearchList = !this.showSearchList;
   }
-
+  cftShowUserList() {
+    this.showUserList = !this.showUserList;
+    //this.use = !this.showSearchList;
+  }
   searchAllCriteria() {
-    if(this.searchA === "ALL") {
-      this.searchA = "ANY"
-    }
-    else {
-      this.searchA = "ALL"
+    if (this.searchA === "ALL") {
+      this.searchA = "ANY";
+    } else {
+      this.searchA = "ALL";
     }
   }
 
   addSearchElementItem(item: any, index: number) {
     this.searchList.push(item);
-    if(this.searchList===[]){
-      this.operator[0] = item["compares"][0]
-    }
-    else{
-      console.log(this.searchList.length)
-      console.log("item", item["compares"][0])
-      this.operator[this.searchList.length-1] = item["compares"][0]
+    if (this.searchList === []) {
+      this.operator[0] = item["compares"][0];
+    } else {
+      console.log(this.searchList.length);
+      console.log("item", item["compares"][0]);
+      this.operator[this.searchList.length - 1] = item["compares"][0];
     }
     this.showSearchList = false;
   }
@@ -599,27 +639,25 @@ export default class Tasklist extends Vue {
   }
 
   callSearchApi(item: any, searchItem: any, comparator: string) {
-    console.log("Value to search", searchItem["values"])
+    console.log("Value to search", searchItem["values"]);
     console.log("Search value", item);
     console.log("comparator", comparator);
     let index = 0;
-    for(let i=0; i<searchItem["compares"].length; i++) {
-      if(searchItem["compares"][i]===comparator){
+    for (let i = 0; i < searchItem["compares"].length; i++) {
+      if (searchItem["compares"][i] === comparator) {
         index = i;
         break;
       }
     }
     console.log("index", searchItem["compares"][index]);
-    if(searchItem["compares"][index]==="like") {
-      searchQuery[0][searchItem["values"][index]] = '%' + item+ '%';
-    }
-
-    else{
+    if (searchItem["compares"][index] === "like") {
+      searchQuery[0][searchItem["values"][index]] = "%" + item + "%";
+    } else {
       searchQuery[0][searchItem["values"][index]] = item;
     }
 
     this.payload["orQueries"] = searchQuery;
-    console.log(this.payload)
+    console.log(this.payload);
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
@@ -732,12 +770,12 @@ export default class Tasklist extends Vue {
 
   oncustomEventCallback = (customEvent: any) => {
     switch (customEvent.type) {
-    case "reloadTasks":
-      this.reloadTasks();
-      break;
-    case "reloadCurrentTask":
-      this.reloadCurrentTask();
-      break;
+      case "reloadTasks":
+        this.reloadTasks();
+        break;
+      case "reloadCurrentTask":
+        this.reloadCurrentTask();
+        break;
     }
   };
 
@@ -848,9 +886,7 @@ export default class Tasklist extends Vue {
     //   this.setSortListDropdownindex = index;
     // }
     // console.log("set index", this.setSortListDropdownindex)
-    this.showSortListDropdown[index] = !this.showSortListDropdown[
-      index
-    ];
+    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
     this.sortOptions = this.getOptions(this.sortList);
   }
 
@@ -953,7 +989,6 @@ export default class Tasklist extends Vue {
           this.xmlData = res.data.bpmn20Xml;
           const modeler = new Modeler({ container: "#canvas" });
           await modeler.importXML(this.xmlData);
-         
         });
       });
 
@@ -974,6 +1009,8 @@ export default class Tasklist extends Vue {
         this.formId = formId;
         this.showfrom = true;
       });
+       this.userSelected = this.task.assignee;
+       console.log(this.userSelected); 
     }
   }
 
@@ -999,11 +1036,11 @@ export default class Tasklist extends Vue {
         this.getProcessDefinitions = response.data;
       }
     );
-    CamundaRest.getUsers(this.token, this.bpmApiUrl).then(
-      (response) => {
-        this.userList = response.data;
-      }
-    )
+    CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
+      console.log("users:", response.data);
+      const result = response.data.map(e => ({ value: e.id,text:e.id }));
+      this.userList = result;
+    });
   }
 }
 </script>
