@@ -296,7 +296,7 @@
                 </b-modal>
               </b-col>
               <b-col>
-                <div
+                <div class="cft-task-assignee"
                   v-if="task.assignee"
                   title="Reset assignee"
                 >
@@ -305,7 +305,10 @@
 
                   <i class="bi bi-x" @click="onUnClaim" />
                 </div>
-                <div v-else @click="onClaim">
+                <div
+                  class="cft-task-assignee"
+                  v-else
+                  @click="onClaim">
                   <i class="bi bi-person-fill" />
                   Claim
                 </div>
@@ -456,6 +459,7 @@ export default class Tasklist extends Vue {
   private xmlData: any;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: any = [];
+  private userList: any = [];
   private updateSortOptions: any = [];
   private setSortListDropdown = false;
   private setSortListDropdownindex: any = null;
@@ -995,6 +999,11 @@ export default class Tasklist extends Vue {
         this.getProcessDefinitions = response.data;
       }
     );
+    CamundaRest.getUsers(this.token, this.bpmApiUrl).then(
+      (response) => {
+        this.userList = response.data;
+      }
+    )
   }
 }
 </script>
