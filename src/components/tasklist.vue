@@ -243,7 +243,10 @@
                   <i class="bi bi-grid-3x3-gap-fill"></i>
                   {{ String(groupListNames) }}
                 </div>
-                <div v-b-modal.AddGroupModal v-else>
+                <div
+                  v-b-modal.AddGroupModal 
+                  v-else
+                >
                   <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
                 </div>
                 <b-modal
@@ -634,17 +637,15 @@ export default class Tasklist extends Vue {
   }
 
   addGroup() {
-    if (!this.setGroup) {
-      CamundaRest.createTaskGroupByID(
-        this.token,
-        this.task.id,
-        this.bpmApiUrl,
-        { userId: null, groupId: this.setGroup, type: "candidate" }
-      ).then(() => {
-        this.getGroupDetails();
-        this.reloadCurrentTask();
-      });
-    }
+    CamundaRest.createTaskGroupByID(
+      this.token,
+      this.task.id,
+      this.bpmApiUrl,
+      { userId: null, groupId: this.setGroup, type: "candidate" }
+    ).then(() => {
+      this.getGroupDetails();
+      this.reloadCurrentTask();
+    });
   }
 
   getGroupDetails() {
