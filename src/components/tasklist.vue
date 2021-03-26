@@ -122,18 +122,22 @@
               </div>
 
                 <br>
-                <p title="operator" @click="showOperatorList">{{operator}}</p>
+                <p title="operator" @click="showOperatorList">
+                  {{operator[index]}}
+                </p>
                 <div v-if="showOperators&&item.compares.length>1">
                   <div v-for="x in item.compares" :key="x">
-                    <span @click="updateOperators(x)">{{x}}</span>
+                    <span @click="updateOperators(x, index)">{{x}}</span>
                   </div>
                 </div>
-                <input v-model="searchItem[index]"/>
+                <input
+                  v-model="searchItem[index]"
+                  v-on:keyup.enter="callSearchApi(searchItem[index], item, operator)"/>
                 <span @click="callSearchApi(searchItem[index], item, operator)">
                   <i class="bi bi-check"></i>
                 </span>
                 <i class="bi bi-x"></i>
-              </div>
+              </div>            
             </div>
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"
           @click="cftshowSearchListElements"/>
@@ -142,17 +146,17 @@
             v-if="showSearchList"
             class="cft-search-items"
           >
-          <b-list-group-item button
-            v-for="(s, index) in searchListElements"
-            :key="s.label"
-            @click="addSearchElementItem(s);setActiveSearchItem(index)"
-            :class="{'cft-search-item-selected': index ==activeSearchItem }"
-          >
-          {{s.label}}
-          </b-list-group-item>
+            <b-list-group-item button
+              v-for="(s, idx) in searchListElements"
+              :key="s.label"
+              @click="addSearchElementItem(s, index);setActiveSearchItem(idx)"
+              :class="{'cft-search-item-selected': index ==activeSearchItem }"
+            >
+            {{s.label}}
+            </b-list-group-item>
           </b-list-group>
-          </b-col>
-          </div>
+        </b-col>
+      </div>
         <!-- Task list section -->
         <b-list-group class="cft-list-container"  v-if="tasks && tasks.length">
 				<b-list-group-item button v-for="(task, idx) in tasks" v-bind:key="task.id" 
@@ -183,7 +187,7 @@
                     Created {{ timedifference(task.created) }}     
                   </span>
                 </div>
-								<div title="Task assignee" >
+								<div title="priority" >
                  {{ task.priority }}
                 </div>
 							</div>
@@ -471,14 +475,15 @@ export default class Tasklist extends Vue {
   };
   private activeSearchItem = 0;
   private searchListElements: any = searchData;
-  private searchA = 'ALL';
+  private searchA = 'ANY';
   private showSearchList = false;
   private searchList: any = [];
   private showUpdatesearch = false;
   private setshowUpdatesearch = false;
   private showOperators = false;
   private searchItem = []
-  private operator = ''
+  private operator: any = []
+  private showSearch = 0
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -557,14 +562,22 @@ export default class Tasklist extends Vue {
     }
   }
 
-  addSearchElementItem(item: any) {
+  addSearchElementItem(item: any, index: number) {
     this.searchList.push(item);
-    this.operator = item["compares"][0]
+    if(this.searchList===[]){
+      this.operator[0] = item["compares"][0]
+    }
+    else{
+      console.log(this.searchList.length)
+      console.log("item", item["compares"][0])
+      this.operator[this.searchList.length-1] = item["compares"][0]
+    }
     this.showSearchList = false;
   }
 
   deleteSearchListElement(index: any) {
     this.searchList.splice(index, 1);
+    this.operator.splice(index, 1);
   }
 
   showUpdateSearchList() {
@@ -575,8 +588,9 @@ export default class Tasklist extends Vue {
     this.searchList[index].label = searchitem.label;
     this.searchList[index].compares = searchitem.compares;
     this.searchList[index].values = searchitem.values;
-    this.operator = searchitem.compares[0];
+    this.operator[index] = searchitem.compares[0];
 
+    // this.showsearchIndex = index;
     this.showUpdatesearch = false;
   }
 
@@ -600,9 +614,7 @@ export default class Tasklist extends Vue {
       searchQuery[0][searchItem["values"][index]] = item;
     }
 
-    // console.log(searchQuery[this.searchListElements["values"][0]])
     this.payload["orQueries"] = searchQuery;
-    // item
     console.log(this.payload)
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
@@ -611,8 +623,8 @@ export default class Tasklist extends Vue {
     this.showOperators = !this.showOperators;
   }
 
-  updateOperators(operator: any) {
-    this.operator = operator;
+  updateOperators(operator: any, index: number) {
+    this.operator[index] = operator;
 
     this.showOperators = false;
   }

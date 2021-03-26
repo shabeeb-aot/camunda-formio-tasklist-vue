@@ -58,9 +58,17 @@ export const getFormattedDateAndTime = (date: Date)=>{
 
 };
 
+
+export const FilterSearchTypes = {
+  VARIABLES:"variables",
+  STRING:"string",
+  DATE:"date",
+  NORMAL:"normal"
+}
+
 export const searchData = [
-  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
-  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="]},
+  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"]},
+  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"]},
   {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"]},
   {"label": "Assignee", "compares": ["like", "="], "values": ["assigneeLike", "assignee"]},
   {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"]},
