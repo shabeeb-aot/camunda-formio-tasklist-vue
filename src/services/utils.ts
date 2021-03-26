@@ -68,9 +68,9 @@ export const searchData = [
   {"label":"Name", "compares": ["like", "="], "values": ["nameLike", "name"]},
   {"label": "Description","compares": ["like", "="], "values": ["descriptionLike", "description"] },
   {"label":"Priority", "compares": ["="], "values": ["priority"]},
-  {"label":"Due Date", "compares": ["="], "values": ["due"]},
-  {"label":"Follow up Date", "compares": ["="], "values": ["followUp"]},
-  {"label":"Created", "compares": ["="], "values": ["created"]},
+  {"label":"Due Date", "compares": ["before", "after"], "values": ["due"]},
+  {"label":"Follow up Date", "compares": ["before", "after"], "values": ["followUp"]},
+  {"label":"Created", "compares": ["before", "after"], "values": ["createdBefore", "createdAfter"]},
 ]
 
 export const searchQuery = [

@@ -29,7 +29,6 @@
       <!-- Forms list & fill section -->
         <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
 
-    <!-- <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first"> -->
       <div class="cft-first">
         <!-- Sorting section -->
 				<div id="cftf-dpdown-container" class="mx-2">
@@ -85,7 +84,6 @@
             </TaskSortOptions>
           </div>
 				</div>
-    <!-- </b-col> -->
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
@@ -233,18 +231,17 @@
                 ></DatePicker>
               </b-col>
               <b-col>
-                <b-button
-                  variant="primary"
+                <div
                   v-b-modal.AddGroupModal
                   v-if="groupListNames"
                   title="groups"
                 >
                   <i class="bi bi-grid-3x3-gap-fill"></i>
                   {{ String(groupListNames) }}
-                </b-button>
-                <b-button variant="primary" v-b-modal.AddGroupModal v-else>
+                </div>
+                <div v-b-modal.AddGroupModal v-else>
                   <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
-                </b-button>
+                </div>
                 <b-modal
                   id="AddGroupModal"
                   ref="modal"
@@ -295,20 +292,19 @@
                 </b-modal>
               </b-col>
               <b-col>
-                <b-button
-                  variant="primary"
+                <div
                   v-if="task.assignee"
-                  @click="onUnClaim"
                   title="Reset assignee"
                 >
+                  <i class="bi bi-person-fill" />
                   {{ task.assignee }}
 
-                  <i class="bi bi-person-x-fill" />
-                </b-button>
-                <b-button variant="primary" v-else @click="onClaim">
+                  <i class="bi bi-x" @click="onUnClaim" />
+                </div>
+                <div v-else @click="onClaim">
                   <i class="bi bi-person-fill" />
                   Claim
-                </b-button>
+                </div>
               </b-col>
             </b-row>
             <div style="height:100%;">
