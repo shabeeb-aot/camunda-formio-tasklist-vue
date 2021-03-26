@@ -346,3 +346,35 @@
   margin-top: 15px;
   padding: 0px;
 }
+.cft-user-select{
+  width: 90%;
+  border: none;
+  background: none;
+  padding: 0;
+  height: none;
+  color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
+  font-weight: 700;
+}
+.cft-user-close{
+  position: relative;
+  color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
+  font-weight: bold;
+}
+.cft-person-fill{
+  padding-right: 3px;
+}
+.cft-user-span {
+  position: absolute;
+  width: 61%;
+}
+.custom-select {
+  height: auto;
+  vertical-align: top;
+
+}
+.custom-select:focus{
+  border-color: none !important;
+  box-shadow: none;
+}
