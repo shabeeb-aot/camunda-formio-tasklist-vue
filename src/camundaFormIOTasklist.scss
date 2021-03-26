@@ -378,3 +378,57 @@
   border-color: none !important;
   box-shadow: none;
 }
+.cft-priority[data-title]:hover:after,
+.cft-task-assignee[data-title]:hover:after,
+.cft-groups[data-title]:hover:after,
+.cft-task-assignee[data-title]:hover:after,
+.cft-process-name[data-title]:hover:after,
+.task-header-title[data-title]:hover:after,
+.cft-application-id[data-title]:hover:after {
+  font-size: 12px;
+  content: attr(data-title);
+  padding: 4px 8px;
+  color: rgb(255, 255, 255);
+  position: absolute;
+  background-color: rgb(0, 0, 0);
+  right: 3rem;
+  top: 100%;
+  white-space: nowrap;
+  z-index: 1;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: 0px 0px 4px #222;
+  -webkit-box-shadow: 0px 0px 4px #222;
+  box-shadow: 0px 0px 4px #222;
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #cccccc));
+  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+}
+.cft-process-name[data-title]:hover:after,.task-header-title[data-title]:hover:after,
+.cft-application-id[data-title]:hover:after{
+  right: 0;
+  position: relative;
+}
+.cft-application-id{
+  display: block;
+  height: auto;
+}
+.task-name{
+  height: 20px;
+}
+.task-header-title{
+  height: 30px;
+}
+.cft-groups[data-title]:hover:after
+{
+ 
+  width: 20%;
+  left: 0rem;
+}
+.cft-task-assignee[data-title]:hover:after {
+  width: 40%;
+}

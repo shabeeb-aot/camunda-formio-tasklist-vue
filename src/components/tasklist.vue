@@ -185,7 +185,7 @@
                     )
                   }}
                 </div>
-                <div title="Task assignee">
+                <div class="cft-task-assignee" data-title="Task assignee">
                   {{ task.assignee }}
                 </div>
               </div>
@@ -202,7 +202,7 @@
                       Created {{ timedifference(task.created) }}
                     </span>
                   </div>
-                  <div title="priority">
+                  <div class="cft-priority" data-title="priority">
                     {{ task.priority }}
                   </div>
                 </div>
@@ -226,15 +226,15 @@
       <!-- Task Detail section -->
       <b-col v-if="selectedTask" lg="9" md="9" sm="12">
         <div class="cft-service-task-details">
-          <b-row class="ml-0 task-header" title="Task Name">
+          <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
           >
           <br />
-          <b-row class="ml-0 task-name" title="Process Name">
-            {{ taskProcess }}</b-row
+          <b-row class="ml-0 task-name">
+            <span class="cft-process-name" data-title="Process Name">{{ taskProcess }}</span></b-row
           >
           <br />
-          <b-row class="ml-0" title="application ID"
+          <b-row class="ml-0 cft-application-id" data-title="application ID"
             >Application ID # {{ applicationId }}</b-row
           >
           <div style="height:100%;">
@@ -260,7 +260,8 @@
                 <div
                   v-b-modal.AddGroupModal
                   v-if="groupListNames"
-                  title="groups"
+                  class="cft-groups"
+                 data-title="groups"
                 >
                   <i class="bi bi-grid-3x3-gap-fill"></i>
                   {{ String(groupListNames) }}
@@ -324,7 +325,7 @@
                 <div
                   class="cft-task-assignee"
                   v-if="task.assignee"
-                  title="Reset assignee"
+                  data-title="Reset assignee"
                 >
                   <i class="bi bi-person-fill cft-person-fill" />
                   <!--   <span>{{ task.assignee }}</span>-->
