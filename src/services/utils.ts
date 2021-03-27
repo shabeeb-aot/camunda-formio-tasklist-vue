@@ -67,18 +67,18 @@ export const FilterSearchTypes = {
 }
 
 export const searchData = [
-  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"]},
-  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"]},
-  {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"]},
-  {"label": "Assignee", "compares": ["like", "="], "values": ["assigneeLike", "assignee"]},
-  {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"]},
-  {"label":"Candidate User", "compares": ["="], "values": ["candidateUser"]},
-  {"label":"Name", "compares": ["like", "="], "values": ["nameLike", "name"]},
-  {"label": "Description","compares": ["like", "="], "values": ["descriptionLike", "description"] },
-  {"label":"Priority", "compares": ["="], "values": ["priority"]},
-  {"label":"Due Date", "compares": ["before", "after"], "values": ["due"]},
-  {"label":"Follow up Date", "compares": ["before", "after"], "values": ["followUp"]},
-  {"label":"Created", "compares": ["before", "after"], "values": ["createdBefore", "createdAfter"]},
+  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
+  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
+  {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING},
+  {"label": "Assignee", "compares": ["like", "="], "values": ["assigneeLike", "assignee"], "type": FilterSearchTypes.STRING},
+  {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"], "type": FilterSearchTypes.NORMAL},
+  {"label":"Candidate User", "compares": ["="], "values": ["candidateUser"], "type": FilterSearchTypes.NORMAL},
+  {"label":"Name", "compares": ["like", "="], "values": ["nameLike", "name"], "type": FilterSearchTypes.STRING},
+  {"label": "Description","compares": ["like", "="], "values": ["descriptionLike", "description"], "type": FilterSearchTypes.STRING },
+  {"label":"Priority", "compares": ["="], "values": ["priority"], "type": FilterSearchTypes.NORMAL},
+  {"label":"Due Date", "compares": ["before", "after"], "values": ["dueBefore", "dueAfter"], "type": FilterSearchTypes.DATE},
+  {"label":"Follow up Date", "compares": ["before", "after"], "values": ["followUpBefore", "followUpAfter"], "type": FilterSearchTypes.DATE},
+  {"label":"Created", "compares": ["before", "after"], "values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE},
 ]
 
 export const searchQuery = [

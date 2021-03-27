@@ -90,8 +90,7 @@
     background-color: transparent;
     cursor: pointer;
     margin: 10px 0;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 16px;
   }
 
   .cft-select-task {
@@ -355,6 +354,7 @@
   color: #1a5a96;
   font-family: Nunito Sans, SemiBold;
   font-weight: 700;
+  font-size: 16px;
 }
 .cft-user-close{
   position: relative;
@@ -428,6 +428,8 @@
  
   width: 20%;
   left: 0rem;
+  font-weight: 400;
+  font-size: 16px;
 }
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;

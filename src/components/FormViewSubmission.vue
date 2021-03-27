@@ -32,6 +32,7 @@ export default class FormViewSubmission extends Vue {
   private readoption = { readOnly: true };
   private fId = ''
   private sId = ''
+  private formioProjectUrl = "https://forms2.aot-technologies.com"
   private test="https://forms2.aot-technologies.com/form/604a542a3a94803fbcf8289b/submission/605c174913e06b30c50c0408"
 
   mounted() {
@@ -39,7 +40,7 @@ export default class FormViewSubmission extends Vue {
 
     const { formioUrl, formId, submissionId } = getFormDetails(
       this.formUrl,
-      localStorage.getItem('formioApiUrl')
+      localStorage.getItem('formioApiUrl') || this.formioProjectUrl
     );
 
     console.log(submissionId, formId)

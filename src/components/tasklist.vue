@@ -29,8 +29,8 @@
 
       <div class="cft-first">
         <!-- Sorting section -->
-				<div id="cftf-dpdown-container" class="mx-2">
-					<div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+        <div id="cftf-dpdown-container" class="mx-2">
+          <div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
               <span v-if="sortList.length>1"
                 class="cftf-exit-button"
                 title="Remove Sorting"
@@ -85,8 +85,8 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <TaskListSearch/>
-        <!-- <div class="cft-input-filter">
+      <!-- <TaskListSearch/> -->
+        <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
             <div class="cft-search-criteria" v-if="searchList.length">
               <b-button
@@ -133,19 +133,24 @@
                     <span @click="updateOperators(x, index)">{{ x }}</span>
                   </div>
                 </div>
+                <span v-if="searchS==='s'" @click="updatesearchinput(s)">??</span>
                 <input
+                  v-if="searchS==='i'"
                   v-model="searchItem[index]"
                   v-on:keyup.enter="
                     callSearchApi(searchItem[index], item, operator)
                   "
                 />
+                <span v-if="searchS==='s'" @click="updateOnclick">
+                  {{searchItem[index]}}
+                </span>
                 <span @click="callSearchApi(searchItem[index], item, operator)">
                   <i class="bi bi-check"></i>
                 </span>
                 <i class="bi bi-x"></i>
               </div>
             </div>
-					<input type="text" class="cft-filter" placeholder="Filter Tasks"
+          <input type="text" class="cft-filter" placeholder="Filter Tasks"
           @click="cftshowSearchListElements"/>
             {{tasklength}}
           <b-list-group
@@ -162,7 +167,7 @@
             </b-list-group-item>
           </b-list-group>
         </b-col>
-      </div> -->
+      </div>
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -261,7 +266,7 @@
                   v-b-modal.AddGroupModal
                   v-if="groupListNames"
                   class="cft-groups"
-                 data-title="groups"
+                  data-title="groups"
                 >
                   <i class="bi bi-grid-3x3-gap-fill"></i>
                   {{ String(groupListNames) }}
@@ -518,7 +523,7 @@ export default class Tasklist extends Vue {
   private showOperators = false;
   private searchItem = [];
   private operator: any = [];
-  private showSearch = 0;
+  private showSearchs = 'a'
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -629,6 +634,7 @@ export default class Tasklist extends Vue {
   }
 
   callSearchApi(item: any, searchItem: any, comparator: string) {
+    this.showSearchs = 's'
     let index = 0;
     for (let i = 0; i < searchItem["compares"].length; i++) {
       if (searchItem["compares"][i] === comparator) {
@@ -639,7 +645,7 @@ export default class Tasklist extends Vue {
     if (searchItem["compares"][index] === "like") {
       searchQuery[0][searchItem["values"][index]] = "%" + item + "%";
     } else {
-      searchQuery[0][searchItem["values"][index]] = item;
+      searchQuery[searchItem["values"][index]] = item;
     }
 
     this.payload["orQueries"] = searchQuery;
@@ -655,6 +661,15 @@ export default class Tasklist extends Vue {
 
     this.showOperators = false;
   }
+
+  updatesearchinput() {
+    this.showSearchs = "i"
+  }
+
+  updateOnclick() {
+    this.showSearchs = 'a'
+  }
+
 
   addGroup() {
     CamundaRest.createTaskGroupByID(
