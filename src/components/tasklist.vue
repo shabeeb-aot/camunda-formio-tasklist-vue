@@ -252,9 +252,10 @@
 </template>
 
 <script lang="ts">
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
+// removed for this project since its making some issue
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';

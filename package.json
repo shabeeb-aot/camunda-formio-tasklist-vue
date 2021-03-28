@@ -2,7 +2,7 @@
   "name": "camunda-formio-tasklist-vue",
   "version": "1.0.0",
   "description": "Vue components to integrate formsflow.ai",
-  "private": true,
+  "private": false,
   "main": "./dist/camunda-formio-tasklist-vue.common.js",
   "author": "faiz.shabeeb@aot-technologies.com",
   "scripts": {
