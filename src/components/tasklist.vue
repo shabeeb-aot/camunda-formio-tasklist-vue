@@ -16,7 +16,7 @@
             {{filter.name}}
           </b-list-group-item>
         </b-list-group>
-        <b-list-group v-else>
+        <b-list-group class="cft-filter-dropdown-content" v-else>
           <b-list-group-item>
             <i class="bi bi-exclamation-circle-fill"></i>
               No Filters found  
