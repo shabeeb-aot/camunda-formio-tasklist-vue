@@ -100,7 +100,7 @@ export default class FormListModal extends Vue{
   private formTitle = ''
   private showForms = true
 
-  @Prop({}) private token !: any;
+  @Prop({}) private token !: string;
   @Prop() private bpmApiUrl !: string;
 
   linkFormGen() {

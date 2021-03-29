@@ -1,6 +1,6 @@
 <template>
     <b-container class="task-outer-container">
-      <i class="fa fa-chevron-left"></i>
+      <a :href="homeUrl"><i class="fa fa-chevron-left"></i></a>
         <div id='formio'></div>
     </b-container>
 </template>
@@ -25,9 +25,11 @@ export default class FormViewSubmission extends Vue {
   private fId = ''
   private sId = ''
   private formioProjectUrl = "https://forms2.aot-technologies.com"
+  private homeUrl = ''
 
   mounted() {
     this.formUrl = window.location.href;
+    this.homeUrl = localStorage.getItem('formsflowaiUrl') || "https://app2.aot-technologies.com"
 
     const { formioUrl, formId, submissionId } = getFormDetails(
       this.formUrl,
