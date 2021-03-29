@@ -123,11 +123,14 @@
                     <span @click="updateOperators(x, index)">{{ x }}</span>
                   </div>
                 </div>
-                {{item.type}}
                 <div v-if='item.type==="date"'>
-                  Date element
-                  <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
-                  ??</span>
+                  <!-- <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
+                  ??</span>                   v-if="showSearchs[index]==='i'"-->
+                  <DatePicker
+                  type="datetime"
+                  v-model="searchDate[index]"
+                  @change="callSearchDateApi(searchDate[index], item, operator, index)"
+                ></DatePicker>
                 </div>
                 <div v-else-if='item.type==="variables"'>
                   Task variables
@@ -410,16 +413,16 @@
 
 <script lang="ts">
 // removed for this project since its making some issue
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap-icons/font/bootstrap-icons.css';
-// import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import "formiojs/dist/formio.full.min.css";
 import "vue2-datepicker/index.css";
 import "semantic-ui-css/semantic.min.css";
 import "../user-styles.css";
 import "../camundaFormIOTasklist.scss";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
@@ -598,7 +601,7 @@ export default class Tasklist extends Vue {
   }
   cftShowUserList() {
     this.showUserList = !this.showUserList;
-    //this.use = !this.showSearchList;
+  //this.use = !this.showSearchList;
   }
   searchAllCriteria() {
     if (this.searchA === "ALL") {
@@ -654,6 +657,28 @@ export default class Tasklist extends Vue {
       searchQuery[0][searchItem["values"][index]] = item;
     }
 
+    this.payload["orQueries"] = searchQuery;
+    this.fetchTaskList(this.selectedfilterId, this.payload);
+  }
+
+  callSearchDateApi(item: any, searchItem: any, comparator: string, idx: number) {
+    this.showSearchs[idx] = 's'
+    let index = 0;
+    for (let i = 0; i < searchItem["compares"].length; i++) {
+      if (searchItem["compares"][i] === comparator) {
+        index = i;
+        break;
+      }
+    }
+
+    const timearr = moment(item)
+      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+      .split("+");
+    const replaceTimezone = timearr[1].replace(":", "");
+    const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+      .replace(timearr[1], replaceTimezone);
+
+    searchQuery[0][searchItem["values"][index]] = titem;
     this.payload["orQueries"] = searchQuery;
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
