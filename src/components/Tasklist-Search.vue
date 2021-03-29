@@ -25,7 +25,6 @@
                 <span title="type" @click="showUpdateSearchList(index)">{{
                   item.label
                 }}</span>
-                {{showUpdatesearch}}
                 <div v-if="showUpdatesearch[index]" class="cft-sort-items">
                   <div
                     v-for="s in searchListElements"
@@ -110,8 +109,6 @@ import moment from "moment";
 @Component
 export default class TaskListSearch extends Vue{
 
-  @Prop({}) private token !: any;
-  @Prop() private bpmApiUrl !: string;
   @Prop({}) private tasklength !: number;
 
   private activeSearchItem = 0;
@@ -123,8 +120,8 @@ export default class TaskListSearch extends Vue{
   private setUpdatesearchindex = 0;
   private showOperators = false;
   private searchItem = [];
-  private operator: any = [];
-  private showSearchs: any = [];
+  private operator: Array<string> = [];
+  private showSearchs: Array<string> = [];
   private searchDate: any = [];
   private setupdateSortListDropdownindex = 0;
 
@@ -157,13 +154,15 @@ export default class TaskListSearch extends Vue{
     this.showSearchList = false;
   }
 
-  deleteSearchListElement(index: any) {
+  deleteSearchListElement(index: number) {
     this.searchList.splice(index, 1);
     this.operator.splice(index, 1);
   }
 
   showUpdateSearchList(index: number) {
-    console.log("Update sort previous", this.setupdateSortListDropdownindex);
+    for(let i=0; i<this.searchListElements.length; i++) {
+      this.showUpdatesearch[i] = false;
+    }
     this.showUpdatesearch[index] = !this.showUpdatesearch[index];
   }
 

@@ -409,8 +409,8 @@ export default class Tasklist extends Vue {
   private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
   private payload: object = {
-    "active": true,
-    "sorting": TASK_FILTER_LIST_DEFAULT_PARAM,
+    active: true,
+    sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
 
@@ -456,7 +456,7 @@ export default class Tasklist extends Vue {
     return moment(date).fromNow();
   }
 
-  getProcessDataFromList(processList: any[], processId: any, dataKey: string) {
+  getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
     const process = processList.find((process) => process.id === processId);
     return process && process[dataKey];
   }
@@ -661,7 +661,7 @@ export default class Tasklist extends Vue {
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
-  getOptions(options: [{"sortOrder": string; "label": string; "sortBy": string}]| []) {
+  getOptions(options: any) {
     const optionsArray: {
       sortOrder: string;
       label: string;
