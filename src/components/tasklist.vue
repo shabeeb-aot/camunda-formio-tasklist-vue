@@ -1,87 +1,77 @@
 <template>
-  <b-container fluid class="task-outer-container">
-    <div class="main-filters my-2 mb-1">
-      <div 
+<b-container fluid class="task-outer-container">
+  <div class="main-filters my-2 mb-1">
+    <!-- Filter section begins -->
+    <div 
       class="cft-filter-dropdown mx-2"
     >
         <button class="cft-filter-dropbtn mr-0">
-          <i class="bi bi-filter-square" />
+          <i class="bi bi-filter-square"/>
         </button>
         <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-          <b-list-group-item button
-            v-for="(filter, idx) in filterList"
-            :key="filter.id"
-            @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-            :class="{'cft-filter-selected': idx == activefilter}"
-          >
+          <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
+          @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
+          :class="{'cft-filter-selected': idx == activefilter}">
             {{filter.name}}
           </b-list-group-item>
         </b-list-group>
         <b-list-group v-else>
           <b-list-group-item>
             <i class="bi bi-exclamation-circle-fill"></i>
-            No Filters found
+              No Filters found  
           </b-list-group-item>
         </b-list-group>
       </div>
       <!-- Forms list & fill section -->
         <FormList :token="token" :bpmApiUrl="bpmApiUrl"/>
 
+    <!-- <b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first"> -->
       <div class="cft-first">
         <!-- Sorting section -->
-        <div id="cftf-dpdown-container" class="mx-2">
-          <div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
+				<div id="cftf-dpdown-container" class="mx-2">
+					<div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
               <span v-if="sortList.length>1"
                 class="cftf-exit-button"
-                title="Remove Sorting"
+                title="Remove Sorting" 
                 @click="deleteSort(sort, index)"
               >
-                <i class="bi bi-x"></i>
+                  <i class="bi bi-x"></i>
               </span>
-              <span
-                class="cftf-span-element"
+							<span
+               class="cftf-span-element"
                 @click="showUpdateSortOptions(idx)"
-                >{{ sortList[idx]["label"] }}</span
-              >
+              >{{sortList[idx]["label"]}}</span>
               <div
                 v-if="showSortListDropdown[idx]"
                 class="cft-sort-items"
               >
-                <div
-                  v-for="s in sortOptions"
-                  :key="s.sortBy"
-                  @click="updateSort(s, idx)"
-                  class="mb-2 cft-sort-element"
+                <div v-for="s in sortOptions" :key="s.sortBy"
+                 @click="updateSort(s,idx)"
+                 class="mb-2 cft-sort-element"
                 >
-                  {{ s.label }}
+                  {{s.label}}
                 </div>
               </div>
-              <a
-                v-if="sort.sortOrder === 'asc'"
-                @click="toggleSort(idx)"
-                href="#"
-                title="Ascending"
-              >
-                <i class="bi bi-chevron-up cftf-arrow"></i>
-              </a>
-              <a v-else @click="toggleSort(idx)" href="#" title="Descending">
-                <i class="bi bi-chevron-down cftf-arrow"></i>
-              </a>
+                <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
+                  <i class="bi bi-chevron-up cftf-arrow"></i>
+                </a>
+                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
+                  <i class="bi bi-chevron-down cftf-arrow"></i>
+                </a>
             </div>
-            <i
-              v-if="updateSortOptions.length === 0"
-              class="fa fa-plus fa-sm click-element cftf-add-sorting"
-              @click="showaddSortListOptions"
-              title="Add sorting"
-            ></i>
-            <TaskSortOptions
-              :sortOptions="sortOptions"
-              :showSortListDropdown="showaddNewSortListDropdown"
-              @add-sort="addSort"
-            >
-            </TaskSortOptions>
+          <i v-if="updateSortOptions.length===0"
+           class="fa fa-plus fa-sm click-element cftf-add-sorting"
+           @click="showaddSortListOptions"
+           title="Add sorting"></i>
+          <TaskSortOptions
+           :sortOptions="sortOptions"
+           :showSortListDropdown="showaddNewSortListDropdown"
+           @add-sort="addSort"
+          >
+          </TaskSortOptions>
           </div>
 				</div>
+    <!-- </b-col> -->
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
@@ -419,9 +409,10 @@
 </template>
 
 <script lang="ts">
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+// removed for this project since its making some issue
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import "formiojs/dist/formio.full.min.css";
 import "vue2-datepicker/index.css";
