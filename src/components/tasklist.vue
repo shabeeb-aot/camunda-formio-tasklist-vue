@@ -413,9 +413,9 @@
 
 <script lang="ts">
 // removed for this project since its making some issue
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import "formiojs/dist/formio.full.min.css";
 import "vue2-datepicker/index.css";
@@ -638,7 +638,6 @@ export default class Tasklist extends Vue {
     this.searchList[index].values = searchitem.values;
     this.operator[index] = searchitem.compares[0];
 
-    // this.showsearchIndex = index;
     this.showUpdatesearch = false;
   }
 
@@ -885,7 +884,7 @@ export default class Tasklist extends Vue {
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
-  getOptions(options: any) {
+  getOptions(options: [{"sortOrder": string; "label": string; "sortBy": string}]| []) {
     const optionsArray: {
       sortOrder: string;
       label: string;
@@ -1070,7 +1069,7 @@ export default class Tasklist extends Vue {
       }
     );
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      const result = response.data.map(e => ({ value: e.id,text:e.id }));
+      const result = response.data.map((e: { id: any }) => ({ value: e.id,text:e.id }));
       this.userList = result;
     });
   }
