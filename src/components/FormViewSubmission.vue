@@ -1,23 +1,13 @@
 <template>
-    <div>
-        <h4>Form Submission View</h4>
-        {{formioUrlLink}}
-        <br>
-        {{fId}}
-        <br>
-        {{sId}}
-        <br>
-        <formio 
-        :src="formioUrlLink"
-        :form="fId"
-        :submission="sId"></formio>
-    </div>
+    <b-container class="task-outer-container">
+      <i class="fa fa-chevron-left"></i>
+        <div id='formio'></div>
+    </b-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-// import CamundaRest from '../services/camunda-rest'
-import { Form } from 'vue-formio';
+import { Component, Prop,  Vue } from 'vue-property-decorator'
+import { Form, Formio } from 'vue-formio';
 import { getFormDetails } from "../services/get-formio";
 
 @Component({
@@ -26,6 +16,8 @@ import { getFormDetails } from "../services/get-formio";
   }
 })
 export default class FormViewSubmission extends Vue {
+  @Prop() private formid !: string;
+  @Prop() private submissionid !: string;
 
   private formUrl = ''
   private formioUrlLink = ''
@@ -33,7 +25,6 @@ export default class FormViewSubmission extends Vue {
   private fId = ''
   private sId = ''
   private formioProjectUrl = "https://forms2.aot-technologies.com"
-  private test="https://forms2.aot-technologies.com/form/604a542a3a94803fbcf8289b/submission/605c174913e06b30c50c0408"
 
   mounted() {
     this.formUrl = window.location.href;
@@ -43,12 +34,22 @@ export default class FormViewSubmission extends Vue {
       localStorage.getItem('formioApiUrl') || this.formioProjectUrl
     );
 
-    console.log(submissionId, formId)
-    this.formioUrlLink = formioUrl.replace("http", "https");
-    console.log(this.formioUrlLink)
-    this.fId = formId;
-    this.sId = submissionId;
-    console.log(this.sId)
+    if(formId&& submissionId){
+
+      this.formioUrlLink = formioUrl.replace("http", "https");
+      this.fId = formId;
+      this.sId = submissionId;
+    }
+
+    else {
+      this.fId = this.formid;
+      this.sId = this.submissionid;
+      this.formioUrlLink = localStorage.getItem('formioApiUrl') || this.formioProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
+    }
+
+    Formio.createForm(document.getElementById('formio'), this.formioUrlLink, {
+      readOnly: true,
+    });
   }
 
 }
