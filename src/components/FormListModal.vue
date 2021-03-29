@@ -1,18 +1,18 @@
 <template>
-  <div class="cftf-form-conatiner">
-   <button type="button" class="btn btn-light cft-form-title" v-b-modal.modal-multi-1>
-        <h4 ref="btn-show"> <i class="fa fa-wpforms"></i> Forms</h4>
-   </button>
-        <b-modal
-          ref="modal-1"
-          id="modal-multi-1"
-          hide-header
-          no-close-on-backdrop
-          no-close-on-esc
-          ok-only
-          ok-title="Cancel"
-          ok-variant="danger"
-        >
+        <div class="cftf-form-conatiner">
+          <button type="button" class="btn btn-light cft-form-title" v-b-modal.modal-multi-1>
+              <h4 ref="btn-show"> <i class="fa fa-wpforms"></i> Forms</h4>
+          </button>
+            <b-modal
+              ref="modal-1"
+              id="modal-multi-1"
+              hide-header
+              no-close-on-backdrop
+              no-close-on-esc
+              ok-only
+              ok-title="Cancel"
+              ok-variant="danger"
+            >
           <div class="overflow-auto">
             <b-table-simple
               hover
@@ -51,7 +51,7 @@
                 class="cft-form-list-paginate"
               />
           </div>
-        </b-modal>
+              </b-modal>
         <b-modal
           ref="modal-2"
           id="modal-multi-2"
@@ -74,7 +74,7 @@
           >
           </Form>
         </b-modal>
-    </div>
+          </div>
 </template>
 
 <script lang="ts">
@@ -90,7 +90,7 @@ import { Form } from 'vue-formio';
     Form
   }
 })
-export default class FormList extends Vue{
+export default class FormListModal extends Vue{
   private formList: Array<object> = []
   private formperPage=10
   private formNumPages=5
@@ -118,12 +118,12 @@ export default class FormList extends Vue{
     });
   }
 
-  storeFormValue(val: string, name: string){
+  storeFormValue(val: string, title: string){
     this.$bvModal.hide('modal-multi-1')
     const forms = localStorage.getItem('formioApiUrl') + '/form/';
     this.formId = val;
     this.formValueId = forms.concat(val);
-    this.formTitle = name;
+    this.formTitle = title;
   }
 
   backClick() {
@@ -132,7 +132,6 @@ export default class FormList extends Vue{
   }
 
   onSubmit(submission: any) {
-    // this.$router.push({name: 'routename'})
     this.$router.push({path: `/form/${submission.form}/submission/${submission._id}`
     })
   }
