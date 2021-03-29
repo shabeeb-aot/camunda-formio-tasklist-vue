@@ -85,7 +85,7 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <!-- <TaskListSearch/> -->
+      <!-- Search Section <TaskListSearch/> -->
         <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
             <div class="cft-search-criteria" v-if="searchList.length">
@@ -133,21 +133,33 @@
                     <span @click="updateOperators(x, index)">{{ x }}</span>
                   </div>
                 </div>
-                <span v-if="searchS==='s'" @click="updatesearchinput(s)">??</span>
+                {{item.type}}
+                <div v-if='item.type==="date"'>
+                  Date element
+                  <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
+                  ??</span>
+                </div>
+                <div v-else-if='item.type==="variables"'>
+                  Task variables
+                </div>
+                <div v-else>
+                <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
+                  ??</span>
                 <input
-                  v-if="searchS==='i'"
+                  v-if="showSearchs[index]==='i'"
                   v-model="searchItem[index]"
                   v-on:keyup.enter="
-                    callSearchApi(searchItem[index], item, operator)
+                    callSearchApi(searchItem[index], item, operator, index)
                   "
                 />
-                <span v-if="searchS==='s'" @click="updateOnclick">
+                <span v-if="showSearchs[index]==='s'" @click="updateresultOnclick(index)">
                   {{searchItem[index]}}
                 </span>
-                <span @click="callSearchApi(searchItem[index], item, operator)">
+                <span @click="callSearchApi(searchItem[index], item, operator, index)">
                   <i class="bi bi-check"></i>
                 </span>
                 <i class="bi bi-x"></i>
+                </div>
               </div>
             </div>
           <input type="text" class="cft-filter" placeholder="Filter Tasks"
@@ -160,8 +172,8 @@
             <b-list-group-item button
               v-for="(s, idx) in searchListElements"
               :key="s.label"
-              @click="addSearchElementItem(s, index);setActiveSearchItem(idx)"
-              :class="{'cft-search-item-selected': index ==activeSearchItem }"
+              @click="addSearchElementItem(s);setActiveSearchItem(idx)"
+              :class="{'cft-search-item-selected':idx ==activeSearchItem }"
             >
             {{s.label}}
             </b-list-group-item>
@@ -523,7 +535,8 @@ export default class Tasklist extends Vue {
   private showOperators = false;
   private searchItem = [];
   private operator: any = [];
-  private showSearchs = 'a'
+  private showSearchs: any = [];
+  private searchDate: any = [];
 
   checkPropsIsPassedAndSetValue() {
     if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -604,12 +617,14 @@ export default class Tasklist extends Vue {
     }
   }
 
-  addSearchElementItem(item: any, index: number) {
+  addSearchElementItem(item: any) {
     this.searchList.push(item);
     if (this.searchList === []) {
       this.operator[0] = item["compares"][0];
+      this.showSearchs[0] = 'a';
     } else {
       this.operator[this.searchList.length - 1] = item["compares"][0];
+      this.showSearchs[this.searchList.length - 1] = 'a';
     }
     this.showSearchList = false;
   }
@@ -633,8 +648,8 @@ export default class Tasklist extends Vue {
     this.showUpdatesearch = false;
   }
 
-  callSearchApi(item: any, searchItem: any, comparator: string) {
-    this.showSearchs = 's'
+  callSearchApi(item: any, searchItem: any, comparator: string, idx: number) {
+    this.showSearchs[idx] = 's'
     let index = 0;
     for (let i = 0; i < searchItem["compares"].length; i++) {
       if (searchItem["compares"][i] === comparator) {
@@ -645,7 +660,7 @@ export default class Tasklist extends Vue {
     if (searchItem["compares"][index] === "like") {
       searchQuery[0][searchItem["values"][index]] = "%" + item + "%";
     } else {
-      searchQuery[searchItem["values"][index]] = item;
+      searchQuery[0][searchItem["values"][index]] = item;
     }
 
     this.payload["orQueries"] = searchQuery;
@@ -662,12 +677,12 @@ export default class Tasklist extends Vue {
     this.showOperators = false;
   }
 
-  updatesearchinput() {
-    this.showSearchs = "i"
+  updatesearchinput(index: number) {
+    this.showSearchs[index] = "i"
   }
 
-  updateOnclick() {
-    this.showSearchs = 'a'
+  updateresultOnclick(index: number) {
+    this.showSearchs[index] = 'i'
   }
 
 
