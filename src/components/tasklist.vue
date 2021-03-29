@@ -71,7 +71,7 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <TaskListSearch :tasklength="tasklength"/>
+      <!-- <TaskListSearch :tasklength="tasklength"/> -->
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -311,23 +311,21 @@
 
 <script lang="ts">
 // removed for this project since its making some issue
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap-icons/font/bootstrap-icons.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import "formiojs/dist/formio.full.min.css";
 import "vue2-datepicker/index.css";
 import "semantic-ui-css/semantic.min.css";
 import "../user-styles.css";
 import "../camundaFormIOTasklist.scss";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue} from "vue-property-decorator";
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
   getTaskFromList,
-  searchData,
-  searchQuery,
   sortingList,
 } from "../services/utils";
 import BpmnJS from "bpmn-js";
@@ -336,7 +334,7 @@ import DatePicker from "vue2-datepicker";
 import { Form } from "vue-formio";
 import FormListModal from "./FormListModal.vue";
 import Modeler from "bpmn-js/lib/Modeler";
-import TaskListSearch from "../components/Tasklist-Search.vue";
+// import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from "../components/tasklist-sortoptions.vue";
 import { authenticateFormio } from "../services/formio-token";
 import { getFormDetails } from "../services/get-formio";
@@ -348,7 +346,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
-    TaskListSearch,
+    // TaskListSearch,
     TaskSortOptions,
     vueBpmn,
     Modeler,
@@ -398,11 +396,11 @@ export default class Tasklist extends Vue {
   private activefilter = 0;
   private applicationId = "";
   private groupList = [];
-  private groupListNames: any = null;
+  private groupListNames: Array<string> | null = null;
   private groupListItems: string[] = [];
   private userEmail = "external";
   private selectedfilterId = "";
-  private xmlData: any;
+  private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
@@ -697,8 +695,14 @@ export default class Tasklist extends Vue {
   }
 
   showUpdateSortOptions(index: number) {
+    for(let i =0; i<6;i++){
+      if(this.showSortListDropdown[i]===true){
+        this.showSortListDropdown[i] = false;
+      }
+    }
     this.showSortListDropdown[index] = !this.showSortListDropdown[index];
     this.sortOptions = this.getOptions(this.sortList);
+    this.setupdateSortListDropdownindex = index;
   }
 
   updateSort(sort: any, index: number) {
@@ -848,7 +852,7 @@ export default class Tasklist extends Vue {
       }
     );
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      const result = response.data.map((e: { id: any }) => ({ value: e.id,text:e.id }));
+      const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.userList = result;
     });
   }
