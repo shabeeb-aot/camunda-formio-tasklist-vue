@@ -111,13 +111,13 @@
               <div class="cft-task-details-assign font-11">
                 <div class="created-details">
                   <div>
-                    <span v-if="task.due">
+                    <span class="cft-due-date" :data-title="getExactDate(task.due)" v-if="task.due">
                       Due {{ timedifference(task.due) }},
                     </span>
-                    <span v-if="task.followUp">
+                    <span class="cft-due-date" :data-title="getExactDate(task.followUp)" v-if="task.followUp">
                       Follow-up {{ timedifference(task.followUp) }},
                     </span>
-                    <span v-if="task.created">
+                    <span class="cft-due-date" :data-title="getExactDate(task.created)" v-if="task.created">
                       Created {{ timedifference(task.created) }}
                     </span>
                   </div>
@@ -336,6 +336,7 @@ import {
   findFilterKeyOfAllTask,
   getTaskFromList,
   sortingList,
+  getFormattedDateAndTime
 } from '../services/utils';
 import BpmnJS from "bpmn-js";
 import CamundaRest from '../services/camunda-rest';
@@ -483,7 +484,9 @@ setselectedTask(task: string) {
   this.selectedTask = task;
   this.fetchData();
 }
-
+getExactDate(date: Date) {
+  return getFormattedDateAndTime(date);
+}
 toggle(index: number) {
   this.activeIndex = index;						  
 }
