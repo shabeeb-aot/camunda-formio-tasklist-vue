@@ -262,7 +262,7 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../user-styles.css'
 import '../camundaFormIOTasklist.scss'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
@@ -347,6 +347,13 @@ private optionsList: any = ['created',]
 private payload: any = {"processVariables":[],"taskVariables":[],"caseInstanceVariables":[], "active": true,
   "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
 }
+
+@Watch('token')
+ontokenChange (newVal: any) {
+  // updating token
+  localStorage.setItem("authToken", newVal);
+}
+
 
 checkPropsIsPassedAndSetValue() {
   if(!this.bpmApiUrl || this.bpmApiUrl===""){
