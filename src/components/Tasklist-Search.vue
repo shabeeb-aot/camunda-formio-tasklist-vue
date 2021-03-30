@@ -19,6 +19,7 @@
                 class="cftf-search-item-box mr-2"
                 v-for="(item, index) in searchList"
                 :key="item.label+index"
+                @click="makeInputNull(index)"
               >
                 <span @click="deleteSearchListElement(index)"
                   ><i class="bi bi-x"></i
@@ -161,6 +162,18 @@ export default class TaskListSearch extends Vue{
     }
   }
 
+  updatesearchinput(index: number) {
+    Vue.set(this.showSearchs, index, 'i');
+  }
+
+  updateresultOnclick(index: number) {
+    Vue.set(this.showSearchs, index, 'i');
+  }
+
+  makeInputNull(index: number){
+    Vue.set(this.showSearchs, index, 'a');
+  }
+
   addSearchElementItem(item: any) {
     this.searchList.push(item);
     if (this.searchList === []) {
@@ -248,12 +261,5 @@ export default class TaskListSearch extends Vue{
     this.showOperators = false;
   }
 
-  updatesearchinput(index: number) {
-    Vue.set(this.showSearchs, index, 'i');
-  }
-
-  updateresultOnclick(index: number) {
-    Vue.set(this.showSearchs, index, 'i');
-  }
 }
 </script>
