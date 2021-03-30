@@ -151,6 +151,8 @@
     color: #333;
     font-weight: 400;
     min-width: 250px;
+    color: rgb(21, 92, 181);
+    font-weight: 600;
   }
 
   .cft-search-item-selected {
@@ -180,7 +182,8 @@
     margin-top: 5px;
     background-color: #f2dede;
     border-color: #ebccd1;
-    color: #0b2d5f;;
+    color: rgb(21, 92, 181);
+    font-weight: 600;
   }
 
   .cft-filter-dropdown-content 
@@ -447,4 +450,22 @@
 }
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;
+}
+.approve-box,.reject-box{
+background-color: white;
+border: 1px solid rgb(165, 163, 163);
+height: 8px;
+width: 8px;
+}
+.icon-actions{
+  display: block;
+  float: right;
+}
+.rhs-container{
+  width: 46.5%;
+  display: inline-block;
+}
+.cft-search-title{
+  margin-bottom: 0rem;
+  display: inline-block;
 }
