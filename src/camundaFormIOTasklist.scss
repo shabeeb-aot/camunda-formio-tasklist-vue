@@ -225,12 +225,12 @@
   }
   [aria-busy=true] {
     cursor: unset !important;
-}
-.cft-paginate{
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-}
+  }
+  .cft-paginate{
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+  }
 
   #cftf-dpdown-container {
     display: flex;
@@ -322,6 +322,9 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
+  }
+  .height-100{
+    min-height: 100%;
   }
 
 }
