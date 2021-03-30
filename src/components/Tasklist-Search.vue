@@ -4,7 +4,7 @@
             <div class="cft-search-criteria" v-if="searchList.length">
               <b-button
                 squared
-                v-if="searchList.length>1"
+                :disabled="searchList.length<2"
                 variant="outline-secondary"
                 @click="searchAllCriteria"
               >
