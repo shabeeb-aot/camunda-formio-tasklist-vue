@@ -635,8 +635,7 @@ getBPMTaskDetail(taskId: string) {
       });
   }
 
-  onUnClaim() {
-											  
+  onUnClaim() {				  
     CamundaRest.unclaim(this.token, this.task.id, this.bpmApiUrl)
       .then(() => {
         this.reloadCurrentTask();

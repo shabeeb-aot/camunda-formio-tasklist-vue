@@ -81,7 +81,7 @@ export const searchData = [
   {"label":"Created", "compares": ["before", "after"], "values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE},
 ]
 
-export const searchQuery = [
+export const searchQuery: any = [
   {
     "assignee": null,
     "assigneeLike": null,
