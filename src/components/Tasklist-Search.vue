@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import { searchData, searchQuery } from "../services/utils";
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
@@ -243,6 +243,7 @@ export default class TaskListSearch extends Vue {
     this.showUpdatesearch[index] = false;
   }
 
+  @Emit()
   callSearchApi(item: any, searchItem: any, comparator: string, idx: number) {
     Vue.set(this.showSearchs, idx, "s");
     let index = 0;
@@ -258,10 +259,13 @@ export default class TaskListSearch extends Vue {
       searchQuery[0][searchItem["values"][index]] = item;
     }
 
+    return searchQuery;
+    //just return payload and after which call fetchApi
     // this.payload["orQueries"] = searchQuery;
     // this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
+  @Emit()
   callSearchDateApi(
     item: any,
     searchItem: any,
@@ -286,6 +290,7 @@ export default class TaskListSearch extends Vue {
       .replace(timearr[1], replaceTimezone);
 
     searchQuery[0][searchItem["values"][index]] = titem;
+    return searchQuery
     // this.payload["orQueries"] = searchQuery;
     // this.fetchTaskList(this.selectedfilterId, this.payload);
   }

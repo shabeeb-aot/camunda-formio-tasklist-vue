@@ -75,7 +75,7 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <TaskListSearch :tasklength="tasklength"/>
+      <TaskListSearch @call-search-api="callSearchApi" @call-search-date-api="callSearchDateApi" :tasklength="tasklength"/>
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -497,6 +497,16 @@ cftShowUserList() {
   this.showUserList = !this.showUserList;
 }
 
+callSearchApi(item: any) {
+  this.payload["orQueries"] = item;
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
+
+callSearchDateApi(item: any) {
+  this.payload["orQueries"] = item;
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
+
 addGroup() {
   CamundaRest.createTaskGroupByID(
     this.token,
@@ -856,31 +866,31 @@ getBPMTaskDetail(taskId: string) {
  
 
   mounted() {
-    if(this.selectedfilterId) {
-      if(! SocketIOService.isConnected()) {
-        SocketIOService.connect((refreshedTaskId: any)=> {
-          if(this.selectedfilterId){
-            //Refreshes the Task
-            this.fetchTaskList(this.selectedfilterId, this.payload);
-          }
-          if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-            this.fetchData()
-          }
-        })
-      }
-    }
-    else{
-      SocketIOService.disconnect();
-      SocketIOService.connect((refreshedTaskId: any)=> {
-        if(this.selectedfilterId){
-          //Refreshes the Task
-          this.fetchTaskList(this.selectedfilterId, this.payload);
-        }
-        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-          this.fetchData()
-        }
-      })
-    }
+    // if(this.selectedfilterId) {
+    //   if(! SocketIOService.isConnected()) {
+    //     SocketIOService.connect((refreshedTaskId: any)=> {
+    //       if(this.selectedfilterId){
+    //         //Refreshes the Task
+    //         this.fetchTaskList(this.selectedfilterId, this.payload);
+    //       }
+    //       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+    //         this.fetchData()
+    //       }
+    //     })
+    //   }
+    // }
+    // else{
+    //   SocketIOService.disconnect();
+    //   SocketIOService.connect((refreshedTaskId: any)=> {
+    //     if(this.selectedfilterId){
+    //       //Refreshes the Task
+    //       this.fetchTaskList(this.selectedfilterId, this.payload);
+    //     }
+    //     if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+    //       this.fetchData()
+    //     }
+    //   })
+    // }
 
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
