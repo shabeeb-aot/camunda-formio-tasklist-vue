@@ -116,7 +116,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import {
   searchData,
   searchQuery,
@@ -161,11 +161,11 @@ export default class TaskListSearch extends Vue{
     this.searchList.push(item);
     if (this.searchList === []) {
       this.operator[0] = item["compares"][0];
-      this.showSearchs[0] = 'a';
+      this.showSearchs[0] = 'i';
       this.showUpdatesearch[0] = false;
     } else {
       this.operator[this.searchList.length - 1] = item["compares"][0];
-      this.showSearchs[this.searchList.length - 1] = 'a';
+      this.showSearchs[this.searchList.length - 1] = 'i';
       this.showUpdatesearch[this.searchList.length - 1] = false;
     }
     this.showSearchList = false;
