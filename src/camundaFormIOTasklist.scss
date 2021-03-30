@@ -416,12 +416,14 @@
 .cft-application-id{
   display: block;
   height: auto;
+  width:40%;
 }
 .task-name{
   height: 20px;
 }
 .task-header-title{
   height: 30px;
+  width: 50%;
 }
 .cft-groups[data-title]:hover:after
 {
