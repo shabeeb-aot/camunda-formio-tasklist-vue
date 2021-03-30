@@ -76,12 +76,6 @@
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
       <TaskListSearch :tasklength="tasklength"/>
-       <!-- <div class="cft-input-filter">
-          <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
-					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
-            {{tasklength}}
-          </b-col>
-        </div> -->
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -143,7 +137,7 @@
         </b-list-group>
       </b-col>
       <!-- Task Detail section -->
-      <b-col v-if="selectedTask" lg="9" md="9" sm="12">
+      <b-col v-if="selectedTaskId" lg="9" md="9" sm="12">
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -346,6 +340,7 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
+import SocketIOService from "../services/SocketIOServices";
 import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -390,7 +385,7 @@ export default class Tasklist extends Vue {
   private setFollowup = null;
   private setDue = null;
   private setGroup = null;
-  private selectedTask = '';
+  private selectedTaskId = '';
   private userSelected = null;
   private showfrom = false;
   private currentPage = 1;
@@ -484,7 +479,7 @@ getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
 }
 
 setselectedTask(task: string) {
-  this.selectedTask = task;
+  this.selectedTaskId = task;
   this.fetchData();
 }
 getExactDate(date: Date) {
@@ -585,7 +580,7 @@ getBPMTaskDetail(taskId: string) {
   this.showfrom = false;
   CamundaRest.getVariablesByTaskId(
     this.token,
-    this.selectedTask,
+    this.selectedTaskId,
     this.bpmApiUrl
   ).then((result) => {
     this.formioUrl = result.data["formUrl"].value;
@@ -615,7 +610,7 @@ getBPMTaskDetail(taskId: string) {
 
   reloadTasks() {
     //used to unSelect the task and refresh taskList
-    this.selectedTask = "";
+    this.selectedTaskId = "";
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
@@ -812,12 +807,12 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    if (this.selectedTask) {
-      this.task = getTaskFromList(this.tasks, this.selectedTask);
+    if (this.selectedTaskId) {
+      this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
-        this.selectedTask,
+        this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
         CamundaRest.getProcessDefinitionById(
@@ -841,7 +836,7 @@ getBPMTaskDetail(taskId: string) {
       this.showfrom = false;
       CamundaRest.getVariablesByTaskId(
         this.token,
-        this.selectedTask,
+        this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
         this.applicationId = result.data["applicationId"].value;
@@ -861,6 +856,32 @@ getBPMTaskDetail(taskId: string) {
  
 
   mounted() {
+    if(this.selectedfilterId) {
+      if(! SocketIOService.isConnected()) {
+        SocketIOService.connect((refreshedTaskId: any)=> {
+          if(this.selectedfilterId){
+            //Refreshes the Task
+            this.fetchTaskList(this.selectedfilterId, this.payload);
+          }
+          if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+            this.fetchData()
+          }
+        })
+      }
+    }
+    else{
+      SocketIOService.disconnect();
+      SocketIOService.connect((refreshedTaskId: any)=> {
+        if(this.selectedfilterId){
+          //Refreshes the Task
+          this.fetchTaskList(this.selectedfilterId, this.payload);
+        }
+        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+          this.fetchData()
+        }
+      })
+    }
+
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
