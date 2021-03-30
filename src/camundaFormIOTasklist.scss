@@ -361,6 +361,7 @@
   color: #1a5a96;
   font-family: Nunito Sans, SemiBold;
   font-weight: bold;
+  float: right;
 }
 .cft-person-fill{
   padding-right: 3px;
@@ -372,6 +373,8 @@
 .custom-select {
   height: auto;
   vertical-align: top;
+  width: 90% !important;
+  position: absolute;
 
 }
 .custom-select:focus{
@@ -384,7 +387,8 @@
 .cft-task-assignee[data-title]:hover:after,
 .cft-process-name[data-title]:hover:after,
 .task-header-title[data-title]:hover:after,
-.cft-application-id[data-title]:hover:after {
+.cft-application-id[data-title]:hover:after,
+.cft-due-date[data-title]:hover:after {
   font-size: 12px;
   content: attr(data-title);
   padding: 4px 8px;
@@ -412,6 +416,7 @@
 .cft-application-id[data-title]:hover:after{
   right: 0;
   position: relative;
+  height: 26px;
 }
 .cft-application-id{
   display: block;
@@ -432,6 +437,13 @@
   left: 0rem;
   font-weight: 400;
   font-size: 16px;
+}
+.cft-due-date[data-title]:hover:after{
+  width: 70%;
+  left: 0rem;
+  font-weight: 400;
+  font-size: 12px;
+  height: 20px;
 }
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;
