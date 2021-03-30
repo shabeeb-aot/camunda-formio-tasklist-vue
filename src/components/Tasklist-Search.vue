@@ -4,6 +4,7 @@
             <div class="cft-search-criteria" v-if="searchList.length">
               <b-button
                 squared
+                v-if="searchList.length>1"
                 variant="outline-secondary"
                 @click="searchAllCriteria"
               >
@@ -17,7 +18,7 @@
               <div
                 class="cftf-search-item-box mr-2"
                 v-for="(item, index) in searchList"
-                :key="item.label"
+                :key="item.label+index"
               >
                 <span @click="deleteSearchListElement(index)"
                   ><i class="bi bi-x"></i
@@ -57,6 +58,22 @@
                 </div>
                 <div v-else-if='item.type==="variables"'>
                   Task variables
+                  <span>{{item.label}}</span>
+                  <input
+                    v-model="searchItem[index]"
+                    />
+                  <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
+                  ??</span>
+                <input
+                  v-if="showSearchs[index]==='i'"
+                  v-model="searchItem[index]"
+                  v-on:keyup.enter="
+                    callSearchApi(searchItem[index], item, operator, index)
+                  "
+                />
+                <span v-if="showSearchs[index]==='s'" @click="updateresultOnclick(index)">
+                  {{searchItem[index]}}
+                </span>
                 </div>
                 <div v-else>
                 <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
@@ -99,7 +116,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import {
   searchData,
   searchQuery,
@@ -113,7 +130,7 @@ export default class TaskListSearch extends Vue{
 
   private activeSearchItem = 0;
   private searchListElements: any = searchData;
-  private searchA = "ANY";
+  private searchA = "ALL";
   private showSearchList = false;
   private searchList: any = [];
   private showUpdatesearch: Array<boolean> = [];
@@ -163,7 +180,7 @@ export default class TaskListSearch extends Vue{
     for(let i=0; i<this.searchListElements.length; i++) {
       this.showUpdatesearch[i] = false;
     }
-    this.showUpdatesearch[index] = !this.showUpdatesearch[index];
+    Vue.set(this.showUpdatesearch, index, !this.showUpdatesearch[index])
   }
 
   updateSearchListElement(searchitem: any, index: number) {
@@ -176,7 +193,7 @@ export default class TaskListSearch extends Vue{
   }
 
   callSearchApi(item: any, searchItem: any, comparator: string, idx: number) {
-    this.showSearchs[idx] = 's'
+    Vue.set(this.showSearchs, idx, 's');
     let index = 0;
     for (let i = 0; i < searchItem["compares"].length; i++) {
       if (searchItem["compares"][i] === comparator) {
@@ -195,7 +212,7 @@ export default class TaskListSearch extends Vue{
   }
 
   callSearchDateApi(item: any, searchItem: any, comparator: string, idx: number) {
-    this.showSearchs[idx] = 's'
+    Vue.set(this.showSearchs, idx, 's');
     let index = 0;
     for (let i = 0; i < searchItem["compares"].length; i++) {
       if (searchItem["compares"][i] === comparator) {
@@ -228,11 +245,11 @@ export default class TaskListSearch extends Vue{
   }
 
   updatesearchinput(index: number) {
-    this.showSearchs[index] = "i"
+    Vue.set(this.showSearchs, index, 'i');
   }
 
   updateresultOnclick(index: number) {
-    this.showSearchs[index] = 'i'
+    Vue.set(this.showSearchs, index, 'i');
   }
 }
 </script>
