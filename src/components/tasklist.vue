@@ -408,10 +408,10 @@ export default class Tasklist extends Vue {
   private setupdateSortListDropdownindex = 0;
   private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
-  private payload: object = {
-    active: true,
-    sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
-  };
+  private payload: any = {
+    "active": true,
+    "sorting": TASK_FILTER_LIST_DEFAULT_PARAM
+  }
   private showUserList = false;
 
   checkPropsIsPassedAndSetValue() {
