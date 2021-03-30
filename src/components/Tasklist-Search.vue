@@ -19,7 +19,6 @@
                 class="cftf-search-item-box mr-2"
                 v-for="(item, index) in searchList"
                 :key="item.label+index"
-                @click="makeInputNull(index)"
               >
                 <span @click="deleteSearchListElement(index)"
                   ><i class="bi bi-x"></i
