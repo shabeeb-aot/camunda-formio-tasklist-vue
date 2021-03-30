@@ -187,6 +187,7 @@
                 </div>				 
                 <div
                   v-b-modal.AddGroupModal 
+                  data-title="groups"
                   v-else
                 >
                   <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
@@ -337,7 +338,7 @@ import {
   getTaskFromList,
   sortingList,
 } from '../services/utils';
-import BpmnJS from "bpmn-js";
+import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
@@ -346,7 +347,8 @@ import Modeler from 'bpmn-js/lib/Modeler';
 // import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
-import {getFormDetails} from "../services/get-formio";
+import {getFormDetails} from '../services/get-formio';
+import {getISODateTime} from '../services/format-time';
 import moment from "moment";
 import vueBpmn from "vue-bpmn";
 
@@ -378,9 +380,9 @@ export default class Tasklist extends Vue {
   private tasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
-  private formId = "";
-  private submissionId = "";
-  private formioUrl = "";
+  private formId = '';
+  private submissionId = '';
+  private formioUrl = '';
   private activeIndex = 0;
   private task: any;
   private setFollowup = null;
@@ -405,12 +407,12 @@ export default class Tasklist extends Vue {
  
   private filterList = [];
   private activefilter = 0;
-  private applicationId = "";
+  private applicationId = '';
   private groupList = [];
   private groupListNames: Array<string> | null = null;
   private groupListItems: string[] = [];
   private userEmail = "external";
-  private selectedfilterId = "";
+  private selectedfilterId = '';
   private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
@@ -761,50 +763,48 @@ getBPMTaskDetail(taskId: string) {
 
   updateFollowUpDate() {
     const referenceobject = this.task;
-    const timearr = moment(this.setFollowup)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .split("+");
-      //TODO: set error handling
-    const replaceTimezone = timearr[1].replace(":", "");
-    referenceobject["followUp"] = moment(this.setFollowup)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .replace(timearr[1], replaceTimezone);
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    )
-      .then(() => {
-        console.warn("Updated follow up date");
-      })
-      .catch((error) => {
-        console.error("Error", error);
-      });
+    referenceobject['followUp'] = getISODateTime(this.setFollowup);
+    if(this.setFollowup && referenceobject['followUp']){
+      CamundaRest.updateTasksByID(
+        this.token,
+        this.task.id,
+        this.bpmApiUrl,
+        referenceobject
+      )
+        .then(() => {
+          console.warn("Updated follow up date");
+          this.reloadCurrentTask();
+        })
+        .catch((error) => {
+          console.error("Error", error);
+        });
+    }
+    else {
+      console.warn("Follow date error");
+    }
   }
 
   updateDueDate() {
     const referenceobject = this.task;
-    const timearr = moment(this.setDue)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .split("+");
-    const replaceTimezone = timearr[1].replace(":", "");
-    referenceobject["due"] = moment(this.setDue)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .replace(timearr[1], replaceTimezone);
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    )
-      .then(() => {
-        console.warn("Update due date");
-        this.reloadCurrentTask();
-      })
-      .catch((error) => {
-        console.error("Error", error);
-      });
+    referenceobject['due'] = getISODateTime(this.setDue);
+    if(this.setFollowup && referenceobject['due']){
+      CamundaRest.updateTasksByID(
+        this.token,
+        this.task.id,
+        this.bpmApiUrl,
+        referenceobject
+      )
+        .then(() => {
+          console.warn("Update due date");
+          this.reloadCurrentTask();
+        })
+        .catch((error) => {
+          console.error("Error", error);
+        });
+    }
+    else {
+      console.warn("Due date error");
+    }
   }
 
   fetchData() {
