@@ -75,13 +75,13 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <!-- <TaskListSearch :tasklength="tasklength"/> -->
-       <div class="cft-input-filter">
+      <TaskListSearch :tasklength="tasklength"/>
+       <!-- <div class="cft-input-filter">
           <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
           </b-col>
-        </div>
+        </div> -->
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -343,7 +343,7 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-// import TaskListSearch from "../components/Tasklist-Search.vue";
+import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from "../services/get-formio";
@@ -356,7 +356,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
-    // TaskListSearch,
+    TaskListSearch,
     TaskSortOptions,
     vueBpmn,
     Modeler,
