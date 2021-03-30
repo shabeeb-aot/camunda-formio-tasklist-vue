@@ -50,7 +50,6 @@
                   <span v-if="showSearchs[index]==='a'" @click="updatesearchinput(index)">
                   ??</span>
                   <DatePicker
-                  v-if="showSearchs[index]==='i'"
                   type="datetime"
                   v-model="searchDate[index]"
                   @change="callSearchDateApi(searchDate[index], item, operator, index)"
@@ -121,9 +120,14 @@ import {
   searchData,
   searchQuery,
 } from "../services/utils";
+import DatePicker from 'vue2-datepicker'
 import moment from "moment";
 
-@Component
+@Component({
+  components: {
+    DatePicker
+  }
+})
 export default class TaskListSearch extends Vue{
 
   @Prop({}) private tasklength !: number;

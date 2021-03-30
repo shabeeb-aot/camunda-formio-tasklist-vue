@@ -334,9 +334,9 @@ import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
+  getFormattedDateAndTime,
   getTaskFromList,
   sortingList,
-  getFormattedDateAndTime
 } from '../services/utils';
 import BpmnJS from "bpmn-js";
 import CamundaRest from '../services/camunda-rest';
