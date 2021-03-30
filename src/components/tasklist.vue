@@ -186,7 +186,8 @@
                   {{ String(groupListNames) }}
                 </div>				 
                 <div
-                  v-b-modal.AddGroupModal 
+                  v-b-modal.AddGroupModal
+                  class="cft-groups"
                   data-title="groups"
                   v-else
                 >
