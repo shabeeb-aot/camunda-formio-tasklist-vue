@@ -105,7 +105,7 @@ import { Form } from 'vue-formio';
 export default class FormListModal extends Vue{
   private formList: Array<object> = []
   private formperPage=10
-  private formNumPages=5
+  private formNumPages=1
   private formcurrentPage=1
   private formValueId = ''
   private formId =  ''

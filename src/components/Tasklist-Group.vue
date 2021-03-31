@@ -79,43 +79,43 @@ export default class TaskListGroup extends Vue {
   private groupListItems: string[] = [];
   private setGroup = null;
 
-  addGroup() {
-    CamundaRest.createTaskGroupByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      { userId: null, groupId: this.setGroup, type: "candidate" }
-    ).then(() => {
-      this.getGroupDetails();
-      this.reloadCurrentTask();
-    });
-  }
+  //   addGroup() {
+  //     CamundaRest.createTaskGroupByID(
+  //       this.token,
+  //       this.task.id,
+  //       this.bpmApiUrl,
+  //       { userId: null, groupId: this.setGroup, type: "candidate" }
+  //     ).then(() => {
+  //       this.getGroupDetails();
+  //       this.reloadCurrentTask();
+  //     });
+  //   }
 
-  getGroupDetails() {
-    CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
-      (response) => {
-        this.groupList = response.data;
-        this.groupListItems = [];
-        this.groupListNames = null;
-        for (const group of response.data) {
-          this.groupListItems.push(group.groupId);
-        }
-        if (this.groupListItems.length) {
-          this.groupListNames = this.groupListItems;
-        }
-      }
-    );
-  }
+  //   getGroupDetails() {
+  //     CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
+  //       (response) => {
+  //         this.groupList = response.data;
+  //         this.groupListItems = [];
+  //         this.groupListNames = null;
+  //         for (const group of response.data) {
+  //           this.groupListItems.push(group.groupId);
+  //         }
+  //         if (this.groupListItems.length) {
+  //           this.groupListNames = this.groupListItems;
+  //         }
+  //       }
+  //     );
+  //   }
 
-  deleteGroup(groupid: string) {		 
-    CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
-      groupId: groupid,
-      type: "candidate",
-    }).then(() => {
-      this.getGroupDetails();
-      this.reloadCurrentTask();
-    });
-  }
+  //   deleteGroup(groupid: string) {		 
+  //     CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
+  //       groupId: groupid,
+  //       type: "candidate",
+  //     }).then(() => {
+  //       this.getGroupDetails();
+  //       this.reloadCurrentTask();
+  //     });
+  //   }
 
 }
 </script>

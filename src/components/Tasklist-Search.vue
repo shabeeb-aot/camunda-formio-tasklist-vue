@@ -2,7 +2,6 @@
   <div class="cft-input-search-filter">
     <b-col
       class="cft-filter-container"
-      cols="*"
       xl="12"
       lg="12"
       md="12"
@@ -49,7 +48,7 @@
             >
               {{ operator[index] }}
             </p>
-            <div v-if="showOperators && item.compares.length > 1">
+            <div class="cft-operator-dropdown" v-if="showOperators && item.compares.length > 1">
               <div v-for="x in item.compares" :key="x">
                 <span @click="updateOperators(x, index)">{{ x }}</span>
               </div>

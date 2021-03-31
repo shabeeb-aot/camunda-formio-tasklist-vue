@@ -311,9 +311,14 @@
     justify-content: flex-start;
     align-items: center;
   }
-  .task-title{
+  .cft-task-title{
     font-size: 16px;
     margin: 0;
+  }
+
+  .cft-process-title{
+    font-size: 16px;
+    font-weight: 500;
   }
 
   .created-details{
@@ -325,6 +330,8 @@
     min-height: 100%;
   }
 
+.cft-process-title[data-title]:hover:after,
+.cft-task-title[data-title]:hover:after,
 .cft-priority[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-groups[data-title]:hover:after,
@@ -425,6 +432,7 @@
 .cft-user-close{
   position: relative;
   color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
   font-weight: bold;
 }
 .cft-person-fill{
@@ -432,14 +440,11 @@
 }
 .cft-user-span {
   position: absolute;
-  width: 61%;
 }
 .custom-select {
   height: auto;
   vertical-align: top;
-  width: 90% !important;
-  position: absolute;
-
+  width: 80% !important;
 }
 .custom-select:focus{
   border-color: none !important;
