@@ -1,5 +1,5 @@
 <template>
-  <div class="cft-input-filter">
+  <div class="cft-input-search-filter">
     <b-col
       class="cft-filter-container"
       cols="*"
@@ -177,6 +177,7 @@
 </template>
 
 <script lang="ts">
+import '../camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import { searchData, searchQuery } from "../services/utils";
 import DatePicker from "vue2-datepicker";

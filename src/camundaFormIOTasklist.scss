@@ -327,63 +327,6 @@
     justify-content: space-between;
   }
 
-}
-
-.cftf-form-conatiner{
-  background-color: white;
-  .cftf-taskhead{
-    font-weight: bold;
-    font-size: 30px;
-    margin-left: 10px;
-    display: flex;
-  }
-  .cftf-table-align{
-    text-align: left;
-  }
-}
-
-.cft-form-list-paginate{
-  display: flex;
-  justify-content: center;
-  margin-top: 15px;
-  padding: 0px;
-}
-.cft-user-select{
-  width: 90%;
-  border: none;
-  background: none;
-  padding: 0;
-  height: none;
-  color: #1a5a96;
-  font-family: Nunito Sans, SemiBold;
-  font-weight: 700;
-  font-size: 16px;
-}
-.cft-user-close{
-  position: relative;
-  color: #1a5a96;
-  font-family: Nunito Sans, SemiBold;
-  font-weight: bold;
-  float: right;
-}
-.cft-person-fill{
-  padding-right: 3px;
-}
-.cft-user-span {
-  position: absolute;
-  width: 61%;
-}
-.custom-select {
-  height: auto;
-  vertical-align: top;
-  width: 90% !important;
-  position: absolute;
-
-}
-.custom-select:focus{
-  border-color: none !important;
-  box-shadow: none;
-}
 .cft-priority[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-groups[data-title]:hover:after,
@@ -451,21 +394,61 @@
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;
 }
-.cft-approve-box,.cft-reject-box{
-background-color: white;
-border: 1px solid rgb(165, 163, 163);
-height: 8px;
-width: 8px;
+
+.cftf-form-conatiner{
+  background-color: white;
+  .cftf-taskhead{
+    font-weight: bold;
+    font-size: 30px;
+    margin-left: 10px;
+    display: flex;
+  }
+  .cftf-table-align{
+    text-align: left;
+  }
 }
-.cft-icon-actions{
-  display: block;
+
+.cft-form-list-paginate{
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  padding: 0px;
+}
+.cft-user-select{
+  width: 90%;
+  border: none;
+  background: none;
+  padding: 0;
+  height: none;
+  color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
+  font-weight: 700;
+  font-size: 16px;
+}
+.cft-user-close{
+  position: relative;
+  color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
+  font-weight: bold;
   float: right;
 }
-.cft-rhs-container{
-  width: 46.5%;
-  display: inline-block;
+.cft-person-fill{
+  padding-right: 3px;
 }
-.cft-search-title{
-  margin-bottom: 0rem;
-  display: inline-block;
+.cft-user-span {
+  position: absolute;
+  width: 61%;
+}
+.custom-select {
+  height: auto;
+  vertical-align: top;
+  width: 90% !important;
+  position: absolute;
+
+}
+.custom-select:focus{
+  border-color: none !important;
+  box-shadow: none;
+}
+
 }
