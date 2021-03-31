@@ -74,10 +74,10 @@
 				</div>					 
   </div>
 	<b-row class="cft-service-task-list mt-1">
-		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+		<b-col xl="3" lg="3" md="12" class="cft-first">
       <!-- <TaskListSearch :tasklength="tasklength"/> -->
        <div class="cft-input-filter">
-          <b-col class="cft-filter-container" cols="*" xl="12" lg="12" md="12" sm="12">
+          <b-col class="cft-filter-container" xl="12" lg="12" md="12" sm="12">
 					<input type="text" class="cft-filter" placeholder="Filter Tasks"/>
             {{tasklength}}
           </b-col>
@@ -143,7 +143,7 @@
         </b-list-group>
       </b-col>
       <!-- Task Detail section -->
-      <b-col v-if="selectedTask" lg="9" md="9" sm="12">
+      <b-col v-if="selectedTask" lg="9" md="12">
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -267,9 +267,9 @@
                 </div>
               </b-col>
             </b-row>
-            <div style="height:100%;">
+            <div class="height-100">
               <!-- form section -->
-              <b-tabs style="height:100%;" content-class="mt-3" v-if="showfrom">
+              <b-tabs class="height-100" content-class="mt-3" v-if="showfrom">
                 <b-tab title="Form">
                   <div class="ml-4 mr-4">
                     <b-overlay
