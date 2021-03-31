@@ -267,9 +267,9 @@
                 </div>
               </b-col>
             </b-row>
-            <div style="height:100%;">
+            <div class="height-100">
               <!-- form section -->
-              <b-tabs style="height:100%;" content-class="mt-3" v-if="showfrom">
+              <b-tabs class="height-100" content-class="mt-3" v-if="showfrom">
                 <b-tab title="Form">
                   <div class="ml-4 mr-4">
                     <b-overlay
