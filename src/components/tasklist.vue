@@ -1,5 +1,4 @@
-<template>
-  
+<template> 
 <b-container fluid class="task-outer-container">
   <div class="main-filters my-2 mb-1">
     <!-- Filter section begins -->
@@ -23,10 +22,9 @@
           </b-list-group-item>
         </b-list-group>
       </div>
-										
+
       <FormListModal :token="token" :bpmApiUrl="bpmApiUrl"/>          
 
-																			
       <div class="cft-first">
         <!-- Sorting section -->
 				<div id="cftf-dpdown-container" class="mx-2">
@@ -74,7 +72,7 @@
 				</div>					 
   </div>
 	<b-row class="cft-service-task-list mt-1">
-		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
+		<b-col xl="3" lg="3" md="12" class="cft-first">
       <TaskListSearch
         @call-search-api="callSearchApi"
         @call-search-date-api="callSearchDateApi"
@@ -92,10 +90,10 @@
             :class="{ 'cft-selected': idx == activeIndex }"
           >
             <div @click="setselectedTask(task.id)" class="cft-select-task">
-              <h5 class="task-title">{{ task.name }}</h5>
+              <h5 class="cft-task-title" data-title='Task Name'>{{ task.name }}</h5>
 
               <div class="cft-task-details-assign assigne-details ">
-                <div>
+                <div class='cft-process-title' data-tile='Process Definition Name'>
                   {{
                     getProcessDataFromList(
                       getProcessDefinitions,
@@ -128,12 +126,12 @@
               </div>
             </div>
           </b-list-group-item>
-          <b-pagination-nav
+          <!-- <b-pagination-nav
             :link-gen="linkGen"
             :number-of-pages="numPages"
             v-model="currentPage"
             class="cft-paginate"
-          />
+          /> -->
         </b-list-group>
         <b-list-group cols="3" v-else>
           <b-row class="cft-not-selected mt-2 ml-1 row">
@@ -143,7 +141,7 @@
         </b-list-group>
       </b-col>
       <!-- Task Detail section -->
-      <b-col v-if="selectedTaskId" lg="9" md="9" sm="12">
+      <b-col v-if="selectedTaskId" lg="9" md="12">
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -175,6 +173,7 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
+              <!-- <TaskListGroup/> -->
               <b-col>
                 <div
                   v-b-modal.AddGroupModal
@@ -260,10 +259,9 @@
                     <i class="bi bi-x cft-user-close" @click="onUnClaim" />
                   </span>
                 </div>
-                <div class="cft-task-assignee" v-else @click="onClaim">
+                <div class="cft-task-assignee" v-else @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />
                   Claim
-			
                 </div>
               </b-col>
             </b-row>
@@ -298,8 +296,9 @@
                   class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
+                  @click="fetchxmldiagram"
                 >
-                  <div class="cft-canvas-container" id="canvas"></div>
+                  <div class="height-100 cft-canvas-container" id="canvas"></div>
                 </b-tab>
               </b-tabs>
             </div>
@@ -347,7 +346,8 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-import SocketIOService from "../services/SocketIOServices";
+// import SocketIOService from "../services/SocketIOServices";
+// import TaskListGroup from "../components/Tasklist-Group.vue";
 import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -362,6 +362,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
+    // TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
@@ -382,8 +383,10 @@ export default class Tasklist extends Vue {
   @Prop() private userName!: string;
 
   private tasks: Array<object> = [];
+  private fulltasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
+  private processDefinitionId = '';
   private formId = '';
   private submissionId = '';
   private formioUrl = '';
@@ -408,7 +411,6 @@ export default class Tasklist extends Vue {
       },
     },
   };
- 
   private filterList = [];
   private activefilter = 0;
   private applicationId = '';
@@ -465,6 +467,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
 
   const val = decodeTokenValues(
     this.token,
@@ -563,7 +566,6 @@ deleteGroup(groupid: string) {
     this.reloadCurrentTask();
   });
 }
- 
 
 onFormSubmitCallback() {
   if (this.task.id) {
@@ -603,9 +605,6 @@ getBPMTaskDetail(taskId: string) {
       this.task = result.data;
     }		   
   );
-	
- 
-
   this.showfrom = false;
   CamundaRest.getVariablesByTaskId(
     this.token,
@@ -625,7 +624,6 @@ getBPMTaskDetail(taskId: string) {
   });
 }
 	
-
   oncustomEventCallback = (customEvent: any) => {
     switch (customEvent.type) {
     case "reloadTasks":
@@ -695,6 +693,7 @@ getBPMTaskDetail(taskId: string) {
       requestData,
       this.bpmApiUrl
     ).then((result) => {
+      // this.fulltasks= result.data;
       this.tasks = result.data.slice(
         (this.currentPage - 1) * this.perPage,
         this.currentPage * this.perPage
@@ -703,6 +702,14 @@ getBPMTaskDetail(taskId: string) {
       this.numPages = Math.ceil(result.data.length / this.perPage);
     });
   }
+
+  // fetchPaginationTaskElements(){
+  //   this.tasks = this.fulltasks.slice(
+  //     (this.currentPage - 1) * this.perPage,
+  //     this.currentPage * this.perPage
+  //   );
+  // }
+
   numberOfPages() {
     if (Math.ceil(this.tasks.length / this.perPage) > 1)
       return Math.ceil(this.tasks.length / this.perPage);
@@ -835,6 +842,19 @@ getBPMTaskDetail(taskId: string) {
     }
   }
 
+  fetchxmldiagram() {
+    CamundaRest.getProcessDiagramXML(
+      this.token,
+      this.processDefinitionId,
+      this.bpmApiUrl
+    ).then(async (res) => {
+      this.xmlData = res.data.bpmn20Xml;
+      const modeler = new Modeler({ container: "#canvas" });
+      await modeler.importXML(this.xmlData);
+    });
+
+  }
+
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
@@ -844,21 +864,13 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
+        this.processDefinitionId = result.data.processDefinitionId;
         CamundaRest.getProcessDefinitionById(
           this.token,
           result.data.processDefinitionId,
           this.bpmApiUrl
         ).then((res) => {
           this.taskProcess = res.data.name;
-        });
-        CamundaRest.getProcessDiagramXML(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then(async (res) => {
-          this.xmlData = res.data.bpmn20Xml;
-          const modeler = new Modeler({ container: "#canvas" });
-          await modeler.importXML(this.xmlData);
         });
       });
 
@@ -882,35 +894,8 @@ getBPMTaskDetail(taskId: string) {
       this.userSelected = this.task.assignee;									   
     }
   }
- 
-
+  
   mounted() {
-    // if(this.selectedfilterId) {
-    //   if(! SocketIOService.isConnected()) {
-    //     SocketIOService.connect((refreshedTaskId: any)=> {
-    //       if(this.selectedfilterId){
-    //         //Refreshes the Task
-    //         this.fetchTaskList(this.selectedfilterId, this.payload);
-    //       }
-    //       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-    //         this.fetchData()
-    //       }
-    //     })
-    //   }
-    // }
-    // else{
-    //   SocketIOService.disconnect();
-    //   SocketIOService.connect((refreshedTaskId: any)=> {
-    //     if(this.selectedfilterId){
-    //       //Refreshes the Task
-    //       this.fetchTaskList(this.selectedfilterId, this.payload);
-    //     }
-    //     if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-    //       this.fetchData()
-    //     }
-    //   })
-    // }
-
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
@@ -922,6 +907,7 @@ getBPMTaskDetail(taskId: string) {
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+      this.selectedfilterId = key;
       this.fetchTaskList(key, this.payload);
     });
 
