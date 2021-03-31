@@ -6,14 +6,18 @@
             <b-modal
               ref="modal-1"
               id="modal-multi-1"
-              hide-header
+              title="Forms"
+              size="lg"
               no-close-on-backdrop
               no-close-on-esc
               ok-only
               ok-title="Cancel"
               ok-variant="danger"
             >
-          <div class="overflow-auto">
+          <div
+            v-if="formList.length"
+            class="overflow-auto"
+          >
             <b-table-simple
               hover
               small
@@ -51,6 +55,14 @@
                 class="cft-form-list-paginate"
               />
           </div>
+          <div v-else>
+              <b-pagination-nav
+                :link-gen="linkFormGen"
+                :number-of-pages="formNumPages"
+                v-model="formcurrentPage"
+                class="cft-form-list-paginate"
+              />
+          </div>
               </b-modal>
         <b-modal
           ref="modal-2"
@@ -80,7 +92,7 @@
 <script lang="ts">
 // import 'bootstrap/dist/css/bootstrap.min.css'
 // import 'bootstrap-vue/dist/bootstrap-vue.css'
-import '../camundaFormIOTasklist.scss'
+import '../camundaFormIOFormList.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
