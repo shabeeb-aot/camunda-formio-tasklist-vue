@@ -175,7 +175,8 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
-              <b-col>
+              <TaskListGroup/>
+              <!-- <b-col>
                 <div
                   v-b-modal.AddGroupModal
                   v-if="groupListNames"
@@ -241,7 +242,7 @@
                     </b-row>
                   </div>
                 </b-modal>
-              </b-col>
+              </b-col> -->
               <b-col>
                 <div
                   class="cft-task-assignee"
@@ -348,6 +349,7 @@ import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import SocketIOService from "../services/SocketIOServices";
+import TaskListGroup from "../components/Tasklist-Group.vue";
 import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -362,6 +364,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
+    TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
@@ -382,6 +385,7 @@ export default class Tasklist extends Vue {
   @Prop() private userName!: string;
 
   private tasks: Array<object> = [];
+  private fulltasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
   private formId = '';
@@ -412,9 +416,9 @@ export default class Tasklist extends Vue {
   private filterList = [];
   private activefilter = 0;
   private applicationId = '';
-  private groupList = [];
-  private groupListNames: Array<string> | null = null;
-  private groupListItems: string[] = [];
+  // private groupList = [];
+  // private groupListNames: Array<string> | null = null;
+  // private groupListItems: string[] = [];
   private userEmail = "external";
   private selectedfilterId = '';
   private xmlData!: string;
@@ -465,6 +469,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
 
   const val = decodeTokenValues(
     this.token,
@@ -524,46 +529,7 @@ callProcessVariablesApi(item: any) {
   searchQuery[0]["processVariables"].push(item);
   this.payload["orQueries"] = searchQuery;
   this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-addGroup() {
-  CamundaRest.createTaskGroupByID(
-    this.token,
-    this.task.id,
-    this.bpmApiUrl,
-    { userId: null, groupId: this.setGroup, type: "candidate" }
-  ).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
-}
-
-getGroupDetails() {
-  CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
-    (response) => {
-      this.groupList = response.data;
-      this.groupListItems = [];
-      this.groupListNames = null;
-      for (const group of response.data) {
-        this.groupListItems.push(group.groupId);
-      }
-      if (this.groupListItems.length) {
-        this.groupListNames = this.groupListItems;
-      }
-    }
-  );
-}
-
-deleteGroup(groupid: string) {		 
-  CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
-    groupId: groupid,
-    type: "candidate",
-  }).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
-}
- 
+} 
 
 onFormSubmitCallback() {
   if (this.task.id) {
@@ -695,6 +661,7 @@ getBPMTaskDetail(taskId: string) {
       requestData,
       this.bpmApiUrl
     ).then((result) => {
+      // this.fulltasks= result.data;
       this.tasks = result.data.slice(
         (this.currentPage - 1) * this.perPage,
         this.currentPage * this.perPage
@@ -703,6 +670,14 @@ getBPMTaskDetail(taskId: string) {
       this.numPages = Math.ceil(result.data.length / this.perPage);
     });
   }
+
+  // fetchPaginationTaskElements(){
+  //   this.tasks = this.fulltasks.slice(
+  //     (this.currentPage - 1) * this.perPage,
+  //     this.currentPage * this.perPage
+  //   );
+  // }
+
   numberOfPages() {
     if (Math.ceil(this.tasks.length / this.perPage) > 1)
       return Math.ceil(this.tasks.length / this.perPage);
@@ -838,7 +813,7 @@ getBPMTaskDetail(taskId: string) {
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      this.getGroupDetails();
+      // this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
         this.selectedTaskId,
@@ -882,35 +857,8 @@ getBPMTaskDetail(taskId: string) {
       this.userSelected = this.task.assignee;									   
     }
   }
- 
-
+  
   mounted() {
-    // if(this.selectedfilterId) {
-    //   if(! SocketIOService.isConnected()) {
-    //     SocketIOService.connect((refreshedTaskId: any)=> {
-    //       if(this.selectedfilterId){
-    //         //Refreshes the Task
-    //         this.fetchTaskList(this.selectedfilterId, this.payload);
-    //       }
-    //       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-    //         this.fetchData()
-    //       }
-    //     })
-    //   }
-    // }
-    // else{
-    //   SocketIOService.disconnect();
-    //   SocketIOService.connect((refreshedTaskId: any)=> {
-    //     if(this.selectedfilterId){
-    //       //Refreshes the Task
-    //       this.fetchTaskList(this.selectedfilterId, this.payload);
-    //     }
-    //     if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-    //       this.fetchData()
-    //     }
-    //   })
-    // }
-
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
@@ -922,10 +870,38 @@ getBPMTaskDetail(taskId: string) {
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+      this.selectedfilterId = key;
+      console.log(this.selectedfilterId);
       this.fetchTaskList(key, this.payload);
     });
 
     this.fetchData();
+    console.log("SocketIO status", SocketIOService.isConnected());
+    if(!SocketIOService.isConnected()) {
+      console.log("SocketIO not connected")
+      console.log(this.selectedfilterId);
+      SocketIOService.connect((refreshedTaskId: any)=> {
+        if(this.selectedfilterId){
+          //Refreshes the Task
+          this.fetchTaskList(this.selectedfilterId, this.payload);
+        }
+        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+          this.fetchData()
+        }
+      })
+    }
+    else {
+      SocketIOService.disconnect();
+      SocketIOService.connect((refreshedTaskId: any)=> {
+        if(this.selectedfilterId){
+          //Refreshes the Task
+          this.fetchTaskList(this.selectedfilterId, this.payload);
+        }
+        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+          this.fetchData()
+        }
+      })
+    }
     this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {
