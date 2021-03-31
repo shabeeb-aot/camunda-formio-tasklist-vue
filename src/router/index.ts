@@ -1,6 +1,6 @@
 import VueRouter, { RouteConfig } from 'vue-router'
 import FormViewSubmission from '@/components/FormViewSubmission.vue'
-import Tasklist from '@/components/tasklist.vue';
+import Tasklist from '@/views/tasklist.vue';
 import Vue from 'vue'
 
 Vue.use(VueRouter)
