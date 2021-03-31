@@ -4,7 +4,7 @@ export const getFormDetails = (formioUrl: string, formIOProjectUrl: string) => {
   formioUrl = formioUrl.replace(domain, replacedomain)
   const formArr = formioUrl.split("/");
   const formId: string = formArr[4];
-  const submissionId: string = formArr[61];
+  const submissionId: string = formArr[6];
 
   return {formioUrl, formId, submissionId}
 }

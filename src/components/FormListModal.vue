@@ -1,12 +1,18 @@
 <template>
-  <div>
-   <b-button class="cft-form-title" v-b-modal.modal-multi-1>
-        <h4> <i class="fa fa-wpforms"></i> Forms</h4>
-        </b-button>
-        <b-modal
-          id="modal-multi-1"
-          title="Forms"
-        >
+        <div class="cftf-form-conatiner">
+          <button type="button" class="btn btn-light cft-form-title" v-b-modal.modal-multi-1>
+              <h4 ref="btn-show"> <i class="fa fa-wpforms"></i> Forms</h4>
+          </button>
+            <b-modal
+              ref="modal-1"
+              id="modal-multi-1"
+              hide-header
+              no-close-on-backdrop
+              no-close-on-esc
+              ok-only
+              ok-title="Cancel"
+              ok-variant="danger"
+            >
           <div class="overflow-auto">
             <b-table-simple
               hover
@@ -42,22 +48,33 @@
                 :link-gen="linkFormGen"
                 :number-of-pages="formNumPages"
                 v-model="formcurrentPage"
+                class="cft-form-list-paginate"
               />
           </div>
-        </b-modal>
+              </b-modal>
         <b-modal
+          ref="modal-2"
           id="modal-multi-2"
           size="lg"
-          title="Create forms"
+          title="SUBMIT FORM"
+          no-close-on-backdrop
+          no-close-on-esc
+          ok-only
+          ok-title="Cancel"
+          ok-variant="danger"
         >
-          Enter and submit form
+          <i class="bi bi-arrow-left" @click="backClick"></i>
           <h4>{{formTitle}}</h4>
           <Form 
             :src="formValueId"
+            form=""
+            submission=""
+            options=""
+            v-on:submit="onSubmit"
           >
           </Form>
         </b-modal>
-    </div>
+          </div>
 </template>
 
 <script lang="ts">
@@ -73,15 +90,17 @@ import { Form } from 'vue-formio';
     Form
   }
 })
-export default class FormList extends Vue{
+export default class FormListModal extends Vue{
   private formList: Array<object> = []
   private formperPage=10
   private formNumPages=5
   private formcurrentPage=1
   private formValueId = ''
+  private formId =  ''
   private formTitle = ''
+  private showForms = true
 
-  @Prop({}) private token !: any;
+  @Prop({}) private token !: string;
   @Prop() private bpmApiUrl !: string;
 
   linkFormGen() {
@@ -93,19 +112,28 @@ export default class FormList extends Vue{
     {
       this.formNumPages = Math.ceil(response.data.length/this.formperPage);
       this.formList = response.data.splice(
-        (this.formcurrentPage - 1) * this.formperPage,
-        this.formcurrentPage * this.formperPage
+        ((this.formcurrentPage - 1) * this.formperPage),
+        (this.formcurrentPage * this.formperPage)
       );
-      console.log("Current Page, num page", this.formcurrentPage, this.formperPage)
-      console.log("end length", this.formcurrentPage*this.formperPage)
-      console.log("length of response", this.formList.length);
     });
   }
 
-  storeFormValue(val: string, name: string){
+  storeFormValue(val: string, title: string){
+    this.$bvModal.hide('modal-multi-1')
     const forms = localStorage.getItem('formioApiUrl') + '/form/';
+    this.formId = val;
     this.formValueId = forms.concat(val);
-    this.formTitle = name;
+    this.formTitle = title;
+  }
+
+  backClick() {
+    this.$bvModal.show('modal-multi-1')
+    this.$bvModal.hide('modal-multi-2')
+  }
+
+  onSubmit(submission: any) {
+    this.$router.push({path: `/form/${submission.form}/submission/${submission._id}`
+    })
   }
 
   mounted() {
