@@ -84,7 +84,15 @@
   .cft-filter-selected {
     border-left: 2px solid #003366 !important;
   }
-
+  .cft-diagram-container{
+    height: 100%;
+  }
+  .cft-canvas-container{
+    height: 100%;
+  }
+  .cft-actionable-container{
+    height:100%;
+  }
   .cft-actionable {
     color: #1a5a96;
     background-color: transparent;

@@ -156,7 +156,7 @@
           <b-row class="ml-0 cft-application-id" data-title="application ID"
             >Application ID # {{ applicationId }}</b-row
           >
-          <div style="height:100%;">
+          <div class="cft-actionable-container">
             <!-- four buttons -->
             <b-row class="cft-actionable">
               <b-col>
@@ -295,11 +295,11 @@
                 <b-tab title="History"></b-tab>
                 <!-- Process diagram -->
                 <b-tab
-                  style="height:100%;"
+                  class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
                 >
-                  <div style="height:100%;" id="canvas"></div>
+                  <div class="cft-canvas-container" id="canvas"></div>
                 </b-tab>
               </b-tabs>
             </div>
