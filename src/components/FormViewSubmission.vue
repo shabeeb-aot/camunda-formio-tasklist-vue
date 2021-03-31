@@ -6,6 +6,9 @@
 </template>
 
 <script lang="ts">
+import "font-awesome/scss/font-awesome.scss";
+import 'semantic-ui-css/semantic.min.css';
+import '../user-styles.css'
 import { Component, Prop,  Vue } from 'vue-property-decorator'
 import { Form, Formio } from 'vue-formio';
 import { getFormDetails } from "../services/get-formio";
