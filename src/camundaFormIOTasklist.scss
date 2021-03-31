@@ -451,17 +451,17 @@
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;
 }
-.approve-box,.reject-box{
+.cft-approve-box,.cft-reject-box{
 background-color: white;
 border: 1px solid rgb(165, 163, 163);
 height: 8px;
 width: 8px;
 }
-.icon-actions{
+.cft-icon-actions{
   display: block;
   float: right;
 }
-.rhs-container{
+.cft-rhs-container{
   width: 46.5%;
   display: inline-block;
 }

@@ -54,7 +54,7 @@
                 <span @click="updateOperators(x, index)">{{ x }}</span>
               </div>
             </div>
-            <div v-if="item.type === 'date'">
+            <div class="cft-rhs-container" v-if="item.type === 'date'">
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
@@ -69,22 +69,10 @@
                 "
               ></DatePicker>
             </div>
-            <div v-else-if="item.type === 'variables'">
-              Task variables
-              <span>{{ item.label }}</span>
-              <input v-model="searchItem[index]" />
-              <span
-                v-if="showSearchs[index] === 'a'"
-                @click="updatesearchinput(index)"
-              >
-                ??</span
-              >
+            <div class="cft-rhs-container" v-else-if="item.label === 'Task Variables'">
               <input
                 v-if="showSearchs[index] === 'i'"
-                v-model="searchItem[index]"
-                v-on:keyup.enter="
-                  callSearchApi(searchItem[index], item, operator, index)
-                "
+                v-model="searchItem[index]" 
               />
               <span
                 v-if="showSearchs[index] === 's'"
@@ -92,26 +80,61 @@
               >
                 {{ searchItem[index] }}
               </span>
+              <!-- <span
+                v-if="showSearchs[index] === 'a'"
+                @click="updatesearchinput(index)"
+              >
+                ??</span
+              > -->
+              <input
+                v-model="variableValue[index]"
+                v-on:keyup.enter="
+                  callTaskVariablesApi(searchItem[index], operator[index], variableValue[index])
+                "
+              />
             </div>
-            <div class="rhs-container" v-else>
+            <div class="cft-rhs-container" v-else-if="item.label === 'Process Variables'">
+              <input
+                v-if="showSearchs[index] === 'i'"
+                v-model="searchItem[index]" 
+              />
+              <span
+                v-if="showSearchs[index] === 's'"
+                @click="updateresultOnclick(index)"
+              >
+                {{ searchItem[index] }}
+              </span>
+              <!-- <span
+                v-if="showSearchs[index] === 'a'"
+                @click="updatesearchinput(index)"
+              >
+                ??</span
+              > -->
+              <input
+                v-model="variableValue[index]"
+                v-on:keyup.enter="
+                  callProcessVariablesApi(searchItem[index], operator[index], variableValue[index])
+                "
+              />
+            </div>
+            <div class="cft-rhs-container" v-else>
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
               >
                 ??</span
               >
-              <span class="icon-actions">
+              <span class="cft-icon-actions">
                 <span
                   @click="
                     callSearchApi(searchItem[index], item, operator, index)
                   "
                 >
-                  <i class="bi bi-check approve-box"></i>
+                  <i class="bi bi-check cft-approve-box"></i>
                 </span>
-                <i class="bi bi-x reject-box"></i
+                <i class="bi bi-x cft-reject-box"></i
               ></span>
               <input
-                placeholder="ssss"
                 v-if="showSearchs[index] === 'i'"
                 v-model="searchItem[index]"
                 v-on:keyup.enter="
@@ -176,6 +199,7 @@ export default class TaskListSearch extends Vue {
   private setUpdatesearchindex = 0;
   private showOperators = false;
   private searchItem = [];
+  private variableValue = [];
   private operator: Array<string> = [];
   private showSearchs: Array<string> = [];
   private searchDate: any = [];
@@ -194,6 +218,16 @@ export default class TaskListSearch extends Vue {
     } else {
       this.searchA = "ALL";
     }
+  }
+
+  showOperatorList() {
+    this.showOperators = !this.showOperators;
+  }
+
+  updateOperators(operator: any, index: number) {
+    this.operator[index] = operator;
+
+    this.showOperators = false;
   }
 
   updatesearchinput(index: number) {
@@ -295,14 +329,16 @@ export default class TaskListSearch extends Vue {
     // this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
-  showOperatorList() {
-    this.showOperators = !this.showOperators;
+  @Emit()
+  callTaskVariablesApi(searchItem: string, operator: string, variableValue: string) {
+    const item = {"name": searchItem, "operator": operator, "value": variableValue}
+    return item;
   }
-
-  updateOperators(operator: any, index: number) {
-    this.operator[index] = operator;
-
-    this.showOperators = false;
+  
+  @Emit()
+  callProcessVariablesApi(searchItem: string, operator: string, variableValue: string) {
+    const item = {"name": searchItem, "operator": operator, "value": variableValue}
+    return item;
   }
 }
 </script>

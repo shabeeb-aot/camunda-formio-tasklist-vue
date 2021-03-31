@@ -75,7 +75,13 @@
   </div>
 	<b-row class="cft-service-task-list mt-1">
 		<b-col cols="*" xl="3" lg="3" md="3" sm="12" class="cft-first">
-      <TaskListSearch @call-search-api="callSearchApi" @call-search-date-api="callSearchDateApi" :tasklength="tasklength"/>
+      <TaskListSearch
+        @call-search-api="callSearchApi"
+        @call-search-date-api="callSearchDateApi"
+        @call-process-variables-api="callProcessVariablesApi"
+        @call-task-variables-api="callTaskVariablesApi"
+        :tasklength="tasklength"
+      />
         <!-- Task list section -->
         <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
           <b-list-group-item
@@ -332,6 +338,7 @@ import {
   findFilterKeyOfAllTask,
   getFormattedDateAndTime,
   getTaskFromList,
+  searchQuery,
   sortingList,
 } from '../services/utils';
 import BpmnJS from 'bpmn-js';
@@ -504,6 +511,18 @@ callSearchApi(item: any) {
 
 callSearchDateApi(item: any) {
   this.payload["orQueries"] = item;
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
+
+callTaskVariablesApi(item: any) {
+  searchQuery[0]["taskVariables"].push(item);
+  this.payload["orQueries"] = searchQuery;
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
+
+callProcessVariablesApi(item: any) {
+  searchQuery[0]["processVariables"].push(item);
+  this.payload["orQueries"] = searchQuery;
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 

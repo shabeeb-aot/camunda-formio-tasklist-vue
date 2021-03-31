@@ -12,15 +12,15 @@ const isConnected = ()=>{
   return stompClient?.connected||null;
 };
 
-const connect = (reloadCallback)=>{
+const connect = (reloadCallback: any)=>{
   const accessToken= AES.encrypt(token, WEBSOCKET_ENCRYPT_KEY).toString();
   const socketUrl=`${BPM_BASE_URL_SOCKET_IO}?accesstoken=${accessToken}`;
   const socket = new SockJS(socketUrl);
   stompClient = Stomp.over(socket);
-  stompClient.connect({}, function(frame){
+  stompClient.connect({}, function(frame: any){
     console.log('Connected- frame: ' + frame);
     if(isConnected()){
-      stompClient.subscribe('/topic/task-event', function(output){
+      stompClient.subscribe('/topic/task-event', function(output: any){
         const taskUpdate = JSON.parse(output.body);
         reloadCallback(taskUpdate.id);
       });
