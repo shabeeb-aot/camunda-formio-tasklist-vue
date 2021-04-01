@@ -382,7 +382,7 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
   @Prop() private userName!: string;
-  @Prop() private WEBSOCKET_ENCRYPT_KEY !: string;
+  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
 
   private tasks: Array<object> = [];
   private fulltasks: Array<object> = [];
