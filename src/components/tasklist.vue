@@ -332,8 +332,8 @@ import "font-awesome/scss/font-awesome.scss";
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import '../user-styles.css'
-import '../camundaFormIOTasklist.scss'
+import '../styles/user-styles.css'
+import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -678,6 +678,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
+    this.editAssignee = false;
   }
 
   onUnClaim() {				  
@@ -924,9 +925,8 @@ getBPMTaskDetail(taskId: string) {
     );
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
-      const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-      this.selectedfilterId = key;
-      this.fetchTaskList(key, this.payload);
+      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+      this.fetchTaskList(this.selectedfilterId, this.payload);
     });
 
     this.fetchData();
@@ -938,8 +938,6 @@ getBPMTaskDetail(taskId: string) {
         //Refreshes the Task
         this.fetchTaskList(this.selectedfilterId, this.payload);
       }
-      console.log(refreshedTaskId);
-      console.log(this.selectedTaskId)
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
         this.fetchData()
         this.reloadCurrentTask();
