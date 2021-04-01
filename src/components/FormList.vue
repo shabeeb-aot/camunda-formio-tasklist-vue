@@ -50,7 +50,7 @@ export default class FormList extends Vue{
 
 private formList: Array<object> = []
 private formperPage=10
-private formNumPages=1    
+private formNumPages=5
 private formcurrentPage=1
 
 @Prop({}) private token !: string;

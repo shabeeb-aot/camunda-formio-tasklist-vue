@@ -6,18 +6,14 @@
             <b-modal
               ref="modal-1"
               id="modal-multi-1"
-              title="Forms"
-              size="xl"
+              hide-header
               no-close-on-backdrop
               no-close-on-esc
               ok-only
               ok-title="Cancel"
               ok-variant="danger"
             >
-          <div
-            v-if="formList.length"
-            class="overflow-auto"
-          >
+          <div class="overflow-auto">
             <b-table-simple
               hover
               small
@@ -55,14 +51,6 @@
                 class="cft-form-list-paginate"
               />
           </div>
-          <div v-else>
-            <b-list-group-item>
-              <b-row class="cft-not-selected mt-2 ml-1 row">
-                <i class="bi bi-exclamation-circle-fill" scale="1"></i>
-                <p>No Form found in the list.</p>
-              </b-row>
-            </b-list-group-item>
-          </div>
               </b-modal>
         <b-modal
           ref="modal-2"
@@ -92,7 +80,7 @@
 <script lang="ts">
 // import 'bootstrap/dist/css/bootstrap.min.css'
 // import 'bootstrap-vue/dist/bootstrap-vue.css'
-import '../camundaFormIOFormList.scss'
+import '../camundaFormIOTasklist.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
@@ -105,7 +93,7 @@ import { Form } from 'vue-formio';
 export default class FormListModal extends Vue{
   private formList: Array<object> = []
   private formperPage=10
-  private formNumPages=1
+  private formNumPages=5
   private formcurrentPage=1
   private formValueId = ''
   private formId =  ''
@@ -132,7 +120,7 @@ export default class FormListModal extends Vue{
 
   storeFormValue(val: string, title: string){
     this.$bvModal.hide('modal-multi-1')
-    const forms = localStorage.getItem('formIOApiUrl') + '/form/';
+    const forms = localStorage.getItem('formioApiUrl') + '/form/';
     this.formId = val;
     this.formValueId = forms.concat(val);
     this.formTitle = title;
