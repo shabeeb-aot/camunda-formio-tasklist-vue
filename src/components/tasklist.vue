@@ -157,7 +157,14 @@
           <div class="cft-actionable-container">
             <!-- four buttons -->
             <b-row class="cft-actionable">
-              <b-col>
+              <b-col v-if='task.followUp'>
+                <!-- TODO: update calendar -->
+                <span>
+                  <i class="fa fa-calendar"></i>
+                  {{timedifference(task.followUp)}}
+                </span>
+              </b-col>
+              <b-col v-else>
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
@@ -165,7 +172,13 @@
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
-              <b-col>
+              <b-col v-if='task.due'>
+                <span>
+                  <i class="fa fa-calendar"></i>
+                  {{timedifference(task.due)}}
+                </span>
+              </b-col>
+              <b-col v-else>
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
