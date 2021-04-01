@@ -333,7 +333,8 @@
 .cft-process-title[data-title]:hover:after,
 .cft-task-title[data-title]:hover:after,
 .cft-priority[data-title]:hover:after,
-.cft-task-assignee[data-title]:hover:after,
+.cft-user-close[data-title]:hover:after,
+.cft-user-span[data-title]:hover:after,
 .cft-groups[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-process-name[data-title]:hover:after,
@@ -426,7 +427,7 @@
   padding: 0;
   height: none;
   color: #1a5a96;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 16px;
 }
 .cft-user-close{

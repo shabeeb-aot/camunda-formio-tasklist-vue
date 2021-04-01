@@ -246,10 +246,9 @@
                 <div
                   class="cft-task-assignee"
                   v-if="task.assignee"
-                  data-title="Reset assignee"
                 >
                   <i class="bi bi-person-fill cft-person-fill" />
-                  <span class="cft-user-span">
+                  <span v-if="editAssignee">
                   <b-form-select
                     class="cft-user-select"
                     v-model="userSelected"
@@ -257,7 +256,11 @@
                     @change="onSetassignee"
                     >
                   </b-form-select>
-                    <i class="bi bi-x cft-user-close" @click="onUnClaim" />
+                  <i class="bi bi-x cft-user-close"  data-title="Reset assignee" @click="onUnClaim" />
+                  </span>
+                  <span v-else class="cft-user-span" data-title="Click to change assignee" @click="toggleassignee"> 
+                    {{task.assignee}}
+                    <i class="bi bi-x cft-user-close"  data-title="Reset assignee" @click="onUnClaim" />
                   </span>
                 </div>
                 <div class="cft-task-assignee" v-else @click="onClaim" data-title="Set assignee">
@@ -414,6 +417,7 @@ export default class Tasklist extends Vue {
     },
   };
   private filterList = [];
+  private editAssignee = false;
   private activefilter = 0;
   private applicationId = '';
   private groupList = [];
@@ -509,6 +513,11 @@ toggle(index: number) {
 
 togglefilter(index: number) {
   this.activefilter = index;
+}
+
+toggleassignee()  {
+  this.editAssignee = ! this.editAssignee;
+  this.userSelected = this.task.assignee;
 }
 
 cftShowUserList() {
@@ -691,6 +700,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       })
+    this.toggleassignee();
   }
 
   fetchTaskList(filterId: string, requestData: object) {
@@ -920,29 +930,22 @@ getBPMTaskDetail(taskId: string) {
     });
 
     this.fetchData();
-    if(!SocketIOService.isConnected()) {
-      SocketIOService.connect((refreshedTaskId: any)=> {
-        if(this.selectedfilterId){
-          //Refreshes the Task
-          this.fetchTaskList(this.selectedfilterId, this.payload);
-        }
-        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-          this.fetchData()
-        }
-      })
-    }
-    else {
+    if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
-      SocketIOService.connect((refreshedTaskId: any)=> {
-        if(this.selectedfilterId){
-          //Refreshes the Task
-          this.fetchTaskList(this.selectedfilterId, this.payload);
-        }
-        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-          this.fetchData()
-        }
-      })
     }
+    SocketIOService.connect((refreshedTaskId: any)=> {
+      if(this.selectedfilterId){
+        //Refreshes the Task
+        this.fetchTaskList(this.selectedfilterId, this.payload);
+      }
+      console.log(refreshedTaskId);
+      console.log(this.selectedTaskId)
+      if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+        this.fetchData()
+        this.reloadCurrentTask();
+      }
+    })
+
     this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {
