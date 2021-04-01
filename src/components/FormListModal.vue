@@ -56,12 +56,12 @@
               />
           </div>
           <div v-else>
-              <b-pagination-nav
-                :link-gen="linkFormGen"
-                :number-of-pages="formNumPages"
-                v-model="formcurrentPage"
-                class="cft-form-list-paginate"
-              />
+            <b-list-group-item>
+              <b-row class="cft-not-selected mt-2 ml-1 row">
+                <i class="bi bi-exclamation-circle-fill" scale="1"></i>
+                <p>No Form found in the list.</p>
+              </b-row>
+            </b-list-group-item>
           </div>
               </b-modal>
         <b-modal
