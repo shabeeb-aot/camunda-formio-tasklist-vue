@@ -126,12 +126,12 @@
               </div>
             </div>
           </b-list-group-item>
-          <!-- <b-pagination-nav
+          <b-pagination-nav
             :link-gen="linkGen"
             :number-of-pages="numPages"
             v-model="currentPage"
             class="cft-paginate"
-          /> -->
+          />
         </b-list-group>
         <b-list-group cols="3" v-else>
           <b-row class="cft-not-selected mt-2 ml-1 row">
