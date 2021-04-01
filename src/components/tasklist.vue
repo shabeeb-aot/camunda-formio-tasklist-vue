@@ -346,7 +346,7 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-// import SocketIOService from "../services/SocketIOServices";
+import SocketIOService from "../services/SocketIOServices";
 // import TaskListGroup from "../components/Tasklist-Group.vue";
 import TaskListSearch from "../components/Tasklist-Search.vue";
 import TaskSortOptions from '../components/tasklist-sortoptions.vue';
@@ -858,7 +858,7 @@ getBPMTaskDetail(taskId: string) {
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      this.getGroupDetails();
+      // this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
         this.selectedTaskId,
@@ -912,6 +912,32 @@ getBPMTaskDetail(taskId: string) {
     });
 
     this.fetchData();
+    console.log("SocketIO status", SocketIOService.isConnected());
+    if(!SocketIOService.isConnected()) {
+      console.log("SocketIO not connected")
+      console.log(this.selectedfilterId);
+      SocketIOService.connect((refreshedTaskId: any)=> {
+        if(this.selectedfilterId){
+          //Refreshes the Task
+          this.fetchTaskList(this.selectedfilterId, this.payload);
+        }
+        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+          this.fetchData()
+        }
+      })
+    }
+    else {
+      SocketIOService.disconnect();
+      SocketIOService.connect((refreshedTaskId: any)=> {
+        if(this.selectedfilterId){
+          //Refreshes the Task
+          this.fetchTaskList(this.selectedfilterId, this.payload);
+        }
+        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+          this.fetchData()
+        }
+      })
+    }
     this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {
