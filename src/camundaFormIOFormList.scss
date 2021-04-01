@@ -1,38 +1,44 @@
 .cftf-form-conatiner{
-    background-color: white;
-    text-align: left;
-    font-size: 16px;
-    
-    .bg-default {
-      background-color: #38598a !important;
-      border: #38598a !important;
-      color: white !important;
-    }
-
-    .cft-form-list-paginate{
-      display: flex;
-      justify-content: center;
-      margin-top: 15px;
-    }
-
-    .cft-not-selected{
-      border: 3px solid #b3b3b3;
-      padding: 10px;
-      color: #b3b3b3;
-      width: 100%;
-    }
-
-}
-
-.cft-form-submission {
   background-color: white;
   text-align: left;
   font-size: 16px;
-  font-family: Nunito Sans, SemiBold;
-
+  
   .bg-default {
     background-color: #38598a !important;
     border: #38598a !important;
     color: white !important;
   }
+
+  .cft-form-list-paginate{
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+
+  .cft-not-selected{
+    border: 3px solid #b3b3b3;
+    padding: 10px;
+    color: #b3b3b3;
+    width: 100%;
+  }
+
+}
+
+.cft-form-submission {
+background-color: white;
+text-align: left;
+font-size: 16px;
+font-family: Nunito Sans, SemiBold;
+
+.bg-default {
+  background-color: #38598a !important;
+  border: #38598a !important;
+  color: white !important;
+}
+}
+
+.cft-form-list-paginate{
+display: flex;
+justify-content: center;
+margin-top: 15px;
 }

@@ -7,7 +7,7 @@
               ref="modal-1"
               id="modal-multi-1"
               title="Forms"
-              size="lg"
+              size="xl"
               no-close-on-backdrop
               no-close-on-esc
               ok-only
@@ -67,7 +67,7 @@
         <b-modal
           ref="modal-2"
           id="modal-multi-2"
-          size="lg"
+          size="xl"
           title="SUBMIT FORM"
           no-close-on-backdrop
           no-close-on-esc

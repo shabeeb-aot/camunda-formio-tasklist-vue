@@ -126,12 +126,12 @@
               </div>
             </div>
           </b-list-group-item>
-          <!-- <b-pagination-nav
+          <b-pagination-nav
             :link-gen="linkGen"
             :number-of-pages="numPages"
             v-model="currentPage"
             class="cft-paginate"
-          /> -->
+          />
         </b-list-group>
         <b-list-group cols="3" v-else>
           <b-row class="cft-not-selected mt-2 ml-1 row">
@@ -217,12 +217,13 @@
                         </b-button>
                       </b-col>
                       <b-col>
-                        <input
+                        <b-form-input
                           type="text"
                           placeholder="Group ID"
                           v-model="setGroup"
                           v-on:keyup.enter="addGroup"
-                        />
+                        ></b-form-input>
+
                       </b-col>
                     </b-row>
                     <b-row>
@@ -381,7 +382,7 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
   @Prop() private userName!: string;
-  @Prop() private WEBSOCKET_ENCRYPT_KEY !: string;
+  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
 
   private tasks: Array<object> = [];
   private fulltasks: Array<object> = [];
@@ -865,7 +866,7 @@ getBPMTaskDetail(taskId: string) {
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      // this.getGroupDetails();
+      this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
         this.selectedTaskId,
