@@ -18,18 +18,8 @@
     width: 100%;
   }
 
-  .cft-filter-container{
-    border: 1px solid #555;
-    border-radius: 3px;
-    width: 70%;
-    padding: 0;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 13px;
-  }
-
   .cft-filter{
-    width: 70%;
+    width:90%;
     margin: 5px;
     border: none;
     font-style: italic;
@@ -59,10 +49,10 @@
 
   .cft-service-task-details {
     min-height: 80vh;
-    max-height: 80vh;
+    // max-height: 80vh;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 100%;
+    // height: 100%;
   }
 
   .task-header {
@@ -84,7 +74,15 @@
   .cft-filter-selected {
     border-left: 2px solid #003366 !important;
   }
-
+  .cft-diagram-container{
+    height: 100%;
+  }
+  .cft-canvas-container{
+    height: 100%;
+  }
+  .cft-actionable-container{
+    height:100%;
+  }
   .cft-actionable {
     color: #1a5a96;
     background-color: transparent;
@@ -313,9 +311,14 @@
     justify-content: flex-start;
     align-items: center;
   }
-  .task-title{
+  .cft-task-title{
     font-size: 16px;
     margin: 0;
+  }
+
+  .cft-process-title{
+    font-size: 16px;
+    font-weight: 500;
   }
 
   .created-details{
@@ -327,70 +330,16 @@
     min-height: 100%;
   }
 
-  // .cft-user-select{
-  //   width: 90%;
-  //   border: none;
-  //   background: none;
-  //   padding: 0;
-  //   height: none;
-  //   color: #1a5a96;
-  //   font-family: Nunito Sans, SemiBold;
-  //   font-weight: 700;
-  //   font-size: 16px;
-  // }
-  .cft-user-close{
-    position: relative;
-    color: #1a5a96;
-    font-family: Nunito Sans, SemiBold;
-    font-weight: bold;
-  }
-  .cft-person-fill{
-    padding-right: 3px;
-  }
-  .cft-user-span {
-    position: absolute;
-    // width: 61%;
-  }
-  .custom-select {
-    height: auto;
-    vertical-align: top;
-    width: 80% !important;
-  
-  }
-
-}
-
-.cftf-form-conatiner{
-  background-color: white;
-  .cftf-taskhead{
-    font-weight: bold;
-    font-size: 30px;
-    margin-left: 10px;
-    display: flex;
-  }
-  .cftf-table-align{
-    text-align: left;
-  }
-}
-
-.cft-form-list-paginate{
-  display: flex;
-  justify-content: center;
-  margin-top: 15px;
-  padding: 0px;
-}
-
-.custom-select:focus{
-  border-color: none !important;
-  box-shadow: none;
-}
+.cft-process-title[data-title]:hover:after,
+.cft-task-title[data-title]:hover:after,
 .cft-priority[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-groups[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-process-name[data-title]:hover:after,
 .task-header-title[data-title]:hover:after,
-.cft-application-id[data-title]:hover:after {
+.cft-application-id[data-title]:hover:after,
+.cft-due-date[data-title]:hover:after {
   font-size: 12px;
   content: attr(data-title);
   padding: 4px 8px;
@@ -418,16 +367,19 @@
 .cft-application-id[data-title]:hover:after{
   right: 0;
   position: relative;
+  height: 26px;
 }
 .cft-application-id{
   display: block;
   height: auto;
+  width:40%;
 }
 .task-name{
   height: 20px;
 }
 .task-header-title{
-  height: 30px;
+  // height: 30px;
+  // width: 50%;
 }
 .cft-groups[data-title]:hover:after
 {
@@ -437,6 +389,66 @@
   font-weight: 400;
   font-size: 16px;
 }
+.cft-due-date[data-title]:hover:after{
+  width: 70%;
+  left: 0rem;
+  font-weight: 400;
+  font-size: 12px;
+  height: 20px;
+}
 .cft-task-assignee[data-title]:hover:after {
   width: 40%;
+}
+
+.cftf-form-conatiner{
+  background-color: white;
+  .cftf-taskhead{
+    font-weight: bold;
+    font-size: 30px;
+    margin-left: 10px;
+    display: flex;
+  }
+  .cftf-table-align{
+    text-align: left;
+  }
+}
+
+.cft-form-list-paginate{
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  padding: 0px;
+}
+.cft-user-select{
+  width: 90%;
+  border: none;
+  background: none;
+  padding: 0;
+  height: none;
+  color: #1a5a96;
+  font-weight: 700;
+  font-size: 16px;
+}
+.cft-user-close{
+  position: relative;
+  color: #1a5a96;
+  font-family: Nunito Sans, SemiBold;
+  font-weight: bold;
+}
+.cft-person-fill{
+  padding-right: 3px;
+}
+.cft-user-span {
+  position: absolute;
+}
+.custom-select {
+  height: auto;
+  vertical-align: top;
+  width: 80% !important;
+}
+.custom-select:focus{
+  border-color: none !important;
+  box-shadow: none;
+}
+
 }

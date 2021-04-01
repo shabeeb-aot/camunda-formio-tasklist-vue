@@ -1,11 +1,14 @@
 <template>
-    <b-container class="task-outer-container">
+    <b-container fluid class="cft-form-submission">
       <a :href="homeUrl"><i class="fa fa-chevron-left"></i></a>
         <div id='formio'></div>
     </b-container>
 </template>
 
 <script lang="ts">
+import "font-awesome/scss/font-awesome.scss";
+import 'semantic-ui-css/semantic.min.css';
+import '../user-styles.css'
 import { Component, Prop,  Vue } from 'vue-property-decorator'
 import { Form, Formio } from 'vue-formio';
 import { getFormDetails } from "../services/get-formio";
@@ -29,7 +32,7 @@ export default class FormViewSubmission extends Vue {
 
   mounted() {
     this.formUrl = window.location.href;
-    this.homeUrl = localStorage.getItem('formsflowaiUrl') || "https://app2.aot-technologies.com"
+    this.homeUrl = localStorage.getItem('formsflow.ai.url') || "https://app2.aot-technologies.com"
 
     const { formioUrl, formId, submissionId } = getFormDetails(
       this.formUrl,
