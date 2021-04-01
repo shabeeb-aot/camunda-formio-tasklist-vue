@@ -1,0 +1,36 @@
+.cft-input-search-filter{
+
+    .cft-filter-container{
+        border: 1px solid #555;
+        border-radius: 3px;
+        width: 100%;
+        padding: 0;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 13px;
+    }
+    
+    .cft-approve-box,.cft-reject-box{
+        background-color: white;
+        border: 1px solid rgb(165, 163, 163);
+        height: 8px;
+        width: 8px;
+        }
+    .cft-icon-actions{
+        display: block;
+        float: right;
+    }
+    .cft-rhs-container{
+        width: 46.5%;
+        display: inline-block;
+    }
+    .cft-search-title{
+        margin-bottom: 0rem;
+        display: inline-block;
+    }
+    .cft-operator-dropdown{
+      width: 15%;
+      background-color: white;
+    }
+
+}
