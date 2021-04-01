@@ -7,7 +7,7 @@
               ref="modal-1"
               id="modal-multi-1"
               title="Forms"
-              size="lg"
+              size="xl"
               no-close-on-backdrop
               no-close-on-esc
               ok-only
