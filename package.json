@@ -18,7 +18,7 @@
     "bootstrap-icons": "^1.4.0",
     "bootstrap-vue": "^2.21.2",
     "bpmn-js": "^8.2.2",
-    "crypto-js": "^4.0.0",
+    "crypto-js": "4.0.0",
     "font-awesome": "^4.7.0",
     "jsonwebtoken": "^8.5.1",
     "keycloak-js": "^12.0.2",
@@ -39,7 +39,7 @@
     "vuelogger": "^1.0.14",
     "vuex": "3.6.2",
     "vuex-class": "^0.3.2",
-    "@types/crypto-js": "^4.0.0",
+    "@types/crypto-js": "4.0.0",
     "@types/stompjs": "^2.3.3"
   },
   "devDependencies": {
