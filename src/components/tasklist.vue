@@ -381,6 +381,7 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
   @Prop() private userName!: string;
+  @Prop() private WEBSOCKET_ENCRYPT_KEY !: string;
 
   private tasks: Array<object> = [];
   private fulltasks: Array<object> = [];
@@ -462,12 +463,18 @@ checkPropsIsPassedAndSetValue() {
   if (!this.formsflowaiUrl || this.formsflowaiUrl === "") {
     console.warn("formsflow.ai URL prop not passed");
   }
+  if(!this.WEBSOCKET_ENCRYPT_KEY || this.WEBSOCKET_ENCRYPT_KEY === ""){
+    console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
+  }
   const engine = "/engine-rest";
+  const socketUrl = "/forms-flow-bpm-socket";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
+  localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
+  localStorage.setItem("WEBSOCKET_ENCRYPT_KEY", this.WEBSOCKET_ENCRYPT_KEY)
 
   const val = decodeTokenValues(
     this.token,
@@ -912,10 +919,7 @@ getBPMTaskDetail(taskId: string) {
     });
 
     this.fetchData();
-    console.log("SocketIO status", SocketIOService.isConnected());
     if(!SocketIOService.isConnected()) {
-      console.log("SocketIO not connected")
-      console.log(this.selectedfilterId);
       SocketIOService.connect((refreshedTaskId: any)=> {
         if(this.selectedfilterId){
           //Refreshes the Task
@@ -948,6 +952,10 @@ getBPMTaskDetail(taskId: string) {
       const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.userList = result;
     });
+  }
+
+  beforeDestroy() {
+    SocketIOService.disconnect();
   }
 }
 </script>
