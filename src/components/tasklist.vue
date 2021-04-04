@@ -337,6 +337,12 @@
 </template>
 
 <script lang="ts">
+
+interface Payload{
+    active: boolean;
+    sorting: Array<object>;
+    orQueries?: Array<object>;
+  }
 // removed for this project since its making some issue
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -446,14 +452,14 @@ export default class Tasklist extends Vue {
   private setupdateSortListDropdownindex = 0;
   private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
-  private payload: any = {
+  private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
   
 @Watch('token')
-  ontokenChange (newVal: any) {
+  ontokenChange (newVal: string) {
   // updating token
     localStorage.setItem("authToken", newVal);
   }
