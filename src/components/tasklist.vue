@@ -186,74 +186,32 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
-              <!-- <TaskListGroup :token="token" :bpmApiUrl="bpmApiUrl" :task="task"></TaskListGroup> -->
               <b-col>
                 <div
-                  v-b-modal.AddGroupModal
-                  v-if="groupListNames"
-                  class="cft-groups"
-                  data-title="groups"
+                    v-b-modal.AddGroupModal
+                    v-if="groupListNames"
+                    class="cft-groups"
+                    data-title="groups"
                 >
-                  <i class="bi bi-grid-3x3-gap-fill"></i>
-                  {{ String(groupListNames) }}
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    {{ String(groupListNames) }}
                 </div>				 
                 <div
-                  v-b-modal.AddGroupModal
-                  class="cft-groups"
-                  data-title="groups"
-                  v-else
+                    v-b-modal.AddGroupModal
+                    class="cft-groups"
+                    data-title="groups"
+                    v-else
                 >
-                  <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
+                <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
                 </div>
-                <b-modal
-                  id="AddGroupModal"
-                  ref="modal"
-                  title="Manage Groups"
-                  ok-title="Close"
-                  ok-only
-                >
-                  <div class="modal-text">
-                    <i class="bi bi-exclamation-circle"></i>
-                    You can add a group by typing a group ID into the input
-                    field and afterwards clicking the button with the plus sign.
-                    <b-row class="mt-3 mb-3">
-                      <b-col>
-                        <b-button
-                          variant="primary"
-                          @click="addGroup"
-                          :disabled='!setGroup'
-                        >
-                          <span>Add a group</span>
-                          <span>
-                            <i class="bi bi-plus"></i>
-                          </span>
-                        </b-button>
-                      </b-col>
-                      <b-col>
-                        <b-form-input
-                          type="text"
-                          placeholder="Group ID"
-                          v-model="setGroup"
-                          v-on:keyup.enter="addGroup"
-                        ></b-form-input>
-
-                      </b-col>
-                    </b-row>
-                    <b-row>
-                      <b-col v-if="groupList.length">
-                        <ul v-for="g in groupList" :key="g.groupId">
-                          <div class="mt-1">
-                            <i
-                              class="fa fa-times mr-2 click-element"
-                              @click="deleteGroup(g.groupId)"
-                            ></i>
-                            <span>{{ g.groupId }}</span>
-                          </div>
-                        </ul>
-                      </b-col>
-                    </b-row>
-                  </div>
-                </b-modal>
+                <TaskListGroup
+                  :token='token'
+                  :bpmApiUrl='bpmApiUrl'
+                  :task="task"
+                  :groupList='groupList'
+                  @add-group='addGroup'
+                  @delete-group='deleteGroup'
+                />             
               </b-col>
               <b-col>
                 <div
@@ -368,7 +326,7 @@ import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import SocketIOService from "../services/SocketIOServices";
-// import TaskListGroup from "../components/TasklistGroup.vue";
+import TaskListGroup from "../components/TasklistGroup.vue";
 import TaskListSearch from "../components/TasklistSearch.vue";
 import TaskSortOptions from '../components/TasklistSortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
@@ -383,7 +341,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
-    // TaskListGroup,
+    TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
@@ -563,16 +521,16 @@ callProcessVariablesApi(item: any) {
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
+onFormSubmitCallback() {
+  if (this.task.id) {
+    this.onBPMTaskFormSubmit(this.task.id);
+    this.reloadTasks();								   
+  }					  
+}
+
 addGroup() {
-  CamundaRest.createTaskGroupByID(
-    this.token,
-    this.task.id,
-    this.bpmApiUrl,
-    { userId: null, groupId: this.setGroup, type: "candidate" }
-  ).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
+  this.getGroupDetails();
+  this.reloadCurrentTask();
 }
 
 getGroupDetails() {
@@ -591,23 +549,10 @@ getGroupDetails() {
   );
 }
 
-deleteGroup(groupid: string) {		 
-  CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
-    groupId: groupid,
-    type: "candidate",
-  }).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
+deleteGroup() {
+  this.getGroupDetails();
+  this.reloadCurrentTask();
 }
-
-onFormSubmitCallback() {
-  if (this.task.id) {
-    this.onBPMTaskFormSubmit(this.task.id);
-    this.reloadTasks();								   
-  }					  
-}
- 
 
 onBPMTaskFormSubmit(taskId: string) {
   const formRequestFormat = {
