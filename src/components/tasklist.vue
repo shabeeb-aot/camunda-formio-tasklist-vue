@@ -186,7 +186,7 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
-              <!-- <TaskListGroup/> -->
+              <!-- <TaskListGroup :token="token" :bpmApiUrl="bpmApiUrl" :task="task"></TaskListGroup> -->
               <b-col>
                 <div
                   v-b-modal.AddGroupModal
@@ -296,8 +296,6 @@
                     >
                       <formio
                         :src="formioUrl"
-                        :submission="submissionId"
-                        :form="formId"
                         :options="
                           task.assignee === userName ? options : readoption
                         "
@@ -342,11 +340,11 @@ interface Payload{
     active: boolean;
     sorting: Array<object>;
     orQueries?: Array<object>;
+    maxResults?: number;
+    firstResult?: number;
   }
-// removed for this project since its making some issue
-// import 'bootstrap/dist/css/bootstrap.min.css';
+
 import 'bootstrap-icons/font/bootstrap-icons.css';
-// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
@@ -423,7 +421,7 @@ export default class Tasklist extends Vue {
   private userSelected = null;
   private showfrom = false;
   private currentPage = 1;
-  private perPage = 15;
+  private perPage = 10;
   private numPages = 5;
   private tasklength = 0;
   private readoption = { readOnly: true };
@@ -498,7 +496,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
   localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("WEBSOCKET_ENCRYPT_KEY", this.WEBSOCKET_ENCRYPT_KEY)
+  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
 
   const val = decodeTokenValues(
     this.token,
@@ -605,7 +603,8 @@ deleteGroup(groupid: string) {
 
 onFormSubmitCallback() {
   if (this.task.id) {
-    this.onBPMTaskFormSubmit(this.task.id);								   
+    this.onBPMTaskFormSubmit(this.task.id);
+    this.reloadTasks();								   
   }					  
 }
  
@@ -739,6 +738,19 @@ getBPMTaskDetail(taskId: string) {
       this.tasklength = result.data.length;
       this.numPages = Math.ceil(result.data.length / this.perPage);
     });
+  }
+
+  fetchInittasklist(filterId: string, payload: object){
+    CamundaRest.filterTaskList(
+      this.token,
+      filterId,
+      payload,
+      this.bpmApiUrl
+    ).then((result) => {
+      this.tasks = result.data;
+      this.fulltasks = result.data;
+      this.numPages =  Math.ceil(result.data.length / this.perPage);
+    })
   }
 
   // fetchPaginationTaskElements(){
@@ -918,6 +930,7 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
+        // handle case when applicationid and formUrl null
         this.applicationId = result.data["applicationId"].value;
         this.formioUrl = result.data["formUrl"].value;
         const { formioUrl, formId, submissionId } = getFormDetails(
