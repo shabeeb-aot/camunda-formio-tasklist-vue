@@ -162,6 +162,7 @@
                 <span>
                   <i class="fa fa-calendar"></i>
                   {{timedifference(task.followUp)}}
+                  <i class="bi bi-x-circle" @click="removeFollowupDate"></i>
                 </span>
               </b-col>
               <b-col v-else>
@@ -176,6 +177,7 @@
                 <span>
                   <i class="fa fa-calendar"></i>
                   {{timedifference(task.due)}}
+                  <i class="bi bi-x-circle" @click="removeDueDate"></i>
                 </span>
               </b-col>
               <b-col v-else>
@@ -835,6 +837,32 @@ getBPMTaskDetail(taskId: string) {
     else {
       console.warn("Due date error");
     }
+  }
+
+  removeDueDate() {
+    const referenceobject = this.task;
+    referenceobject["due"] = null;
+    CamundaRest.updateTasksByID(
+      this.token,
+      this.task.id,
+      this.bpmApiUrl,
+      referenceobject
+    ).then(() => {
+      this.reloadCurrentTask();
+    })
+  }
+
+  removeFollowupDate() {
+    const referenceobject = this.task;
+    referenceobject["followUp"] = null;
+    CamundaRest.updateTasksByID(
+      this.token,
+      this.task.id,
+      this.bpmApiUrl,
+      referenceobject
+    ).then(() => {
+      this.reloadCurrentTask();
+    })
   }
 
   fetchxmldiagram() {
