@@ -183,9 +183,10 @@
 
   .cft-filter-dropdown-content 
   {
-    display: none;
+    font-size: large;
+    display: block;
     position: absolute;
-    // position: relative;
+    cursor: pointer;
     background-color: #f9f9f9;
     min-width: 250px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -194,12 +195,7 @@
   .cft-list-container {
     margin-top: 5px;
   }
-  .cft-filter-dropdown-content :hover {background-color: #f1f1f1}
-
-  .cft-filter-dropdown:hover .cft-filter-dropdown-content 
-  {
-    display: block;
-  }
+  
   .cft-task-details-assign{
     display: flex;
     justify-content: space-between;

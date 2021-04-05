@@ -1,26 +1,25 @@
 <template> 
 <b-container fluid class="task-outer-container">
   <div class="main-filters my-2 mb-1">
-    <!-- Filter section begins -->
     <div 
       class="cft-filter-dropdown mx-2"
     >
-        <button class="cft-filter-dropbtn mr-0">
+        <button class="cft-filter-dropbtn mr-0" @click="toggleshowfilter">
           <i class="bi bi-filter-square"/>
         </button>
-        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-          <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-          @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-          :class="{'cft-filter-selected': idx == activefilter}">
-            {{filter.name}}
-          </b-list-group-item>
-        </b-list-group>
-        <b-list-group class="cft-filter-dropdown-content"  v-else>
-          <b-list-group-item>
+        <div v-if="showfilter" class="cft-filter-dropdown-content">
+          <div  v-if="filterList.length">
+            <div v-for="(filter, idx) in filterList" :key="filter.id"
+            @click="togglefilter(filter, idx)"
+            :class="{'cft-filter-selected': idx == activefilter}">
+              {{filter.name}}
+            </div>
+          </div>
+          <div v-else>
             <i class="bi bi-exclamation-circle-fill"></i>
               No Filters found  
-          </b-list-group-item>
-        </b-list-group>
+          </div>
+        </div>
       </div>
 
       <FormListModal :token="token" :bpmApiUrl="bpmApiUrl"/>          
@@ -394,6 +393,7 @@ export default class Tasklist extends Vue {
     },
   };
   private filterList = [];
+  private showfilter=false;
   private editAssignee = false;
   private activefilter = 0;
   private applicationId = '';
@@ -488,8 +488,14 @@ toggle(index: number) {
   this.activeIndex = index;						  
 }
 
-togglefilter(index: number) {
+toggleshowfilter() {
+  this.showfilter = ! this.showfilter;
+}
+
+togglefilter(filter: any, index: number) {
   this.activefilter = index;
+  this.fetchTaskList(filter.id, this.payload);
+  this.showfilter = false;
 }
 
 toggleassignee()  {
