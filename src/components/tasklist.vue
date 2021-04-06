@@ -532,7 +532,7 @@ callProcessVariablesApi(item: any) {
 onFormSubmitCallback() {
   if (this.task.id) {
     this.onBPMTaskFormSubmit(this.task.id);
-    this.reloadTasks();								   
+    this.reloadTasks();					   
   }					  
 }
 

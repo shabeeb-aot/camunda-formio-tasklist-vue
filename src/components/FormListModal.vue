@@ -105,6 +105,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
 import FormViewSubmission from '../components/FormViewSubmission.vue';
+import {formApplicationSubmit} from '../services/formsflowai-api';
 
 @Component({
   components: {
@@ -120,6 +121,7 @@ export default class FormListModal extends Vue{
   private formValueId = ''
   private formId =  ''
   private submissionId = ''
+  private formioUrl = '';
   private formTitle = ''
   private showForms = true
 
@@ -157,6 +159,12 @@ export default class FormListModal extends Vue{
   onSubmit(submission: any) {
     this.formId = submission.form;
     this.submissionId = submission._id;
+    this.formioUrl = localStorage.getItem("formsflow.ai.url") + '/form/' + this.formId +'/submission/' + this.submissionId
+    formApplicationSubmit(
+      localStorage.getItem("formsflow.ai.api.url") || "https://app2.aot-technologies.com/api",
+      {"formId": this.formId,"formSubmissionId": this.submissionId,
+        "formUrl": this.formioUrl},
+      this.token);
     this.$bvModal.show('modal-multi-3');
     this.$bvModal.hide('modal-multi-2');
   }
