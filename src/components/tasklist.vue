@@ -12,7 +12,7 @@
             <div v-for="(filter, idx) in filterList" :key="filter.id"
             @click="togglefilter(filter, idx)"
             :class="{'cft-filter-selected': idx == activefilter}">
-              {{filter.name}}
+              <h3>{{filter.name}}</h3>
             </div>
           </div>
           <div v-else>
@@ -518,14 +518,14 @@ callSearchDateApi(item: any) {
 }
 
 callTaskVariablesApi(item: any) {
-  searchQuery[0]["taskVariables"].push(item);
-  this.payload["orQueries"] = searchQuery;
+  searchQuery["taskVariables"].push(item);
+  this.payload["orQueries"] = [searchQuery];
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 callProcessVariablesApi(item: any) {
-  searchQuery[0]["processVariables"].push(item);
-  this.payload["orQueries"] = searchQuery;
+  searchQuery["processVariables"].push(item);
+  this.payload["orQueries"] = [searchQuery];
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
