@@ -219,21 +219,29 @@
                   class="cft-task-assignee"
                   v-if="task.assignee"
                 >
-                  <i class="bi bi-person-fill cft-person-fill" />
-                  <span v-if="editAssignee">
-                  <b-form-select
-                    class="cft-user-select"
-                    v-model="userSelected"
-                    :options="userList"
-                    @change="onSetassignee"
-                    >
-                  </b-form-select>
-                  <i class="bi bi-x cft-user-close"  data-title="Reset assignee" @click="onUnClaim" />
-                  </span>
-                  <span v-else class="cft-user-span" data-title="Click to change assignee" @click="toggleassignee"> 
+                  <div v-if="editAssignee" class="cft-user-edit">
+                    <div class='cft-assignee-change-box'>
+                      <span @click="onSetassignee">
+                        <i class="bi bi-check"></i>
+                      </span>
+                      <span @click="toggleassignee">
+                        <i class="fa fa-times ml-1"></i>
+                      </span>
+                    </div>
+                    <b-form-select
+                      class="cft-user-select"
+                      v-model="userSelected"
+                      :options="userList"
+                      >
+                    </b-form-select>
+                  </div>
+                  <div class="cft-user-details" v-else @click="toggleassignee"> 
+                    <i class="bi bi-person-fill cft-person-fill" />
+                    <span class="cft-user-span" data-title="Click to change assignee">
                     {{task.assignee}}
-                    <i class="bi bi-x cft-user-close"  data-title="Reset assignee" @click="onUnClaim" />
-                  </span>
+                    </span>
+                    <i class="fa fa-times ml-1 cft-remove-user"  data-title="Reset assignee" @click="onUnClaim" />
+                  </div>
                 </div>
                 <div class="cft-task-assignee" v-else @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />

@@ -99,6 +99,7 @@
   .cft-task-assignee {
     font-weight: 500;
     font-size: 16px;
+    text-align: right;
   }
 
   .cft-filter-dropbtn 
@@ -165,14 +166,6 @@
   .cft-search-item-criteria {
     font-size: 16px;
   }
-  // .cft-search-item{
-  //   font-size: medium;
-  //   text-align: left;
-  //   cursor: pointer;
-  //   color: #333;
-  //   font-weight: 400;
-  //   padding: 2px 9px;
-  // }
 
   .cftf-search-item-box {
     margin-top: 5px;
@@ -336,7 +329,8 @@
 .cft-process-name[data-title]:hover:after,
 .task-header-title[data-title]:hover:after,
 .cft-application-id[data-title]:hover:after,
-.cft-due-date[data-title]:hover:after {
+.cft-due-date[data-title]:hover:after,
+.cft-remove-user[data-title]:hover:after {
   font-size: 12px;
   content: attr(data-title);
   padding: 4px 8px;
@@ -373,10 +367,6 @@
 }
 .task-name{
   height: 20px;
-}
-.task-header-title{
-  // height: 30px;
-  // width: 50%;
 }
 .cft-groups[data-title]:hover:after
 {
@@ -417,14 +407,12 @@
   padding: 0px;
 }
 .cft-user-select{
-  width: 90%;
-  border: none;
-  background: none;
-  padding: 0;
+  width: 70%;
   height: none;
-  color: #1a5a96;
+  color: #01060a;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 14px;
+  border: 3px solid #b3b3b3;
 }
 .cft-user-close{
   position: relative;
@@ -435,7 +423,7 @@
 .cft-person-fill{
   padding-right: 3px;
 }
-.cft-user-span {
+.cft-user-details {
   position: absolute;
 }
 .custom-select {
