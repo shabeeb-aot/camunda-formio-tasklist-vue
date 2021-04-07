@@ -8,13 +8,13 @@
           <i class="bi bi-filter-square"/>
         </button>
         <div v-if="showfilter" class="cft-filter-dropdown-content">
-          <div  v-if="filterList.length">
-            <div v-for="(filter, idx) in filterList" :key="filter.id"
+          <b-list-group  v-if="filterList.length">
+            <b-list-group-item v-for="(filter, idx) in filterList" :key="filter.id"
             @click="togglefilter(filter, idx)"
             :class="{'cft-filter-selected': idx == activefilter}">
-              <h3>{{filter.name}}</h3>
-            </div>
-          </div>
+              {{filter.name}}
+            </b-list-group-item>
+          </b-list-group>
           <div v-else>
             <i class="bi bi-exclamation-circle-fill"></i>
               No Filters found  
