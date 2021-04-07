@@ -67,7 +67,7 @@
         <b-modal
           ref="modal-2"
           id="modal-multi-2"
-          size="lg"
+          size="xl"
           title="SUBMIT FORM"
           no-close-on-backdrop
           no-close-on-esc
@@ -86,20 +86,31 @@
           >
           </Form>
         </b-modal>
+        <b-modal
+          ref="modal-3"
+          id="modal-multi-3"
+          size="xl"
+          title="View form"
+          ok-only
+        >
+        <FormViewSubmission :formid="formId" :submissionid="submissionId">
+        </FormViewSubmission>
+        </b-modal>
           </div>
 </template>
 
 <script lang="ts">
-// import 'bootstrap/dist/css/bootstrap.min.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
-import '../camundaFormIOFormList.scss'
+import '../styles/camundaFormIOFormList.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
+import FormViewSubmission from '../components/FormViewSubmission.vue';
+import {formApplicationSubmit} from '../services/formsflowai-api';
 
 @Component({
   components: {
-    Form
+    Form,
+    FormViewSubmission
   }
 })
 export default class FormListModal extends Vue{
@@ -109,6 +120,8 @@ export default class FormListModal extends Vue{
   private formcurrentPage=1
   private formValueId = ''
   private formId =  ''
+  private submissionId = ''
+  private formioUrl = '';
   private formTitle = ''
   private showForms = true
 
@@ -144,8 +157,16 @@ export default class FormListModal extends Vue{
   }
 
   onSubmit(submission: any) {
-    this.$router.push({path: `/form/${submission.form}/submission/${submission._id}`
-    })
+    this.formId = submission.form;
+    this.submissionId = submission._id;
+    this.formioUrl = localStorage.getItem("formsflow.ai.url") + '/form/' + this.formId +'/submission/' + this.submissionId
+    formApplicationSubmit(
+      localStorage.getItem("formsflow.ai.api.url") || "https://app2.aot-technologies.com/api",
+      {"formId": this.formId,"formSubmissionId": this.submissionId,
+        "formUrl": this.formioUrl},
+      this.token);
+    this.$bvModal.show('modal-multi-3');
+    this.$bvModal.hide('modal-multi-2');
   }
 
   mounted() {
