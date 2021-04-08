@@ -302,17 +302,8 @@
 </template>
 
 <script lang="ts">
-
-interface Payload{
-    active: boolean;
-    sorting: Array<object>;
-    orQueries?: Array<object>;
-    maxResults?: number;
-    firstResult?: number;
-  }
-
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import "font-awesome/scss/font-awesome.scss";
+import 'font-awesome/scss/font-awesome.scss';
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
@@ -334,15 +325,16 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-import SocketIOService from "../services/SocketIOServices";
-import TaskListGroup from "../components/TasklistGroup.vue";
-import TaskListSearch from "../components/TasklistSearch.vue";
+import {Payload} from '../services/TasklistTypes';
+import SocketIOService from '../services/SocketIOServices';
+import TaskListGroup from '../components/TasklistGroup.vue';
+import TaskListSearch from '../components/TasklistSearch.vue';
 import TaskSortOptions from '../components/TasklistSortoptions.vue';
-import {authenticateFormio} from "../services/formio-token";
+import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
-import moment from "moment";
-import vueBpmn from "vue-bpmn";
+import moment from 'moment';
+import vueBpmn from 'vue-bpmn';
 
 
 @Component({
@@ -408,7 +400,7 @@ export default class Tasklist extends Vue {
   private groupList = [];
   private groupListNames: Array<string> | null = null;
   private groupListItems: string[] = [];
-  private userEmail = "external";
+  private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
