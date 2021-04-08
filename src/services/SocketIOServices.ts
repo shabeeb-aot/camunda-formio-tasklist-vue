@@ -5,7 +5,7 @@ import AES from 'crypto-js/aes';
 let stompClient: any = null;
 const BPM_BASE_URL_SOCKET_IO = localStorage.getItem('bpmSocketUrl');
 const token: any = localStorage.getItem('authToken');
-const WEBSOCKET_ENCRYPT_KEY: any = localStorage.getItem('WEBSOCKET_ENCRYPT_KEY');
+const WEBSOCKET_ENCRYPT_KEY: any = localStorage.getItem('websocketEncryptkey');
 
 
 const isConnected = ()=>{

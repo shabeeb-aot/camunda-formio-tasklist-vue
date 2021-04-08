@@ -1,26 +1,25 @@
 <template> 
 <b-container fluid class="task-outer-container">
   <div class="main-filters my-2 mb-1">
-    <!-- Filter section begins -->
     <div 
       class="cft-filter-dropdown mx-2"
     >
-        <button class="cft-filter-dropbtn mr-0">
+        <button class="cft-filter-dropbtn mr-0" @click="toggleshowfilter">
           <i class="bi bi-filter-square"/>
         </button>
-        <b-list-group  v-if="filterList && filterList.length" class="cft-filter-dropdown-content">
-          <b-list-group-item button v-for="(filter, idx) in filterList" :key="filter.id"
-          @click="fetchTaskList(filter.id, payload); togglefilter(idx)"
-          :class="{'cft-filter-selected': idx == activefilter}">
-            {{filter.name}}
-          </b-list-group-item>
-        </b-list-group>
-        <b-list-group class="cft-filter-dropdown-content"  v-else>
-          <b-list-group-item>
+        <div v-if="showfilter" class="cft-filter-dropdown-content">
+          <b-list-group  v-if="filterList.length">
+            <b-list-group-item v-for="(filter, idx) in filterList" :key="filter.id"
+            @click="togglefilter(filter, idx)"
+            :class="{'cft-filter-selected': idx == activefilter}">
+              {{filter.name}}
+            </b-list-group-item>
+          </b-list-group>
+          <div v-else>
             <i class="bi bi-exclamation-circle-fill"></i>
               No Filters found  
-          </b-list-group-item>
-        </b-list-group>
+          </div>
+        </div>
       </div>
 
       <FormListModal :token="token" :bpmApiUrl="bpmApiUrl"/>          
@@ -157,7 +156,15 @@
           <div class="cft-actionable-container">
             <!-- four buttons -->
             <b-row class="cft-actionable">
-              <b-col>
+              <b-col v-if='task.followUp'>
+                <!-- TODO: update calendar -->
+                <span>
+                  <i class="fa fa-calendar"></i>
+                  {{timedifference(task.followUp)}}
+                  <i class="bi bi-x-circle" @click="removeFollowupDate"></i>
+                </span>
+              </b-col>
+              <b-col v-else>
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
@@ -165,7 +172,14 @@
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
-              <b-col>
+              <b-col v-if='task.due'>
+                <span>
+                  <i class="fa fa-calendar"></i>
+                  {{timedifference(task.due)}}
+                  <i class="bi bi-x-circle" @click="removeDueDate"></i>
+                </span>
+              </b-col>
+              <b-col v-else>
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
@@ -173,92 +187,61 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
-              <!-- <TaskListGroup/> -->
               <b-col>
                 <div
-                  v-b-modal.AddGroupModal
-                  v-if="groupListNames"
-                  class="cft-groups"
-                  data-title="groups"
+                    v-b-modal.AddGroupModal
+                    v-if="groupListNames"
+                    class="cft-groups"
+                    data-title="groups"
                 >
-                  <i class="bi bi-grid-3x3-gap-fill"></i>
-                  {{ String(groupListNames) }}
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    {{ String(groupListNames) }}
                 </div>				 
                 <div
-                  v-b-modal.AddGroupModal
-                  class="cft-groups"
-                  data-title="groups"
-                  v-else
+                    v-b-modal.AddGroupModal
+                    class="cft-groups"
+                    data-title="groups"
+                    v-else
                 >
-                  <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
+                <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
                 </div>
-                <b-modal
-                  id="AddGroupModal"
-                  ref="modal"
-                  title="Manage Groups"
-                  ok-title="Close"
-                  ok-only
-                >
-                  <div class="modal-text">
-                    <i class="bi bi-exclamation-circle"></i>
-                    You can add a group by typing a group ID into the input
-                    field and afterwards clicking the button with the plus sign.
-                    <b-row class="mt-3 mb-3">
-                      <b-col>
-                        <b-button
-                          variant="primary"
-                          @click="addGroup"
-                          :disabled='!setGroup'
-                        >
-                          <span>Add a group</span>
-                          <span>
-                            <i class="bi bi-plus"></i>
-                          </span>
-                        </b-button>
-                      </b-col>
-                      <b-col>
-                        <b-form-input
-                          type="text"
-                          placeholder="Group ID"
-                          v-model="setGroup"
-                          v-on:keyup.enter="addGroup"
-                        ></b-form-input>
-
-                      </b-col>
-                    </b-row>
-                    <b-row>
-                      <b-col v-if="groupList.length">
-                        <ul v-for="g in groupList" :key="g.groupId">
-                          <div class="mt-1">
-                            <i
-                              class="fa fa-times mr-2 click-element"
-                              @click="deleteGroup(g.groupId)"
-                            ></i>
-                            <span>{{ g.groupId }}</span>
-                          </div>
-                        </ul>
-                      </b-col>
-                    </b-row>
-                  </div>
-                </b-modal>
+                <TaskListGroup
+                  :token='token'
+                  :bpmApiUrl='bpmApiUrl'
+                  :task="task"
+                  :groupList='groupList'
+                  @add-group='addGroup'
+                  @delete-group='deleteGroup'
+                />             
               </b-col>
               <b-col>
                 <div
                   class="cft-task-assignee"
                   v-if="task.assignee"
-                  data-title="Reset assignee"
                 >
-                  <i class="bi bi-person-fill cft-person-fill" />
-                  <span class="cft-user-span">
-                  <b-form-select
-                    class="cft-user-select"
-                    v-model="userSelected"
-                    :options="userList"
-                    @change="onSetassignee"
-                    >
-                  </b-form-select>
-                    <i class="bi bi-x cft-user-close" @click="onUnClaim" />
-                  </span>
+                  <div v-if="editAssignee" class="cft-user-edit">
+                    <div class='cft-assignee-change-box'>
+                      <span @click="onSetassignee">
+                        <i class="bi bi-check"></i>
+                      </span>
+                      <span @click="toggleassignee">
+                        <i class="fa fa-times ml-1"></i>
+                      </span>
+                    </div>
+                    <b-form-select
+                      class="cft-user-select"
+                      v-model="userSelected"
+                      :options="userList"
+                      >
+                    </b-form-select>
+                  </div>
+                  <div class="cft-user-details" v-else @click="toggleassignee"> 
+                    <i class="bi bi-person-fill cft-person-fill" />
+                    <span class="cft-user-span" data-title="Click to change assignee">
+                    {{task.assignee}}
+                    </span>
+                    <i class="fa fa-times ml-1 cft-remove-user"  data-title="Reset assignee" @click="onUnClaim" />
+                  </div>
                 </div>
                 <div class="cft-task-assignee" v-else @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />
@@ -280,8 +263,6 @@
                     >
                       <formio
                         :src="formioUrl"
-                        :submission="submissionId"
-                        :form="formId"
                         :options="
                           task.assignee === userName ? options : readoption
                         "
@@ -321,16 +302,22 @@
 </template>
 
 <script lang="ts">
-// removed for this project since its making some issue
-// import 'bootstrap/dist/css/bootstrap.min.css';
+
+interface Payload{
+    active: boolean;
+    sorting: Array<object>;
+    orQueries?: Array<object>;
+    maxResults?: number;
+    firstResult?: number;
+  }
+
 import 'bootstrap-icons/font/bootstrap-icons.css';
-// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import "font-awesome/scss/font-awesome.scss";
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import '../user-styles.css'
-import '../camundaFormIOTasklist.scss'
+import '../styles/user-styles.css'
+import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -348,9 +335,9 @@ import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import SocketIOService from "../services/SocketIOServices";
-// import TaskListGroup from "../components/Tasklist-Group.vue";
-import TaskListSearch from "../components/Tasklist-Search.vue";
-import TaskSortOptions from '../components/tasklist-sortoptions.vue';
+import TaskListGroup from "../components/TasklistGroup.vue";
+import TaskListSearch from "../components/TasklistSearch.vue";
+import TaskSortOptions from '../components/TasklistSortoptions.vue';
 import {authenticateFormio} from "../services/formio-token";
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
@@ -363,7 +350,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
-    // TaskListGroup,
+    TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
@@ -401,7 +388,7 @@ export default class Tasklist extends Vue {
   private userSelected = null;
   private showfrom = false;
   private currentPage = 1;
-  private perPage = 15;
+  private perPage = 10;
   private numPages = 5;
   private tasklength = 0;
   private readoption = { readOnly: true };
@@ -414,6 +401,8 @@ export default class Tasklist extends Vue {
     },
   };
   private filterList = [];
+  private showfilter=false;
+  private editAssignee = false;
   private activefilter = 0;
   private applicationId = '';
   private groupList = [];
@@ -429,14 +418,14 @@ export default class Tasklist extends Vue {
   private setupdateSortListDropdownindex = 0;
   private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
-  private payload: any = {
+  private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
   
 @Watch('token')
-  ontokenChange (newVal: any) {
+  ontokenChange (newVal: string) {
   // updating token
     localStorage.setItem("authToken", newVal);
   }
@@ -475,7 +464,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
   localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("WEBSOCKET_ENCRYPT_KEY", this.WEBSOCKET_ENCRYPT_KEY)
+  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
 
   const val = decodeTokenValues(
     this.token,
@@ -507,8 +496,19 @@ toggle(index: number) {
   this.activeIndex = index;						  
 }
 
-togglefilter(index: number) {
+toggleshowfilter() {
+  this.showfilter = ! this.showfilter;
+}
+
+togglefilter(filter: any, index: number) {
   this.activefilter = index;
+  this.fetchTaskList(filter.id, this.payload);
+  this.showfilter = false;
+}
+
+toggleassignee()  {
+  this.editAssignee = ! this.editAssignee;
+  this.userSelected = this.task.assignee;
 }
 
 cftShowUserList() {
@@ -526,27 +526,27 @@ callSearchDateApi(item: any) {
 }
 
 callTaskVariablesApi(item: any) {
-  searchQuery[0]["taskVariables"].push(item);
-  this.payload["orQueries"] = searchQuery;
+  searchQuery["taskVariables"].push(item);
+  this.payload["orQueries"] = [searchQuery];
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 callProcessVariablesApi(item: any) {
-  searchQuery[0]["processVariables"].push(item);
-  this.payload["orQueries"] = searchQuery;
+  searchQuery["processVariables"].push(item);
+  this.payload["orQueries"] = [searchQuery];
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
+onFormSubmitCallback() {
+  if (this.task.id) {
+    this.onBPMTaskFormSubmit(this.task.id);
+    this.reloadTasks();					   
+  }					  
+}
+
 addGroup() {
-  CamundaRest.createTaskGroupByID(
-    this.token,
-    this.task.id,
-    this.bpmApiUrl,
-    { userId: null, groupId: this.setGroup, type: "candidate" }
-  ).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
+  this.getGroupDetails();
+  this.reloadCurrentTask();
 }
 
 getGroupDetails() {
@@ -565,22 +565,10 @@ getGroupDetails() {
   );
 }
 
-deleteGroup(groupid: string) {		 
-  CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
-    groupId: groupid,
-    type: "candidate",
-  }).then(() => {
-    this.getGroupDetails();
-    this.reloadCurrentTask();
-  });
+deleteGroup() {
+  this.getGroupDetails();
+  this.reloadCurrentTask();
 }
-
-onFormSubmitCallback() {
-  if (this.task.id) {
-    this.onBPMTaskFormSubmit(this.task.id);								   
-  }					  
-}
- 
 
 onBPMTaskFormSubmit(taskId: string) {
   const formRequestFormat = {
@@ -669,6 +657,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
+    this.editAssignee = false;
   }
 
   onUnClaim() {				  
@@ -691,6 +680,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       })
+    this.toggleassignee();
   }
 
   fetchTaskList(filterId: string, requestData: object) {
@@ -709,6 +699,19 @@ getBPMTaskDetail(taskId: string) {
       this.tasklength = result.data.length;
       this.numPages = Math.ceil(result.data.length / this.perPage);
     });
+  }
+
+  fetchInittasklist(filterId: string, payload: object){
+    CamundaRest.filterTaskList(
+      this.token,
+      filterId,
+      payload,
+      this.bpmApiUrl
+    ).then((result) => {
+      this.tasks = result.data;
+      this.fulltasks = result.data;
+      this.numPages =  Math.ceil(result.data.length / this.perPage);
+    })
   }
 
   // fetchPaginationTaskElements(){
@@ -850,6 +853,32 @@ getBPMTaskDetail(taskId: string) {
     }
   }
 
+  removeDueDate() {
+    const referenceobject = this.task;
+    referenceobject["due"] = null;
+    CamundaRest.updateTasksByID(
+      this.token,
+      this.task.id,
+      this.bpmApiUrl,
+      referenceobject
+    ).then(() => {
+      this.reloadCurrentTask();
+    })
+  }
+
+  removeFollowupDate() {
+    const referenceobject = this.task;
+    referenceobject["followUp"] = null;
+    CamundaRest.updateTasksByID(
+      this.token,
+      this.task.id,
+      this.bpmApiUrl,
+      referenceobject
+    ).then(() => {
+      this.reloadCurrentTask();
+    })
+  }
+
   fetchxmldiagram() {
     CamundaRest.getProcessDiagramXML(
       this.token,
@@ -866,7 +895,7 @@ getBPMTaskDetail(taskId: string) {
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      // this.getGroupDetails();
+      this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
         this.selectedTaskId,
@@ -888,6 +917,7 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
+        // handle case when applicationid and formUrl null
         this.applicationId = result.data["applicationId"].value;
         this.formioUrl = result.data["formUrl"].value;
         const { formioUrl, formId, submissionId } = getFormDetails(
@@ -914,35 +944,25 @@ getBPMTaskDetail(taskId: string) {
     );
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
-      const key = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-      this.selectedfilterId = key;
-      this.fetchTaskList(key, this.payload);
+      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+      this.fetchTaskList(this.selectedfilterId, this.payload);
     });
 
     this.fetchData();
-    if(!SocketIOService.isConnected()) {
-      SocketIOService.connect((refreshedTaskId: any)=> {
-        if(this.selectedfilterId){
-          //Refreshes the Task
-          this.fetchTaskList(this.selectedfilterId, this.payload);
-        }
-        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-          this.fetchData()
-        }
-      })
-    }
-    else {
+    if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
-      SocketIOService.connect((refreshedTaskId: any)=> {
-        if(this.selectedfilterId){
-          //Refreshes the Task
-          this.fetchTaskList(this.selectedfilterId, this.payload);
-        }
-        if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-          this.fetchData()
-        }
-      })
     }
+    SocketIOService.connect((refreshedTaskId: any)=> {
+      if(this.selectedfilterId){
+        //Refreshes the Task
+        this.fetchTaskList(this.selectedfilterId, this.payload);
+      }
+      if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+        this.fetchData()
+        this.reloadCurrentTask();
+      }
+    })
+
     this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {

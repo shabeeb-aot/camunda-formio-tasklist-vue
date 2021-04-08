@@ -99,6 +99,9 @@
   .cft-task-assignee {
     font-weight: 500;
     font-size: 16px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .cft-filter-dropbtn 
@@ -165,14 +168,6 @@
   .cft-search-item-criteria {
     font-size: 16px;
   }
-  // .cft-search-item{
-  //   font-size: medium;
-  //   text-align: left;
-  //   cursor: pointer;
-  //   color: #333;
-  //   font-weight: 400;
-  //   padding: 2px 9px;
-  // }
 
   .cftf-search-item-box {
     margin-top: 5px;
@@ -183,9 +178,10 @@
 
   .cft-filter-dropdown-content 
   {
-    display: none;
+    font-size: large;
+    display: block;
     position: absolute;
-    // position: relative;
+    cursor: pointer;
     background-color: #f9f9f9;
     min-width: 250px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -194,12 +190,7 @@
   .cft-list-container {
     margin-top: 5px;
   }
-  .cft-filter-dropdown-content :hover {background-color: #f1f1f1}
-
-  .cft-filter-dropdown:hover .cft-filter-dropdown-content 
-  {
-    display: block;
-  }
+  
   .cft-task-details-assign{
     display: flex;
     justify-content: space-between;
@@ -333,13 +324,15 @@
 .cft-process-title[data-title]:hover:after,
 .cft-task-title[data-title]:hover:after,
 .cft-priority[data-title]:hover:after,
-.cft-task-assignee[data-title]:hover:after,
+.cft-user-close[data-title]:hover:after,
+.cft-user-span[data-title]:hover:after,
 .cft-groups[data-title]:hover:after,
 .cft-task-assignee[data-title]:hover:after,
 .cft-process-name[data-title]:hover:after,
 .task-header-title[data-title]:hover:after,
 .cft-application-id[data-title]:hover:after,
-.cft-due-date[data-title]:hover:after {
+.cft-due-date[data-title]:hover:after,
+.cft-remove-user[data-title]:hover:after {
   font-size: 12px;
   content: attr(data-title);
   padding: 4px 8px;
@@ -376,10 +369,6 @@
 }
 .task-name{
   height: 20px;
-}
-.task-header-title{
-  // height: 30px;
-  // width: 50%;
 }
 .cft-groups[data-title]:hover:after
 {
@@ -420,14 +409,12 @@
   padding: 0px;
 }
 .cft-user-select{
-  width: 90%;
-  border: none;
-  background: none;
-  padding: 0;
+  width: 70%;
   height: none;
-  color: #1a5a96;
-  font-weight: 700;
-  font-size: 16px;
+  color: #01060a;
+  font-weight: 500;
+  font-size: 14px;
+  border: 3px solid #b3b3b3;
 }
 .cft-user-close{
   position: relative;
@@ -438,7 +425,7 @@
 .cft-person-fill{
   padding-right: 3px;
 }
-.cft-user-span {
+.cft-user-details {
   position: absolute;
 }
 .custom-select {

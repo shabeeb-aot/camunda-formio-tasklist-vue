@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts">
+import '../styles/camundaFormIOFormList.scss'
 import { Component, Prop,  Vue } from 'vue-property-decorator';
 import CamundaRest from '../services/camunda-rest';
 

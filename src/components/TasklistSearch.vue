@@ -176,7 +176,7 @@
 </template>
 
 <script lang="ts">
-import '../camundaFormIOTaslistSearch.scss'
+import '../styles/camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import { searchData, searchQuery } from "../services/utils";
 import DatePicker from "vue2-datepicker";
@@ -288,12 +288,12 @@ export default class TaskListSearch extends Vue {
       }
     }
     if (searchItem["compares"][index] === "like") {
-      searchQuery[0][searchItem["values"][index]] = "%" + item + "%";
+      searchQuery[searchItem["values"][index]] = "%" + item + "%";
     } else {
-      searchQuery[0][searchItem["values"][index]] = item;
+      searchQuery[searchItem["values"][index]] = item;
     }
 
-    return searchQuery;
+    return [searchQuery];
     //just return payload and after which call fetchApi
     // this.payload["orQueries"] = searchQuery;
     // this.fetchTaskList(this.selectedfilterId, this.payload);
@@ -323,8 +323,8 @@ export default class TaskListSearch extends Vue {
       .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
       .replace(timearr[1], replaceTimezone);
 
-    searchQuery[0][searchItem["values"][index]] = titem;
-    return searchQuery
+    searchQuery[searchItem["values"][index]] = titem;
+    return [searchQuery]
     // this.payload["orQueries"] = searchQuery;
     // this.fetchTaskList(this.selectedfilterId, this.payload);
   }

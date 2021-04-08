@@ -9,7 +9,7 @@ export const findFilterKeyOfAllTask = (array: string|any[], key: string|number, 
       return array[i]["id"];
     }
   }
-  return null;
+  return array[0]["id"];
 }
 
 export const TASK_FILTER_LIST_DEFAULT_PARAM =  [{sortBy: "created",
@@ -81,8 +81,7 @@ export const searchData = [
   {"label":"Created", "compares": ["before", "after"], "values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE},
 ]
 
-export const searchQuery: any = [
-  {
+export const searchQuery: any = {
     "assignee": null,
     "assigneeLike": null,
     "created": null,
@@ -100,4 +99,3 @@ export const searchQuery: any = [
     "candidateGroup":null,
     "candidateUser": null
   }
-]

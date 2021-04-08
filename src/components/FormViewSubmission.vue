@@ -1,6 +1,6 @@
 <template>
     <b-container fluid class="cft-form-submission">
-      <a :href="homeUrl"><i class="fa fa-chevron-left"></i></a>
+      <!-- <a :href="homeUrl"><i class="fa fa-chevron-left"></i></a> -->
         <div id='formio'></div>
     </b-container>
 </template>
@@ -8,7 +8,7 @@
 <script lang="ts">
 import "font-awesome/scss/font-awesome.scss";
 import 'semantic-ui-css/semantic.min.css';
-import '../user-styles.css'
+import '../styles/user-styles.css'
 import { Component, Prop,  Vue } from 'vue-property-decorator'
 import { Form, Formio } from 'vue-formio';
 import { getFormDetails } from "../services/get-formio";
@@ -49,7 +49,7 @@ export default class FormViewSubmission extends Vue {
     else {
       this.fId = this.formid;
       this.sId = this.submissionid;
-      this.formioUrlLink = localStorage.getItem('formioApiUrl') || this.formioProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
+      this.formioUrlLink = this.formioProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
     }
 
     Formio.createForm(document.getElementById('formio'), this.formioUrlLink, {
