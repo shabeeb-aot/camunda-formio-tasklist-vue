@@ -272,7 +272,38 @@
                     </b-overlay>
                   </div>
                 </b-tab>
-                <b-tab title="History"></b-tab>
+                <b-tab title="History">
+                  <h3> <i class="bi bi-list-task"></i> Application History </h3>
+                  <b-col v-if="applicationId">
+                  <b-table-simple
+                    hover
+                    small
+                    caption-top
+                    responsive
+                    head-variant='light'
+                    :bordered=true
+                    :outlined=true
+                  >
+                    <b-thead head-variant="light">
+                      <b-tr>
+                        <b-th>Status</b-th>
+                        <b-th>Created</b-th>
+                        <b-th>Submissions</b-th>
+                      </b-tr>
+                    </b-thead>
+                    <b-tbody>
+                      <b-tr v-for='h in taskHistoryList' :key='h.created'>
+                        <b-th>{{h.applicationStatus}}</b-th>
+                        <b-th>{{h.created}}</b-th>
+                        <b-th><b-button>View Submission</b-button></b-th>
+                      </b-tr>
+                    </b-tbody>
+                  </b-table-simple>
+                  </b-col>
+                  <b-col v-else>
+                    <span> No application history found</span>
+                  </b-col>
+                </b-tab>
                 <!-- Process diagram -->
                 <b-tab
                   class="cft-diagram-container"
@@ -333,6 +364,7 @@ import TaskSortOptions from '../components/TasklistSortoptions.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
+import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
 import vueBpmn from 'vue-bpmn';
 
@@ -415,6 +447,7 @@ export default class Tasklist extends Vue {
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
+  private taskHistoryList: any = [];
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -910,17 +943,28 @@ getBPMTaskDetail(taskId: string) {
         this.bpmApiUrl
       ).then((result) => {
         // handle case when applicationid and formUrl null
-        this.applicationId = result.data["applicationId"].value;
-        this.formioUrl = result.data["formUrl"].value;
-        const { formioUrl, formId, submissionId } = getFormDetails(
-          this.formioUrl,
-          this.formIOApiUrl
-        );
-        this.formioUrl = formioUrl;
-        this.submissionId = submissionId;
-        this.formId = formId;
-        this.showfrom = true;
+        if(result.data && result.data.applicationId && result.data.formUrl) {
+          this.applicationId = result.data["applicationId"].value;
+          this.formioUrl = result.data["formUrl"].value;
+          const { formioUrl, formId, submissionId } = getFormDetails(
+            this.formioUrl,
+            this.formIOApiUrl
+          );
+          this.formioUrl = formioUrl;
+          this.submissionId = submissionId;
+          this.formId = formId;
+          this.showfrom = true;
+        }
       });
+      console.log(this.applicationId);
+      if(this.applicationId){
+        console.log(this.applicationId);
+        getformHistoryApi(this.formsflowaiApiUrl, this.applicationId, this.token)
+          .then((result)=> {
+            console.log(result.data);
+            this.taskHistoryList = result.data.applications;
+          })
+      }
       this.userSelected = this.task.assignee;									   
     }
   }
