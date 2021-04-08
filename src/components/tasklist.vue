@@ -280,7 +280,7 @@
                   title="Diagram"
                   @click="fetchxmldiagram"
                 >
-                  <div class="height-100 cft-canvas-container" id="canvas"></div>
+                  <div class="height-100 cft-canvas-container" id="canvas" style="height: 999px"></div>
                 </b-tab>
               </b-tabs>
             </div>
