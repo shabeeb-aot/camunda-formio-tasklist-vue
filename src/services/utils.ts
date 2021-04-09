@@ -102,4 +102,4 @@ export const searchQuery: any = {
 
 export const getLocalDateTime = (date: any) => {
     return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
-  }
+}
