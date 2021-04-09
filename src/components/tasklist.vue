@@ -725,26 +725,6 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  fetchInittasklist(filterId: string, payload: object){
-    CamundaRest.filterTaskList(
-      this.token,
-      filterId,
-      payload,
-      this.bpmApiUrl
-    ).then((result) => {
-      this.tasks = result.data;
-      this.fulltasks = result.data;
-      this.numPages =  Math.ceil(result.data.length / this.perPage);
-    })
-  }
-
-  // fetchPaginationTaskElements(){
-  //   this.tasks = this.fulltasks.slice(
-  //     (this.currentPage - 1) * this.perPage,
-  //     this.currentPage * this.perPage
-  //   );
-  // }
-
   numberOfPages() {
     if (Math.ceil(this.tasks.length / this.perPage) > 1)
       return Math.ceil(this.tasks.length / this.perPage);
