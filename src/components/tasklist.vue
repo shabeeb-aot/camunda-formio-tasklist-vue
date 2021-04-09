@@ -309,7 +309,6 @@
                   class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
-                  @click="fetchxmldiagram"
                 >
                   <div class="height-100 cft-canvas-container diagram-full-screen" id="canvas"></div>
                 </b-tab>
@@ -904,19 +903,6 @@ getBPMTaskDetail(taskId: string) {
     })
   }
 
-  fetchxmldiagram() {
-    CamundaRest.getProcessDiagramXML(
-      this.token,
-      this.processDefinitionId,
-      this.bpmApiUrl
-    ).then(async (res) => {
-      this.xmlData = res.data.bpmn20Xml;
-      const modeler = new Modeler({ container: "#canvas" });
-      await modeler.importXML(this.xmlData);
-    });
-
-  }
-
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
@@ -926,13 +912,22 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
-        this.processDefinitionId = result.data.processDefinitionId;
         CamundaRest.getProcessDefinitionById(
           this.token,
           result.data.processDefinitionId,
           this.bpmApiUrl
         ).then((res) => {
           this.taskProcess = res.data.name;
+        });
+
+        CamundaRest.getProcessDiagramXML(
+          this.token,
+          result.data.processDefinitionId,
+          this.bpmApiUrl
+        ).then(async (res) => {
+          this.xmlData = res.data.bpmn20Xml;
+          const modeler = new Modeler({ container: "#canvas" });
+          await modeler.importXML(this.xmlData);
         });
       });
 
