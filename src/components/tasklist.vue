@@ -272,13 +272,14 @@
                     </b-overlay>
                   </div>
                 </b-tab>
-                <b-tab title="History"></b-tab>
+                <b-tab title="History">
+                  <TaskHistory :taskHistoryList='taskHistoryList' :applicationId="applicationId"/>
+                </b-tab>
                 <!-- Process diagram -->
                 <b-tab
                   class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
-                  @click="fetchxmldiagram"
                 >
                   <div class="height-100 cft-canvas-container diagram-full-screen" id="canvas"></div>
                 </b-tab>
@@ -302,17 +303,8 @@
 </template>
 
 <script lang="ts">
-
-interface Payload{
-    active: boolean;
-    sorting: Array<object>;
-    orQueries?: Array<object>;
-    maxResults?: number;
-    firstResult?: number;
-  }
-
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import "font-awesome/scss/font-awesome.scss";
+import 'font-awesome/scss/font-awesome.scss';
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
@@ -334,15 +326,18 @@ import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
 import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-import SocketIOService from "../services/SocketIOServices";
-import TaskListGroup from "../components/TasklistGroup.vue";
-import TaskListSearch from "../components/TasklistSearch.vue";
+import {Payload} from '../services/TasklistTypes';
+import SocketIOService from '../services/SocketIOServices';
+import TaskHistory from '../components/TaskHistory.vue';
+import TaskListGroup from '../components/TasklistGroup.vue';
+import TaskListSearch from '../components/TasklistSearch.vue';
 import TaskSortOptions from '../components/TasklistSortoptions.vue';
-import {authenticateFormio} from "../services/formio-token";
+import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
-import moment from "moment";
-import vueBpmn from "vue-bpmn";
+import {getformHistoryApi} from '../services/formsflowai-api';
+import moment from 'moment';
+import vueBpmn from 'vue-bpmn';
 
 
 @Component({
@@ -350,6 +345,7 @@ import vueBpmn from "vue-bpmn";
     formio: Form,
     DatePicker,
     FormListModal,
+    TaskHistory,
     TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
@@ -408,7 +404,7 @@ export default class Tasklist extends Vue {
   private groupList = [];
   private groupListNames: Array<string> | null = null;
   private groupListItems: string[] = [];
-  private userEmail = "external";
+  private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
@@ -423,6 +419,7 @@ export default class Tasklist extends Vue {
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
+  private taskHistoryList: Array<object> = [];
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -701,26 +698,6 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  fetchInittasklist(filterId: string, payload: object){
-    CamundaRest.filterTaskList(
-      this.token,
-      filterId,
-      payload,
-      this.bpmApiUrl
-    ).then((result) => {
-      this.tasks = result.data;
-      this.fulltasks = result.data;
-      this.numPages =  Math.ceil(result.data.length / this.perPage);
-    })
-  }
-
-  // fetchPaginationTaskElements(){
-  //   this.tasks = this.fulltasks.slice(
-  //     (this.currentPage - 1) * this.perPage,
-  //     this.currentPage * this.perPage
-  //   );
-  // }
-
   numberOfPages() {
     if (Math.ceil(this.tasks.length / this.perPage) > 1)
       return Math.ceil(this.tasks.length / this.perPage);
@@ -879,19 +856,6 @@ getBPMTaskDetail(taskId: string) {
     })
   }
 
-  fetchxmldiagram() {
-    CamundaRest.getProcessDiagramXML(
-      this.token,
-      this.processDefinitionId,
-      this.bpmApiUrl
-    ).then(async (res) => {
-      this.xmlData = res.data.bpmn20Xml;
-      const modeler = new Modeler({ container: "#canvas" });
-      await modeler.importXML(this.xmlData);
-    });
-
-  }
-
   fetchData() {
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
@@ -901,13 +865,22 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
-        this.processDefinitionId = result.data.processDefinitionId;
         CamundaRest.getProcessDefinitionById(
           this.token,
           result.data.processDefinitionId,
           this.bpmApiUrl
         ).then((res) => {
           this.taskProcess = res.data.name;
+        });
+
+        CamundaRest.getProcessDiagramXML(
+          this.token,
+          result.data.processDefinitionId,
+          this.bpmApiUrl
+        ).then(async (res) => {
+          this.xmlData = res.data.bpmn20Xml;
+          const modeler = new Modeler({ container: "#canvas" });
+          await modeler.importXML(this.xmlData);
         });
       });
 
@@ -917,7 +890,15 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
-        // handle case when applicationid and formUrl null
+        if(result.data && result.data["applicationId"].value) {
+          getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
+            .then((r)=> {
+              this.taskHistoryList = r.data.applications;
+            })
+        }
+        else {
+          console.warn("The selected task has no applicationid")
+        }
         this.applicationId = result.data["applicationId"].value;
         this.formioUrl = result.data["formUrl"].value;
         const { formioUrl, formId, submissionId } = getFormDetails(
@@ -928,8 +909,8 @@ getBPMTaskDetail(taskId: string) {
         this.submissionId = submissionId;
         this.formId = formId;
         this.showfrom = true;
+        this.userSelected = this.task.assignee;
       });
-      this.userSelected = this.task.assignee;									   
     }
   }
   
@@ -956,6 +937,7 @@ getBPMTaskDetail(taskId: string) {
       if(this.selectedfilterId){
         //Refreshes the Task
         this.fetchTaskList(this.selectedfilterId, this.payload);
+        this.fetchData();
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
         this.fetchData()
