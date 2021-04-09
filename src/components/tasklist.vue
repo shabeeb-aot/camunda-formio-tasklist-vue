@@ -273,36 +273,7 @@
                   </div>
                 </b-tab>
                 <b-tab title="History">
-                  <h3> <i class="bi bi-list-task"></i> Application History </h3>
-                  <b-col v-if="applicationId">
-                  <b-table-simple
-                    hover
-                    small
-                    caption-top
-                    responsive
-                    head-variant='light'
-                    :bordered=true
-                    :outlined=true
-                  >
-                    <b-thead head-variant="light">
-                      <b-tr>
-                        <b-th>Status</b-th>
-                        <b-th>Created</b-th>
-                        <b-th>Submissions</b-th>
-                      </b-tr>
-                    </b-thead>
-                    <b-tbody>
-                      <b-tr v-for='h in taskHistoryList' :key='h.created'>
-                        <b-th>{{h.applicationStatus}}</b-th>
-                        <b-th>{{h.created}}</b-th>
-                        <b-th><b-button>View Submission</b-button></b-th>
-                      </b-tr>
-                    </b-tbody>
-                  </b-table-simple>
-                  </b-col>
-                  <b-col v-else>
-                    <span> No application history found</span>
-                  </b-col>
+                  <TaskHistory :taskHistoryList='taskHistoryList' :applicationId="applicationId"/>
                 </b-tab>
                 <!-- Process diagram -->
                 <b-tab
@@ -357,6 +328,7 @@ import FormListModal from './FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
+import TaskHistory from '../components/TaskHistory.vue';
 import TaskListGroup from '../components/TasklistGroup.vue';
 import TaskListSearch from '../components/TasklistSearch.vue';
 import TaskSortOptions from '../components/TasklistSortoptions.vue';
@@ -373,6 +345,7 @@ import vueBpmn from 'vue-bpmn';
     formio: Form,
     DatePicker,
     FormListModal,
+    TaskHistory,
     TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
@@ -446,7 +419,7 @@ export default class Tasklist extends Vue {
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
-  private taskHistoryList: any = [];
+  private taskHistoryList: Array<object> = [];
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -917,30 +890,27 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
-        // handle case when applicationid and formUrl null
-        if(result.data && result.data.applicationId && result.data.formUrl) {
-          this.applicationId = result.data["applicationId"].value;
-          this.formioUrl = result.data["formUrl"].value;
-          const { formioUrl, formId, submissionId } = getFormDetails(
-            this.formioUrl,
-            this.formIOApiUrl
-          );
-          this.formioUrl = formioUrl;
-          this.submissionId = submissionId;
-          this.formId = formId;
-          this.showfrom = true;
+        if(result.data && result.data["applicationId"].value) {
+          getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
+            .then((r)=> {
+              this.taskHistoryList = r.data.applications;
+            })
         }
+        else {
+          console.warn("The selected task has no applicationid")
+        }
+        this.applicationId = result.data["applicationId"].value;
+        this.formioUrl = result.data["formUrl"].value;
+        const { formioUrl, formId, submissionId } = getFormDetails(
+          this.formioUrl,
+          this.formIOApiUrl
+        );
+        this.formioUrl = formioUrl;
+        this.submissionId = submissionId;
+        this.formId = formId;
+        this.showfrom = true;
+        this.userSelected = this.task.assignee;
       });
-      console.log(this.applicationId);
-      if(this.applicationId){
-        console.log(this.applicationId);
-        getformHistoryApi(this.formsflowaiApiUrl, this.applicationId, this.token)
-          .then((result)=> {
-            console.log(result.data);
-            this.taskHistoryList = result.data.applications;
-          })
-      }
-      this.userSelected = this.task.assignee;									   
     }
   }
   
@@ -967,6 +937,7 @@ getBPMTaskDetail(taskId: string) {
       if(this.selectedfilterId){
         //Refreshes the Task
         this.fetchTaskList(this.selectedfilterId, this.payload);
+        this.fetchData();
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
         this.fetchData()

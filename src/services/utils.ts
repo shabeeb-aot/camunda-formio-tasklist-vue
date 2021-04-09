@@ -99,3 +99,7 @@ export const searchQuery: any = {
     "candidateGroup":null,
     "candidateUser": null
   }
+
+export const getLocalDateTime = (date: any) => {
+    return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
+  }
