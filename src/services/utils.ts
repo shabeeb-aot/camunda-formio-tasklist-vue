@@ -82,24 +82,24 @@ export const searchData = [
 ]
 
 export const searchQuery: any = {
-    "assignee": null,
-    "assigneeLike": null,
-    "created": null,
-    "followUp": null,
-    "due": null,
-    "description": null,
-    "descriptionLike": null,
-    "processVariables": [],
-    "taskVariables": [],
-    "processDefinitionNameLike": null,
-    "processDefinitionName": null,
-    "priority": null,
-    "name": null,
-    "nameLike": null,
-    "candidateGroup":null,
-    "candidateUser": null
-  }
+  "assignee": null,
+  "assigneeLike": null,
+  "created": null,
+  "followUp": null,
+  "due": null,
+  "description": null,
+  "descriptionLike": null,
+  "processVariables": [],
+  "taskVariables": [],
+  "processDefinitionNameLike": null,
+  "processDefinitionName": null,
+  "priority": null,
+  "name": null,
+  "nameLike": null,
+  "candidateGroup":null,
+  "candidateUser": null
+}
 
 export const getLocalDateTime = (date: any) => {
-    return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
+  return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
 }
