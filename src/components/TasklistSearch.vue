@@ -178,7 +178,7 @@
 <script lang="ts">
 import '../styles/camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-import { searchData, searchQuery } from "../services/utils";
+import { searchData, searchQuery } from "../services/search-constants";
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
 
