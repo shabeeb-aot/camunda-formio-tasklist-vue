@@ -919,7 +919,7 @@ getBPMTaskDetail(taskId: string) {
           this.token,
           result.data.processInstanceId,
           this.bpmApiUrl
-        ).then()
+        )
 
         CamundaRest.getProcessDiagramXML(
           this.token,
