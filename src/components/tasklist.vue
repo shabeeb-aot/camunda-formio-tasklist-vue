@@ -374,6 +374,7 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
+import {searchQuery} from '../services/search-constants';
 import vueBpmn from 'vue-bpmn';
 
 
