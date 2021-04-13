@@ -27,7 +27,7 @@
           <span @click="deleteSearchListElement(index)"
             ><i class="fa fa-times"></i
           ></span>
-          <span title="type" @click="showUpdateSearchList(index)">{{
+          <span class="cftf-search-title" title="type" @click="showUpdateSearchList(index)">{{
             item.label
           }}</span>
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
@@ -40,9 +40,9 @@
               {{ s.label }}
             </div>
           </div>
-          <div class="test">
+          <div>
             <p
-              class="cft-search-title"
+              class="cft-search-operator"
               title="operator"
               @click="showSearchQueryOperatorList(index)"
             >
