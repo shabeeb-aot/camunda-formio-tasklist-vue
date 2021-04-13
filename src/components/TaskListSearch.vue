@@ -44,11 +44,11 @@
             <p
               class="cft-search-title"
               title="operator"
-              @click="showOperatorList"
+              @click="showOperatorList(index)"
             >
               {{ operator[index] }}
             </p>
-            <div class="cft-operator-dropdown" v-if="showOperators && item.compares.length > 1">
+            <div class="cft-operator-dropdown" v-if="showsearchQueryOperators[index] && item.compares.length > 1">
               <div v-for="x in item.compares" :key="x">
                 <span @click="updateOperators(x, index)">{{ x }}</span>
               </div>
@@ -163,7 +163,7 @@
           v-for="(s, idx) in searchListElements"
           :key="s.label"
           @click="
-            addSearchElementItem(s, index);
+            addSearchElementItem(s);
             setActiveSearchItem(idx);
           "
           :class="{ 'cft-search-item-selected': idx == activeSearchItem }"
@@ -197,7 +197,7 @@ export default class TaskListSearch extends Vue {
   private selectedSearchQueries: any = [];
   private showUpdatesearch: Array<boolean> = [];
   private setUpdatesearchindex = 0;
-  private showOperators = false;
+  private showsearchQueryOperators: any = [];
   private searchItem = [];
   private variableValue = [];
   private operator: Array<string> = [];
@@ -220,14 +220,14 @@ export default class TaskListSearch extends Vue {
     }
   }
 
-  showOperatorList() {
-    this.showOperators = !this.showOperators;
+  showOperatorList(index: number) {
+    this.showsearchQueryOperators[index] = !this.showsearchQueryOperators[index];
   }
 
   updateOperators(operator: any, index: number) {
     this.operator[index] = operator;
 
-    this.showOperators = false;
+    this.showsearchQueryOperators[index] = false;
   }
 
   updatesearchinput(index: number) {
@@ -246,12 +246,14 @@ export default class TaskListSearch extends Vue {
     this.selectedSearchQueries.push(item);
     if (this.selectedSearchQueries === []) {
       this.operator[0] = item["compares"][0];
-      this.showSearchs[0] = "i";
+      this.showSearchs[0] = "a";
       this.showUpdatesearch[0] = false;
+      this.showsearchQueryOperators[0] = false;
     } else {
       this.operator[this.selectedSearchQueries.length - 1] = item["compares"][0];
-      this.showSearchs[this.selectedSearchQueries.length - 1] = "i";
+      this.showSearchs[this.selectedSearchQueries.length - 1] = "a";
       this.showUpdatesearch[this.selectedSearchQueries.length - 1] = false;
+      this.showsearchQueryOperators[this.selectedSearchQueries.length - 1] = false;
     }
     this.showSearchList = false;
   }
