@@ -448,7 +448,7 @@ export default class Tasklist extends Vue {
   private userList: Array<object> = [];
   private updateSortOptions: Array<object> = [];
   private setupdateSortListDropdownindex = 0;
-  private showSortListDropdown = [false, false, false, false, false, false];
+  private showSortListDropdown = [];
   private showaddNewSortListDropdown = false;
   private payload: Payload = {
     active: true,
@@ -775,13 +775,14 @@ getBPMTaskDetail(taskId: string) {
   }
 
   addSort(sort: any) {
-    this.sortList.push(sort);
+    this.sortList.push(sort[0]);
     if (this.sortList.length === sortingList.length) {
       this.updateSortOptions = this.sortOptions;
     } else {
       this.sortOptions = this.getOptions(this.sortList);
     }
-    this.showaddNewSortListDropdown = false;									  
+    this.showaddNewSortListDropdown = false;	
+    this.showSortListDropdown[sort[1]] = false;								  
   }
 
   showaddSortListOptions() {
