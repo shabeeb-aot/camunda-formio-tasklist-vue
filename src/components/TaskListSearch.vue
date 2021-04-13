@@ -12,9 +12,9 @@
           squared
           :disabled="selectedSearchQueries.length < 2"
           variant="outline-secondary"
-          @click="searchAllCriteria"
+          @click="queryTypellCriteria"
         >
-          {{ searchA }}
+          {{ queryType }}
         </b-button>
         <span class="cft-search-item-criteria"> of the criteria are met.</span>
       </div>
@@ -192,7 +192,7 @@ export default class TaskListSearch extends Vue {
 
   private activeSearchItem = 0;
   private searchListElements: any = searchData;
-  private searchA = "ALL";
+  private queryType = "ALL";
   private showSearchList = false;
   private selectedSearchQueries: any = [];
   private showUpdatesearch: Array<boolean> = [];
@@ -212,11 +212,11 @@ export default class TaskListSearch extends Vue {
   cftshowSearchListElements() {
     this.showSearchList = !this.showSearchList;
   }
-  searchAllCriteria() {
-    if (this.searchA === "ALL") {
-      this.searchA = "ANY";
+  queryTypellCriteria() {
+    if (this.queryType === "ALL") {
+      this.queryType = "ANY";
     } else {
-      this.searchA = "ALL";
+      this.queryType = "ALL";
     }
   }
 
