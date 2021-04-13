@@ -29,6 +29,7 @@
                             <i class="bi bi-eye-fill" style="color:black;"></i>
                             View Submission
                             </b-button>
+                            <a :href="formatURL(h.formUrl)" target="_blank">viewSubmission</a>
                         </b-th>
                       </b-tr>
                     </b-tbody>
@@ -76,6 +77,14 @@ export default class TaskHistory extends Vue{
       const {formId, submissionId} = getFormIdandSubmissionId(url);
       this.fId = formId;
       this.sId = submissionId;
+    }
+
+    formatURL (url: any) {
+      const currentUrl = window.location.protocol + '//' +  window.location.host
+      const a = document.createElement('a');
+      a.href = url
+      const processedUrl = url.replace(a.protocol + '//' + a.host, currentUrl)
+      return processedUrl
     }
 }
 </script>
