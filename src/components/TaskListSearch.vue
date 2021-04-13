@@ -25,7 +25,7 @@
           :key="item.label + index"
         >
           <span @click="deleteSearchListElement(index)"
-            ><i class="bi bi-x"></i
+            ><i class="fa fa-times"></i
           ></span>
           <span title="type" @click="showUpdateSearchList(index)">{{
             item.label
@@ -79,12 +79,12 @@
               >
                 {{ searchItem[index] }}
               </span>
-              <!-- <span
+              <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
               >
                 ??</span
-              > -->
+              >
               <input
                 v-model="variableValue[index]"
                 v-on:keyup.enter="
@@ -103,12 +103,12 @@
               >
                 {{ searchItem[index] }}
               </span>
-              <!-- <span
+              <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
               >
                 ??</span
-              > -->
+              >
               <input
                 v-model="variableValue[index]"
                 v-on:keyup.enter="
@@ -123,6 +123,7 @@
               >
                 ??</span
               >
+              <span v-if="showSearchs[index] === 'i'">
               <span class="cft-icon-actions">
                 <span
                   @click="
@@ -134,12 +135,12 @@
                 <i class="bi bi-x cft-reject-box"></i
               ></span>
               <input
-                v-if="showSearchs[index] === 'i'"
                 v-model="searchItem[index]"
                 v-on:keyup.enter="
                   callSearchApi(searchItem[index], item, operator, index)
                 "
               />
+              </span>
               <span
                 v-if="showSearchs[index] === 's'"
                 @click="updateresultOnclick(index)"
