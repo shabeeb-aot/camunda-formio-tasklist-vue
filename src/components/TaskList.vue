@@ -448,7 +448,7 @@ export default class Tasklist extends Vue {
   private userList: Array<object> = [];
   private updateSortOptions: Array<object> = [];
   private setupdateSortListDropdownindex = 0;
-  private showSortListDropdown = [];
+  private showSortListDropdown: any = []; 
   private showaddNewSortListDropdown = false;
   private payload: Payload = {
     active: true,
