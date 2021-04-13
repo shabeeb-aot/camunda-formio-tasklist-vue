@@ -7,10 +7,10 @@
       md="12"
       sm="12"
     >
-      <div class="cft-search-criteria" v-if="searchList.length">
+      <div class="cft-search-criteria" v-if="selectedSearchQueries.length">
         <b-button
           squared
-          :disabled="searchList.length < 2"
+          :disabled="selectedSearchQueries.length < 2"
           variant="outline-secondary"
           @click="searchAllCriteria"
         >
@@ -18,10 +18,10 @@
         </b-button>
         <span class="cft-search-item-criteria"> of the criteria are met.</span>
       </div>
-      <div v-if="searchList && searchList.length">
+      <div v-if="selectedSearchQueries && selectedSearchQueries.length">
         <div
           class="cftf-search-item-box mr-2"
-          v-for="(item, index) in searchList"
+          v-for="(item, index) in selectedSearchQueries"
           :key="item.label + index"
         >
           <span @click="deleteSearchListElement(index)"
@@ -194,7 +194,7 @@ export default class TaskListSearch extends Vue {
   private searchListElements: any = searchData;
   private searchA = "ALL";
   private showSearchList = false;
-  private searchList: any = [];
+  private selectedSearchQueries: any = [];
   private showUpdatesearch: Array<boolean> = [];
   private setUpdatesearchindex = 0;
   private showOperators = false;
@@ -243,21 +243,21 @@ export default class TaskListSearch extends Vue {
   }
 
   addSearchElementItem(item: any) {
-    this.searchList.push(item);
-    if (this.searchList === []) {
+    this.selectedSearchQueries.push(item);
+    if (this.selectedSearchQueries === []) {
       this.operator[0] = item["compares"][0];
       this.showSearchs[0] = "i";
       this.showUpdatesearch[0] = false;
     } else {
-      this.operator[this.searchList.length - 1] = item["compares"][0];
-      this.showSearchs[this.searchList.length - 1] = "i";
-      this.showUpdatesearch[this.searchList.length - 1] = false;
+      this.operator[this.selectedSearchQueries.length - 1] = item["compares"][0];
+      this.showSearchs[this.selectedSearchQueries.length - 1] = "i";
+      this.showUpdatesearch[this.selectedSearchQueries.length - 1] = false;
     }
     this.showSearchList = false;
   }
 
   deleteSearchListElement(index: number) {
-    this.searchList.splice(index, 1);
+    this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
   }
 
@@ -269,11 +269,10 @@ export default class TaskListSearch extends Vue {
   }
 
   updateSearchListElement(searchitem: any, index: number) {
-    this.searchList[index].label = searchitem.label;
-    this.searchList[index].compares = searchitem.compares;
-    this.searchList[index].values = searchitem.values;
+    this.selectedSearchQueries[index].label = searchitem.label;
+    this.selectedSearchQueries[index].compares = searchitem.compares;
+    this.selectedSearchQueries[index].values = searchitem.values;
     this.operator[index] = searchitem.compares[0];
-
     this.showUpdatesearch[index] = false;
   }
 
