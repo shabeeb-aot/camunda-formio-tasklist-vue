@@ -366,8 +366,8 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
-import TaskListSearch from '../components/TasklistSearch.vue';
-import TaskSortOptions from '../components/TasklistSortoptions.vue';
+import TaskListSearch from '../components/TaskListSearch.vue';
+import TaskSortOptions from '../components/TaskListSortoptions.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
@@ -963,6 +963,7 @@ getBPMTaskDetail(taskId: string) {
   }
   
   mounted() {
+    console.log(this.token);
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
