@@ -68,25 +68,65 @@
                     class="cft-groups"
                     data-title="groups"
                 >
-                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                <i class="bi bi-grid-3x3-gap-fill"></i>
                     {{ String(groupListNames) }}
                 </div>				 
                 <div
-                    v-b-modal.AddGroupModal
-                    class="cft-groups"
-                    data-title="groups"
-                    v-else
+                  v-b-modal.AddGroupModal
+                  class="cft-groups"
+                  data-title="groups"
+                  v-else
                 >
-                <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
+                  <i class="bi bi-grid-3x3-gap-fill"></i> Add Groups
                 </div>
-                <TaskListGroup
-                  :token='token'
-                  :bpmApiUrl='bpmApiUrl'
-                  :task="task"
-                  :groupList='groupList'
-                  @add-group='addGroup'
-                  @delete-group='deleteGroup'
-                />             
+                <b-modal
+                  id="AddGroupModal"
+                  ref="modal"
+                  title="Manage Groups"
+                  ok-title="Close"
+                  ok-only
+                >
+                  <div class="modal-text">
+                    <i class="bi bi-exclamation-circle"></i>
+                    You can add a group by typing a group ID into the input
+                    field and afterwards clicking the button with the plus sign.
+                    <b-row class="mt-3 mb-3">
+                      <b-col>
+                        <b-button
+                          variant="primary"
+                          @click="addGroup"
+                          :disabled='!setGroup'
+                        >
+                          <span>Add a group</span>
+                          <span>
+                            <i class="bi bi-plus"></i>
+                          </span>
+                        </b-button>
+                      </b-col>
+                      <b-col>
+                        <input
+                          type="text"
+                          placeholder="Group ID"
+                          v-model="setGroup"
+                          v-on:keyup.enter="addGroup"
+                        />
+                      </b-col>
+                    </b-row>
+                    <b-row>
+                      <b-col v-if="groupList.length">
+                        <ul v-for="g in groupList" :key="g.groupId">
+                          <div class="mt-1">
+                            <i
+                              class="fa fa-times mr-2 click-element"
+                              @click="deleteGroup(g.groupId)"
+                            ></i>
+                            <span>{{ g.groupId }}</span>
+                          </div>
+                        </ul>
+                      </b-col>
+                    </b-row>
+                  </div>
+                </b-modal>
               </b-col>
               <b-col>
                 <div
@@ -195,7 +235,6 @@ import {
   findFilterKeyOfAllTask,
   getFormattedDateAndTime,
   getTaskFromList,
-  searchQuery,
   sortingList,
 } from '../services/utils';
 import BpmnJS from 'bpmn-js';
@@ -207,7 +246,6 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
-import TaskListGroup from '../components/TasklistGroup.vue';
 import TaskListSearch from '../components/TasklistSearch.vue';
 import TaskSortOptions from '../components/TasklistSortoptions.vue';
 import {authenticateFormio} from '../services/formio-token';
@@ -215,6 +253,7 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
+import {searchQuery} from '../services/search-constants';
 import vueBpmn from 'vue-bpmn';
 
 
@@ -224,7 +263,6 @@ import vueBpmn from 'vue-bpmn';
     DatePicker,
     FormListModal,
     TaskHistory,
-    TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
@@ -245,7 +283,7 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
   @Prop() private userName!: string;
-  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
+  @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
 
   private tasks: Array<object> = [];
   private fulltasks: Array<object> = [];
@@ -330,7 +368,7 @@ checkPropsIsPassedAndSetValue() {
   if (!this.formsflowaiUrl || this.formsflowaiUrl === "") {
     console.warn("formsflow.ai URL prop not passed");
   }
-  if(!this.WEBSOCKET_ENCRYPT_KEY || this.WEBSOCKET_ENCRYPT_KEY === ""){
+  if(!this.webSocketEncryptkey || this.webSocketEncryptkey === ""){
     console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
   }
   const engine = "/engine-rest";
@@ -341,7 +379,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
   localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
+  localStorage.setItem("webSocketEncryptkey", this.webSocketEncryptkey)
 
   const val = decodeTokenValues(
     this.token,
@@ -422,10 +460,17 @@ onFormSubmitCallback() {
 }
 
 addGroup() {
-  this.getGroupDetails();
-  this.reloadCurrentTask();
+  CamundaRest.createTaskGroupByID(
+    this.token,
+    this.task.id,
+    this.bpmApiUrl,
+    { userId: null, groupId: this.setGroup, type: "candidate" }
+  ).then(() => {
+    this.getGroupDetails();
+    this.reloadCurrentTask();
+    this.setGroup = null;
+  });
 }
-
 getGroupDetails() {
   CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
     (response) => {
@@ -441,10 +486,14 @@ getGroupDetails() {
     }
   );
 }
-
-deleteGroup() {
-  this.getGroupDetails();
-  this.reloadCurrentTask();
+deleteGroup(groupid: string) {		 
+  CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
+    groupId: groupid,
+    type: "candidate",
+  }).then(() => {
+    this.getGroupDetails();
+    this.reloadCurrentTask();
+  });
 }
 
 onBPMTaskFormSubmit(taskId: string) {
@@ -509,13 +558,11 @@ getBPMTaskDetail(taskId: string) {
   };
 
   reloadTasks() {
-    //used to unSelect the task and refresh taskList
     this.selectedTaskId = "";
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
   reloadCurrentTask() {
-    //used to refresh selected task and taskList
     this.getBPMTaskDetail(this.task.id);
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
@@ -705,9 +752,6 @@ getBPMTaskDetail(taskId: string) {
           console.error("Error", error);
         });
     }
-    else {
-      console.warn("Due date error");
-    }
   }
 
   removeDueDate() {
@@ -752,6 +796,12 @@ getBPMTaskDetail(taskId: string) {
         ).then((res) => {
           this.taskProcess = res.data.name;
         });
+
+        CamundaRest.getVariablesByProcessId(
+          this.token,
+          result.data.processInstanceId,
+          this.bpmApiUrl
+        )
 
         CamundaRest.getProcessDiagramXML(
           this.token,
@@ -812,9 +862,9 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.fetchData();
     });
 
-    this.fetchData();
     if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
     }
