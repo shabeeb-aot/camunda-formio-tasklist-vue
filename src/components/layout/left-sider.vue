@@ -94,7 +94,6 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../../services/TasklistTypes';
 import SocketIOService from '../../services/SocketIOServices';
 import TaskHistory from '../../components/TaskHistory.vue';
-import TaskListGroup from '../../components/TasklistGroup.vue';
 import TaskListSearch from '../../components/TasklistSearch.vue';
 import TaskSortOptions from '../../components/TasklistSortoptions.vue';
 import {authenticateFormio} from '../../services/formio-token';
@@ -111,7 +110,6 @@ import vueBpmn from 'vue-bpmn';
     DatePicker,
     FormListModal,
     TaskHistory,
-    TaskListGroup,
     TaskListSearch,
     TaskSortOptions,
     vueBpmn,
