@@ -566,7 +566,6 @@ getBPMTaskDetail(taskId: string) {
     this.getBPMTaskDetail(this.task.id);
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
- 
 
   onClaim() {
     CamundaRest.claim(
