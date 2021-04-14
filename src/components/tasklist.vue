@@ -395,61 +395,13 @@ timedifference(date: Date) {
   return moment(date).fromNow();											
 }													   
 
-getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
-  const process = processList.find((process) => process.id === processId);
-  return process && process[dataKey];
-}
-
-setselectedTask(task: string) {
-  this.selectedTaskId = task;
-  this.fetchData();
-}
-getExactDate(date: Date) {
-  return getFormattedDateAndTime(date);
-}
 toggle(index: number) {
   this.activeIndex = index;						  
-}
-
-toggleshowfilter() {
-  this.showfilter = ! this.showfilter;
-}
-
-togglefilter(filter: any, index: number) {
-  this.activefilter = index;
-  this.fetchTaskList(filter.id, this.payload);
-  this.showfilter = false;
 }
 
 toggleassignee()  {
   this.editAssignee = ! this.editAssignee;
   this.userSelected = this.task.assignee;
-}
-
-cftShowUserList() {
-  this.showUserList = !this.showUserList;
-}
-
-callSearchApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callSearchDateApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callTaskVariablesApi(item: any) {
-  searchQuery["taskVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callProcessVariablesApi(item: any) {
-  searchQuery["processVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 onFormSubmitCallback() {
@@ -624,19 +576,6 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  numberOfPages() {
-    if (Math.ceil(this.tasks.length / this.perPage) > 1)
-      return Math.ceil(this.tasks.length / this.perPage);
-    else {
-      return 15;
-    }
-  }
-
-  linkGen() {
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
- 
-
   getOptions(options: any) {
     const optionsArray: {
       sortOrder: string;
@@ -655,31 +594,6 @@ getBPMTaskDetail(taskId: string) {
     return optionsArray;
   }
 
-  addSort(sort: any) {
-    this.sortList.push(sort);
-    if (this.sortList.length === sortingList.length) {
-      this.updateSortOptions = this.sortOptions;
-    } else {
-      this.sortOptions = this.getOptions(this.sortList);
-    }
-    this.showaddNewSortListDropdown = false;									  
-  }
-
-  showaddSortListOptions() {
-    this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
-    this.sortOptions = this.getOptions(this.sortList);
-  }
-
-  showUpdateSortOptions(index: number) {
-    for(let i =0; i<6;i++){
-      if(this.showSortListDropdown[i]===true){
-        this.showSortListDropdown[i] = false;
-      }
-    }
-    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.setupdateSortListDropdownindex = index;
-  }
 
   updateSort(sort: any, index: number) {
     this.sortList[index].label = sort.label;
@@ -687,25 +601,6 @@ getBPMTaskDetail(taskId: string) {
 
     this.sortOptions = this.getOptions(this.sortList);
     this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  deleteSort(sort: any, index: number) {
-    this.sortList.splice(index, 1);
-    this.updateSortOptions = [];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  toggleSort(index: number) {
-    if (this.sortList[index].sortOrder === "asc")
-      this.sortList[index].sortOrder = "desc";
-  
-    else {
-      this.sortList[index].sortOrder = "asc";
-    }
     this.payload["sorting"] = this.sortList;
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
