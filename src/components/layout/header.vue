@@ -77,8 +77,8 @@ import 'font-awesome/scss/font-awesome.scss';
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import '@/styles/user-styles.css'
-import '@/styles/camundaFormIOTasklist.scss'
+import '../../styles/user-styles.css'
+import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -88,26 +88,20 @@ import {
   getTaskFromList,
   searchQuery,
   sortingList,
-} from '@/services/utils';
+} from '../../services/utils';
 import BpmnJS from 'bpmn-js';
-import CamundaRest from '@/services/camunda-rest';
+import CamundaRest from '../../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
-import FormListModal from '@/components/FormListModal.vue';
+import FormListModal from '../../components/FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-import {Payload} from '@/services/TasklistTypes';
-import SocketIOService from '@/services/SocketIOServices';
-import TaskHistory from '@/components/TaskHistory.vue';
-import TaskListGroup from '@/components/TasklistGroup.vue';
-import TaskListSearch from '@/components/TasklistSearch.vue';
-import TaskSortOptions from '@/components/TasklistSortoptions.vue';
-import {authenticateFormio} from '@/services/formio-token';
-import {getFormDetails} from '@/services/get-formio';
-import {getISODateTime} from '@/services/format-time';
-import {getformHistoryApi} from '@/services/formsflowai-api';
-import moment from 'moment';
+import {Payload} from '../../services/TasklistTypes';
+import SocketIOService from '../../services/SocketIOServices';
+import TaskHistory from '../../components/TaskHistory.vue';
+import TaskListGroup from '../../components/TasklistGroup.vue';
+import TaskListSearch from '../../components/TasklistSearch.vue';
+import TaskSortOptions from '../../components/TasklistSortoptions.vue';
 import vueBpmn from 'vue-bpmn';
-
 
 @Component({
   components: {

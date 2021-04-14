@@ -74,8 +74,8 @@ import 'font-awesome/scss/font-awesome.scss';
 import 'formiojs/dist/formio.full.min.css'
 import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import '@/styles/user-styles.css'
-import '@/styles/camundaFormIOTasklist.scss'
+import '../../styles/user-styles.css'
+import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -85,23 +85,22 @@ import {
   getTaskFromList,
   searchQuery,
   sortingList,
-} from '@/services/utils';
+} from '../../services/utils';
 import BpmnJS from 'bpmn-js';
-import CamundaRest from '@/services/camunda-rest';
+import CamundaRest from '../../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
-import FormListModal from '@/components/FormListModal.vue';
+import FormListModal from '../../components/FormListModal.vue';
 import Modeler from 'bpmn-js/lib/Modeler';
-import {Payload} from '@/services/TasklistTypes';
-import SocketIOService from '@/services/SocketIOServices';
-import TaskHistory from '@/components/TaskHistory.vue';
-import TaskListGroup from '@/components/TasklistGroup.vue';
-import TaskListSearch from '@/components/TasklistSearch.vue';
-import TaskSortOptions from '@/components/TasklistSortoptions.vue';
-import {authenticateFormio} from '@/services/formio-token';
-import {getFormDetails} from '@/services/get-formio';
-import {getISODateTime} from '@/services/format-time';
-import {getformHistoryApi} from '@/services/formsflowai-api';
+import {Payload} from '../../services/TasklistTypes';
+import SocketIOService from '../../services/SocketIOServices';
+import TaskHistory from '../../components/TaskHistory.vue';
+import TaskListGroup from '../../components/TasklistGroup.vue';
+import TaskListSearch from '../../components/TasklistSearch.vue';
+import TaskSortOptions from '../../components/TasklistSortoptions.vue';
+import {authenticateFormio} from '../../services/formio-token';
+import {getFormDetails} from '../../services/get-formio';
+import {getformHistoryApi} from '../../services/formsflowai-api';
 import moment from 'moment';
 import vueBpmn from 'vue-bpmn';
 
@@ -259,12 +258,6 @@ toggle(index: number) {
   this.activeIndex = index;						  
 }
 
-toggleassignee()  {
-  this.editAssignee = ! this.editAssignee;
-  this.userSelected = this.task.assignee;
-}
-
-
 callSearchApi(item: any) {
   this.payload["orQueries"] = item;
   this.fetchTaskList(this.selectedfilterId, this.payload);
@@ -303,36 +296,6 @@ getGroupDetails() {
   );
 }
 
-deleteGroup() {
-  this.getGroupDetails();
-  this.reloadCurrentTask();
-}
-
-onBPMTaskFormSubmit(taskId: string) {
-  const formRequestFormat = {
-    variables: {
-      formUrl: {
-        value: this.formioUrl,
-      },
-      applicationId: {
-        value: this.applicationId,
-      },
-    },
-  };
-  CamundaRest.formTaskSubmit(
-    this.token,
-    taskId,
-    formRequestFormat,
-    this.bpmApiUrl
-  )
-    .then(() => {
-      this.reloadCurrentTask();
-    })
-    .catch((error) => {
-      console.error("Error", error);
-    });
-}
-
 getBPMTaskDetail(taskId: string) {
   CamundaRest.getTaskById(this.token, taskId, this.bpmApiUrl).then(
     (result) => {
@@ -358,22 +321,6 @@ getBPMTaskDetail(taskId: string) {
   });
 }
 	
-  oncustomEventCallback = (customEvent: any) => {
-    switch (customEvent.type) {
-    case "reloadTasks":
-      this.reloadTasks();
-      break;
-    case "reloadCurrentTask":
-      this.reloadCurrentTask();
-      break;
-    }
-  };
-
-  reloadTasks() {
-    //used to unSelect the task and refresh taskList
-    this.selectedTaskId = "";
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
 
   reloadCurrentTask() {
     //used to refresh selected task and taskList
@@ -381,46 +328,6 @@ getBPMTaskDetail(taskId: string) {
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
  
-
-  onClaim() {
-    CamundaRest.claim(
-      this.token,
-      this.task.id,
-      { userId: this.userName },
-      this.bpmApiUrl
-    )
-      .then(() => {
-        this.reloadCurrentTask();
-      })
-      .catch((error) => {
-        console.error("Error", error);
-      });
-    this.editAssignee = false;
-  }
-
-  onUnClaim() {				  
-    CamundaRest.unclaim(this.token, this.task.id, this.bpmApiUrl)
-      .then(() => {
-        this.reloadCurrentTask();
-      })
-      .catch((error) => {
-        console.error("Error", error);
-      });
-  }
-
-  onSetassignee() {
-    CamundaRest.setassignee(this.token, this.task.id,
-      {"userId": this.userSelected},
-      this.bpmApiUrl)
-      .then(() => {
-        this.reloadCurrentTask()
-      })
-      .catch((error) => {
-        console.error("Error", error);
-      })
-    this.toggleassignee();
-  }
-
   fetchTaskList(filterId: string, requestData: object) {
     this.selectedfilterId = filterId;
     CamundaRest.filterTaskList(
@@ -437,14 +344,6 @@ getBPMTaskDetail(taskId: string) {
       this.tasklength = result.data.length;
       this.numPages = Math.ceil(result.data.length / this.perPage);
     });
-  }
-
-  numberOfPages() {
-    if (Math.ceil(this.tasks.length / this.perPage) > 1)
-      return Math.ceil(this.tasks.length / this.perPage);
-    else {
-      return 15;
-    }
   }
 
   linkGen() {
@@ -470,31 +369,6 @@ getBPMTaskDetail(taskId: string) {
     return optionsArray;
   }
 
-  addSort(sort: any) {
-    this.sortList.push(sort);
-    if (this.sortList.length === sortingList.length) {
-      this.updateSortOptions = this.sortOptions;
-    } else {
-      this.sortOptions = this.getOptions(this.sortList);
-    }
-    this.showaddNewSortListDropdown = false;									  
-  }
-
-  showaddSortListOptions() {
-    this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
-    this.sortOptions = this.getOptions(this.sortList);
-  }
-
-  showUpdateSortOptions(index: number) {
-    for(let i =0; i<6;i++){
-      if(this.showSortListDropdown[i]===true){
-        this.showSortListDropdown[i] = false;
-      }
-    }
-    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.setupdateSortListDropdownindex = index;
-  }
 
   updateSort(sort: any, index: number) {
     this.sortList[index].label = sort.label;
@@ -504,97 +378,6 @@ getBPMTaskDetail(taskId: string) {
     this.showSortListDropdown[index] = false;
     this.payload["sorting"] = this.sortList;
     this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  deleteSort(sort: any, index: number) {
-    this.sortList.splice(index, 1);
-    this.updateSortOptions = [];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  toggleSort(index: number) {
-    if (this.sortList[index].sortOrder === "asc")
-      this.sortList[index].sortOrder = "desc";
-  
-    else {
-      this.sortList[index].sortOrder = "asc";
-    }
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  updateFollowUpDate() {
-    const referenceobject = this.task;
-    referenceobject['followUp'] = getISODateTime(this.setFollowup);
-    if(this.setFollowup && referenceobject['followUp']){
-      CamundaRest.updateTasksByID(
-        this.token,
-        this.task.id,
-        this.bpmApiUrl,
-        referenceobject
-      )
-        .then(() => {
-          console.warn("Updated follow up date");
-          this.reloadCurrentTask();
-        })
-        .catch((error) => {
-          console.error("Error", error);
-        });
-    }
-    else {
-      console.warn("Follow date error");
-    }
-  }
-
-  updateDueDate() {
-    const referenceobject = this.task;
-    referenceobject['due'] = getISODateTime(this.setDue);
-    if(this.setFollowup && referenceobject['due']){
-      CamundaRest.updateTasksByID(
-        this.token,
-        this.task.id,
-        this.bpmApiUrl,
-        referenceobject
-      )
-        .then(() => {
-          console.warn("Update due date");
-          this.reloadCurrentTask();
-        })
-        .catch((error) => {
-          console.error("Error", error);
-        });
-    }
-    else {
-      console.warn("Due date error");
-    }
-  }
-
-  removeDueDate() {
-    const referenceobject = this.task;
-    referenceobject["due"] = null;
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    ).then(() => {
-      this.reloadCurrentTask();
-    })
-  }
-
-  removeFollowupDate() {
-    const referenceobject = this.task;
-    referenceobject["followUp"] = null;
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    ).then(() => {
-      this.reloadCurrentTask();
-    })
   }
 
   fetchData() {

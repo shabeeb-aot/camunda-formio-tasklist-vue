@@ -226,8 +226,8 @@ import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 // eslint-disable-next-line sort-imports
-import Header from '@/components/layout/header.vue'
-import LeftSider from '@/components/layout/left-sider.vue'
+import Header from './layout/header.vue'
+import LeftSider from './layout/left-sider.vue'
 
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
