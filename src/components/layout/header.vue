@@ -84,9 +84,6 @@ import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
-  getFormattedDateAndTime,
-  getTaskFromList,
-  searchQuery,
   sortingList,
 } from '../../services/utils';
 import BpmnJS from 'bpmn-js';

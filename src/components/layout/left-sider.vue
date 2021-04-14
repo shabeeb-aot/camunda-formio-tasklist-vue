@@ -83,7 +83,6 @@ import {
   findFilterKeyOfAllTask,
   getFormattedDateAndTime,
   getTaskFromList,
-  searchQuery,
   sortingList,
 } from '../../services/utils';
 import BpmnJS from 'bpmn-js';
