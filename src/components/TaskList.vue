@@ -71,10 +71,7 @@
 	<b-row class="cft-service-task-list mt-1">
 		<b-col xl="3" lg="3" md="12" class="cft-first">
       <TaskListSearch
-        @call-search-api="callSearchApi"
-        @call-search-date-api="callSearchDateApi"
-        @call-process-variables-api="callProcessVariablesApi"
-        @call-task-variables-api="callTaskVariablesApi"
+        @update-task-list='updateTasklistResult'
         :tasklength="tasklength"
       />
         <!-- Task list section -->
@@ -550,6 +547,7 @@ cftShowUserList() {
 
 updateTasklistResult(queryList: object) {
   const combined = { ...this.payload, ...queryList}
+  this.payload = combined;
   this.fetchTaskList(this.selectedfilterId, combined);
 }
 // callSearchApi(item: any) {

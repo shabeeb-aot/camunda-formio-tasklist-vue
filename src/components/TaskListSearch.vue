@@ -50,7 +50,7 @@
               {{ operator[index] }}
             </p>
             <div class="cft-operator-dropdown" v-if="showSearchQueryOperators[index]">
-              <div v-for="x in item.compares" :key="x">
+              <div v-for="x in query.compares" :key="x">
                 <span @click="updateSearchQueryOperators(x, index)">{{ x }}</span>
               </div>
             </div>
@@ -220,7 +220,7 @@ export default class TaskListSearch extends Vue {
   }
 
   showSearchQueryOperatorList(index: number) {
-    Vue.set(this.showSearchQueryOperators, index, !this.showUpdatesearch[index]);
+    Vue.set(this.showSearchQueryOperators, index, !this.showSearchQueryOperators[index]);
   }
 
   updateSearchQueryOperators(operator: any, index: number) {
@@ -262,7 +262,7 @@ export default class TaskListSearch extends Vue {
   }
 
   showUpdateSearchList(index: number) {
-    for (let i = 0; i < this.searchListElements.length; i++) {
+    for (let i = 0; i < 12; i++) {
       this.showUpdatesearch[i] = false;
     }
     Vue.set(this.showUpdatesearch, index, !this.showUpdatesearch[index]);
@@ -278,7 +278,6 @@ export default class TaskListSearch extends Vue {
     this.searchListElements = taskSearchFilters;
   }
 
-  // @Emit()
   callSearchApi(item: any, query: any, operator: string, idx: number) {
     Vue.set(this.showSearchs, idx, "s");
     let index = 0;
@@ -288,7 +287,6 @@ export default class TaskListSearch extends Vue {
         break;
       }
     }
-
     switch(query.type) {
     case FilterSearchTypes.DATE: {
       const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
@@ -312,11 +310,10 @@ export default class TaskListSearch extends Vue {
     }
     default:
     }
-    console.log(this.queryList)
   }
 
 
-  @Emit()
+  @Emit('update-task-list')
   updateTasklistResult(){
     if(this.queryType === "ALL") {
       return this.queryList
