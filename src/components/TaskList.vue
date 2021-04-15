@@ -247,7 +247,6 @@ import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
 import TaskListSearch from '../components/TaskListSearch.vue';
-import TaskSortOptions from '../components/TaskListSortoptions.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
@@ -264,7 +263,6 @@ import vueBpmn from 'vue-bpmn';
     FormListModal,
     TaskHistory,
     TaskListSearch,
-    TaskSortOptions,
     vueBpmn,
     Modeler,
     BpmnJS,
@@ -592,17 +590,6 @@ getBPMTaskDetail(taskId: string) {
       }
     });
     return optionsArray;
-  }
-
-
-  updateSort(sort: any, index: number) {
-    this.sortList[index].label = sort.label;
-    this.sortList[index].sortBy = sort.sortBy;
-
-    this.sortOptions = this.getOptions(this.sortList);
-    this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
   updateFollowUpDate() {
