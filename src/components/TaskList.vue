@@ -548,10 +548,14 @@ cftShowUserList() {
   this.showUserList = !this.showUserList;
 }
 
-callSearchApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
+updateTasklistResult(queryList: object) {
+  const combined = { ...this.payload, ...queryList}
+  this.fetchTaskList(this.selectedfilterId, combined);
 }
+// callSearchApi(item: any) {
+//   this.payload["orQueries"] = item;
+//   this.fetchTaskList(this.selectedfilterId, this.payload);
+// }
 
 // callSearchDateApi(item: any) {
 //   this.payload["orQueries"] = item;

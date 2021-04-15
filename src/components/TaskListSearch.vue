@@ -22,14 +22,14 @@
       <div v-if="selectedSearchQueries && selectedSearchQueries.length">
         <div
           class="cftf-search-item-box mr-2"
-          v-for="(item, index) in selectedSearchQueries"
-          :key="item.label + index"
+          v-for="(query, index) in selectedSearchQueries"
+          :key="query.label + index"
         >
           <span @click="deleteSearchListElement(index)"
             ><i class="fa fa-times"></i
           ></span>
           <span class="cftf-search-title" title="type" @click="showUpdateSearchList(index)">{{
-            item.label
+            query.label
           }}</span>
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
             <div
@@ -128,7 +128,7 @@
               <span class="cft-icon-actions">
                 <span
                   @click="
-                    callSearchApi(searchItem[index], item, operator, index)
+                    callSearchApi(searchItem[index], query, operator[index], index)
                   "
                 >
                   <i class="bi bi-check cft-approve-box"></i>
@@ -138,7 +138,7 @@
               <input
                 v-model="searchItem[index]"
                 v-on:keyup.enter="
-                  callSearchApi(searchItem[index], item, operator, index)
+                  callSearchApi(searchItem[index], query, operator[index], index)
                 "
               />
               </span>
@@ -180,7 +180,7 @@
 <script lang="ts">
 import '../styles/camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-import { getVariableOperator, searchQuery, taskSearchFilters } from "../services/search-constants";
+import { FilterSearchTypes, getVariableOperator, searchQuery, taskSearchFilters } from "../services/search-constants";
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
 
@@ -206,6 +206,7 @@ export default class TaskListSearch extends Vue {
   private showSearchs: Array<string> = [];
   private searchDate: any = [];
   private setupdateSortListDropdownindex = 0;
+  private queryList: any = {};
 
   setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
@@ -277,26 +278,52 @@ export default class TaskListSearch extends Vue {
     this.searchListElements = taskSearchFilters;
   }
 
-  @Emit()
-  callSearchApi(item: any, searchItem: any, comparator: string, idx: number) {
+  // @Emit()
+  callSearchApi(item: any, query: any, operator: string, idx: number) {
     Vue.set(this.showSearchs, idx, "s");
     let index = 0;
-    for (let i = 0; i < searchItem["compares"].length; i++) {
-      if (searchItem["compares"][i] === comparator) {
+    for (let i = 0; i < query["compares"].length; i++) {
+      if (query["compares"][i] === operator) {
         index = i;
         break;
       }
     }
-    if (searchItem["compares"][index] === "like") {
-      searchQuery[searchItem["values"][index]] = "%" + item + "%";
-    } else {
-      searchQuery[searchItem["values"][index]] = item;
-    }
 
-    return [searchQuery];
-    //just return payload and after which call fetchApi
-    // this.payload["orQueries"] = searchQuery;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
+    switch(query.type) {
+    case FilterSearchTypes.DATE: {
+      const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
+      const replaceTimezone = timearr[1].replace(":", "");
+      const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+        .replace(timearr[1], replaceTimezone);
+
+      this.queryList[query["values"][index]] = titem;
+      this.updateTasklistResult();
+      break;
+    }
+    case FilterSearchTypes.STRING:
+    case FilterSearchTypes.NORMAL:{
+      if (query["compares"][index] === "like") {
+        this.queryList[query["values"][index]] = "%" + item + "%";
+      } else {
+        this.queryList[query["values"][index]] = item;
+      }
+      this.updateTasklistResult();
+      break;
+    }
+    default:
+    }
+    console.log(this.queryList)
+  }
+
+
+  @Emit()
+  updateTasklistResult(){
+    if(this.queryType === "ALL") {
+      return this.queryList
+    }
+    else {
+      return {orQueries: this.queryList}
+    }
   }
 
   // @Emit()
@@ -315,15 +342,15 @@ export default class TaskListSearch extends Vue {
   //     }
   //   }
 
-  //   const timearr = moment(item)
-  //     .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-  //     .split("+");
-  //   const replaceTimezone = timearr[1].replace(":", "");
-  //   const titem = moment(item)
-  //     .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-  //     .replace(timearr[1], replaceTimezone);
+  // const timearr = moment(item)
+  //   .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+  //   .split("+");
+  // const replaceTimezone = timearr[1].replace(":", "");
+  // const titem = moment(item)
+  //   .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+  //   .replace(timearr[1], replaceTimezone);
 
-  //   searchQuery[searchItem["values"][index]] = titem;
+  // searchQuery[searchItem["values"][index]] = titem;
   //   return [searchQuery]
   //   // this.payload["orQueries"] = searchQuery;
   //   // this.fetchTaskList(this.selectedfilterId, this.payload);
