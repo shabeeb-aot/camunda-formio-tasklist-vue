@@ -225,12 +225,13 @@
                         </b-button>
                       </b-col>
                       <b-col>
-                        <input
+                        <b-form-input
                           type="text"
                           placeholder="Group ID"
                           v-model="setGroup"
                           v-on:keyup.enter="addGroup"
-                        />
+                        >
+                        </b-form-input>
                       </b-col>
                     </b-row>
                     <b-row>

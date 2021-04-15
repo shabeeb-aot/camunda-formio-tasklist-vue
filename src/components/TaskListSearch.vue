@@ -134,12 +134,13 @@
                 </span>
                 <i class="bi bi-x cft-reject-box"></i
               ></span>
-              <input
+              <b-form-input
                 v-model="searchItem[index]"
                 v-on:keyup.enter="
                   setSearchQueryValue(searchItem[index], query, operator[index], index)
                 "
-              />
+              >
+              </b-form-input>
               </span>
               <span
                 v-if="showSearchs[index] === 's'"
