@@ -10,7 +10,6 @@
       <div class="cft-search-criteria" v-if="selectedSearchQueries.length">
         <b-button
           squared
-          :disabled="selectedSearchQueries.length < 2"
           variant="outline-secondary"
           @click="changeQueryType"
         >
@@ -25,9 +24,9 @@
           v-for="(query, index) in selectedSearchQueries"
           :key="query.label + index"
         >
-          <span @click="deleteSearchListElement(index)"
-            ><i class="fa fa-times"></i
-          ></span>
+          <span @click="deleteSearchQueryElement(query,index)">
+            <i class="fa fa-times"></i>
+          </span>
           <span class="cftf-search-title" title="type" @click="showUpdateSearchList(index)">{{
             query.label
           }}</span>
@@ -35,7 +34,7 @@
             <div
               v-for="s in searchListElements"
               :key="s.label"
-              @click="updateSearchListElement(s, index)"
+              @click="updateSearchQueryElement(s, index)"
               class="mb-2 cft-sort-element"
             >
               {{ s.label }}
@@ -45,7 +44,7 @@
             <p
               class="cft-search-operator"
               title="operator"
-              @click="showSearchQueryOperatorList(index)"
+              @click="toggleSearchQueryOperatorList(index)"
             >
               {{ operator[index] }}
             </p>
@@ -128,7 +127,7 @@
               <span class="cft-icon-actions">
                 <span
                   @click="
-                    callSearchApi(searchItem[index], query, operator[index], index)
+                    setSearchQueryValue(searchItem[index], query, operator[index], index)
                   "
                 >
                   <i class="bi bi-check cft-approve-box"></i>
@@ -138,7 +137,7 @@
               <input
                 v-model="searchItem[index]"
                 v-on:keyup.enter="
-                  callSearchApi(searchItem[index], query, operator[index], index)
+                  setSearchQueryValue(searchItem[index], query, operator[index], index)
                 "
               />
               </span>
@@ -217,9 +216,10 @@ export default class TaskListSearch extends Vue {
   }
   changeQueryType() {
     this.queryType==="ALL"? (this.queryType= "ANY") : this.queryType = "ALL"
+    this.updateTasklistResult();
   }
 
-  showSearchQueryOperatorList(index: number) {
+  toggleSearchQueryOperatorList(index: number) {
     Vue.set(this.showSearchQueryOperators, index, !this.showSearchQueryOperators[index]);
   }
 
@@ -256,9 +256,17 @@ export default class TaskListSearch extends Vue {
     this.showSearchList = false;
   }
 
-  deleteSearchListElement(index: number) {
+  deleteSearchQueryElement(query: any, index: number) {
+    let id = 0;
+    for(let i=0; i<this.selectedSearchQueries[index]["compares"].length; i++) {
+      if(this.selectedSearchQueries[index]["compares"][i]===this.operator[index]) {
+        id = i;
+      }
+    }
+    delete this.queryList[query["values"][id]];
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
+    this.updateTasklistResult()
   }
 
   showUpdateSearchList(index: number) {
@@ -268,7 +276,7 @@ export default class TaskListSearch extends Vue {
     Vue.set(this.showUpdatesearch, index, !this.showUpdatesearch[index]);
   }
 
-  updateSearchListElement(searchitem: any, index: number) {
+  updateSearchQueryElement(searchitem: any, index: number) {
     this.selectedSearchQueries[index].label = searchitem.label;
     this.selectedSearchQueries[index].compares = searchitem.compares;
     this.selectedSearchQueries[index].values = searchitem.values;
@@ -278,7 +286,7 @@ export default class TaskListSearch extends Vue {
     this.searchListElements = taskSearchFilters;
   }
 
-  callSearchApi(item: any, query: any, operator: string, idx: number) {
+  setSearchQueryValue(item: any, query: any, operator: string, idx: number) {
     Vue.set(this.showSearchs, idx, "s");
     let index = 0;
     for (let i = 0; i < query["compares"].length; i++) {
@@ -319,7 +327,7 @@ export default class TaskListSearch extends Vue {
       return this.queryList
     }
     else {
-      return {orQueries: this.queryList}
+      return {orQueries: [this.queryList]}
     }
   }
 
