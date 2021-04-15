@@ -86,12 +86,14 @@ import {
   sortingList,
 } from '../../services/utils';
 import CamundaRest from '../../services/camunda-rest';
+import FormListModal from '../FormListModal.vue';
 import {Payload} from '../../services/TasklistTypes';
 import SocketIOService from '../../services/SocketIOServices';
-import TaskSortOptions from '../../components/TaskListSortoptions.vue';
+import TaskSortOptions from '../TaskListSortoptions.vue';
 
 @Component({
   components: {
+    FormListModal,
     TaskSortOptions
   }
 })
