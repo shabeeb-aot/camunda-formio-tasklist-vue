@@ -6,8 +6,8 @@ export const FilterSearchTypes = {
 }
   
 export const taskSearchFilters = [
-  {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
-  {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
+  {"label": "Task Variables", "key": "taskVariables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
+  {"label": "Process Variables", "key": "processVariables" ,"compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
   {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING},
   {"label": "Assignee", "compares": ["like", "="], "values": ["assigneeLike", "assignee"], "type": FilterSearchTypes.STRING},
   {"label":"Candidate Group", "compares": ["="], "values": ["candidateGroup"], "type": FilterSearchTypes.NORMAL},

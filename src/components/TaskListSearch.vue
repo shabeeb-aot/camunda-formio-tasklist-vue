@@ -205,7 +205,10 @@ export default class TaskListSearch extends Vue {
   private showSearchs: Array<string> = [];
   private searchDate: any = [];
   private setupdateSortListDropdownindex = 0;
-  private queryList: any = {};
+  private queryList: any = {
+    "taskVariables": [],
+    "processVariables": []
+  };
 
   setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
@@ -263,7 +266,12 @@ export default class TaskListSearch extends Vue {
         id = i;
       }
     }
-    delete this.queryList[query["values"][id]];
+    if(this.queryList.length>1){
+      delete this.queryList[query["values"][id]];
+    }
+    else{
+      this.queryList = {}
+    }
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
     this.updateTasklistResult()
@@ -296,6 +304,14 @@ export default class TaskListSearch extends Vue {
       }
     }
     switch(query.type) {
+    case FilterSearchTypes.VARIABLES: {
+      this.queryList[query.key].push({
+        "name": this.searchItem[idx],
+        "operator": getVariableOperator(operator),
+        "value": this.variableValue[idx]
+      })
+      break;
+    }
     case FilterSearchTypes.DATE: {
       const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
       const replaceTimezone = timearr[1].replace(":", "");
