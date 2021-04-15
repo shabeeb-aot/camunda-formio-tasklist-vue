@@ -82,89 +82,31 @@ import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   sortingList,
 } from '../../services/utils';
-import BpmnJS from 'bpmn-js';
 import CamundaRest from '../../services/camunda-rest';
-import DatePicker from 'vue2-datepicker'
-import { Form } from 'vue-formio';
-import FormListModal from '../../components/FormListModal.vue';
-import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../../services/TasklistTypes';
 import SocketIOService from '../../services/SocketIOServices';
-import TaskHistory from '../../components/TaskHistory.vue';
-import TaskListSearch from '../../components/TaskListSearch.vue';
 import TaskSortOptions from '../../components/TaskListSortoptions.vue';
-import vueBpmn from 'vue-bpmn';
 
 @Component({
   components: {
-    formio: Form,
-    DatePicker,
-    FormListModal,
-    TaskHistory,
-    TaskListSearch,
-    TaskSortOptions,
-    vueBpmn,
-    Modeler,
-    BpmnJS,
-  },
+    TaskSortOptions
+  }
 })
 export default class Tasklist extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
-  @Prop() private formIOResourceId!: string;
-  @Prop() private formIOReviewerId!: string;
-  @Prop() private formIOReviewer!: string;
-  @Prop() private formIOApiUrl!: string;
-  @Prop() private formsflowaiApiUrl!: string;
-  @Prop() private formsflowaiUrl!: string;
-  @Prop() private formIOUserRoles!: string;
-  @Prop() private userName!: string;
-  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
 
-  private tasks: Array<object> = [];
-  private fulltasks: Array<object> = [];
-  private getProcessDefinitions: Array<object> = [];
-  private taskProcess = null;
-  private processDefinitionId = '';
-  private formId = '';
-  private submissionId = '';
-  private formioUrl = '';
-  private activeIndex = 0;
-  private task: any;
-  private setFollowup = null;
-  private setDue = null;
-  private setGroup = null;
-  private selectedTaskId = '';
-  private userSelected = null;
-  private showfrom = false;
   private currentPage = 1;
   private perPage = 10;
   private numPages = 5;
   private tasklength = 0;
-  private readoption = { readOnly: true };
-  private options = {
-    noAlerts: false,
-    i18n: {
-      en: {
-        error: "Please fix the errors before submitting again.",
-      },
-    },
-  };
   private filterList = [];
   private showfilter=false;
-  private editAssignee = false;
   private activefilter = 0;
-  private applicationId = '';
-  private groupList = [];
-  private groupListNames: Array<string> | null = null;
-  private groupListItems: string[] = [];
-  private userEmail = 'external';
   private selectedfilterId = '';
-  private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
@@ -176,60 +118,12 @@ export default class Tasklist extends Vue {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
-  private showUserList = false;
-  private taskHistoryList: Array<object> = [];
   
 @Watch('token')
   ontokenChange (newVal: string) {
   // updating token
     localStorage.setItem("authToken", newVal);
   }
-
-checkPropsIsPassedAndSetValue() {
-  if (!this.bpmApiUrl || this.bpmApiUrl === "") {
-    console.warn("bpmApiUrl prop not Passed");
-  }
-  if (!this.token || this.token === "") {
-    console.warn("token prop not Passed");
-  }
-  if (!this.formIOResourceId || this.formIOResourceId === "") {
-    console.warn("formIOResourceId prop not passed");
-  }
-  if (!this.formIOReviewerId || this.formIOReviewerId === "") {
-    console.warn("formIOReviewerId prop not passed");
-  }
-  if (!this.formIOApiUrl || this.formIOApiUrl === "") {
-    console.warn("formIOApiUrl prop not passed");
-  }
-  if (!this.formsflowaiApiUrl || this.formsflowaiApiUrl === "") {
-    console.warn("formsflow.ai API url prop not passed");
-  }
-  if (!this.formsflowaiUrl || this.formsflowaiUrl === "") {
-    console.warn("formsflow.ai URL prop not passed");
-  }
-  if(!this.WEBSOCKET_ENCRYPT_KEY || this.WEBSOCKET_ENCRYPT_KEY === ""){
-    console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
-  }
-  const engine = "/engine-rest";
-  const socketUrl = "/forms-flow-bpm-socket";
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
-  localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
-  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
-  localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
-
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
-  this.userName = val.userName;
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
-}
-
 
 toggleshowfilter() {
   this.showfilter = ! this.showfilter;
@@ -241,24 +135,6 @@ togglefilter(filter: any, index: number) {
   this.$root.$emit('call-fetchTaskList', {filterId: filter.id, requestData: this.payload})
   this.showfilter = false;
 }
- 
-//   fetchTaskList(filterId: string, requestData: object) {
-//     this.selectedfilterId = filterId;
-//     CamundaRest.filterTaskList(
-//       this.token,
-//       filterId,
-//       requestData,
-//       this.bpmApiUrl
-//     ).then((result) => {
-//       // this.fulltasks= result.data;
-//       this.tasks = result.data.slice(
-//         (this.currentPage - 1) * this.perPage,
-//         this.currentPage * this.perPage
-//       );
-//       this.tasklength = result.data.length;
-//       this.numPages = Math.ceil(result.data.length / this.perPage);
-//     });
-//   }
 
 getOptions(options: any) {
   const optionsArray: {
@@ -284,6 +160,7 @@ addSort(sort: any) {
   } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   this.showaddNewSortListDropdown = false;									  
 }
 
@@ -335,7 +212,6 @@ toggleSort(index: number) {
   this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
 }
 mounted() {
-  this.checkPropsIsPassedAndSetValue();
   CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
     this.filterList = response.data;
     this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
