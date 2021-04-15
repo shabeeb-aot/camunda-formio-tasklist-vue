@@ -270,7 +270,7 @@ export default class TaskListSearch extends Vue {
     if(this.queryList.length>1){
       delete this.queryList[query["values"][id]];
     }
-    else{
+    else {
       this.queryList = {}
     }
     this.selectedSearchQueries.splice(index, 1);

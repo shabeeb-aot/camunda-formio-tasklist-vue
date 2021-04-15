@@ -370,8 +370,9 @@ import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
-import {searchQuery} from '../services/search-constants';
+// import {searchQuery} from '../services/search-constants';
 import vueBpmn from 'vue-bpmn';
 
 
@@ -449,7 +450,6 @@ export default class Tasklist extends Vue {
   private showSortListDropdown: any = []; 
   private showaddNewSortListDropdown = false;
   private payload: Payload = {
-    active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
@@ -547,9 +547,12 @@ cftShowUserList() {
 }
 
 updateTasklistResult(queryList: object) {
-  const combined = { ...this.payload, ...queryList}
-  this.payload = combined;
-  this.fetchTaskList(this.selectedfilterId, combined);
+  const combined = { ...{"sorting": this.sortList}, ...queryList}
+  console.log(combined);
+  if(!isEqual(combined, this.payload)) {
+    this.payload = combined;
+    this.fetchTaskList(this.selectedfilterId, combined);
+  }
 }
 // callSearchApi(item: any) {
 //   this.payload["orQueries"] = item;
@@ -967,7 +970,6 @@ getBPMTaskDetail(taskId: string) {
   }
   
   mounted() {
-    console.log(this.token);
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
