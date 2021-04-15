@@ -95,8 +95,8 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../../services/TasklistTypes';
 import SocketIOService from '../../services/SocketIOServices';
 import TaskHistory from '../../components/TaskHistory.vue';
-import TaskListSearch from '../../components/TasklistSearch.vue';
-import TaskSortOptions from '../../components/TasklistSortoptions.vue';
+import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskSortOptions from '../../components/TaskListSortoptions.vue';
 import vueBpmn from 'vue-bpmn';
 
 @Component({
@@ -183,7 +183,7 @@ export default class Tasklist extends Vue {
   ontokenChange (newVal: string) {
   // updating token
     localStorage.setItem("authToken", newVal);
-}
+  }
 
 checkPropsIsPassedAndSetValue() {
   if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -237,7 +237,7 @@ toggleshowfilter() {
 
 togglefilter(filter: any, index: number) {
   this.activefilter = index;
-//   this.fetchTaskList(filter.id, this.payload);
+  //   this.fetchTaskList(filter.id, this.payload);
   this.$root.$emit('call-fetchTaskList', {filterId: filter.id, requestData: this.payload})
   this.showfilter = false;
 }
@@ -260,104 +260,104 @@ togglefilter(filter: any, index: number) {
 //     });
 //   }
 
-  getOptions(options: any) {
-    const optionsArray: {
+getOptions(options: any) {
+  const optionsArray: {
       sortOrder: string;
       label: string;
       sortBy: string;
     }[] = [];
-    sortingList.forEach((sortOption) => {
-      if (
-        !options.some(
-          (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-        )
-      ) {
-        optionsArray.push({ ...sortOption });
-      }
-    });
-    return optionsArray;
-  }
-  addSort(sort: any) {
-    this.sortList.push(sort);
-    if (this.sortList.length === sortingList.length) {
-      this.updateSortOptions = this.sortOptions;
-    } else {
-      this.sortOptions = this.getOptions(this.sortList);
+  sortingList.forEach((sortOption) => {
+    if (
+      !options.some(
+        (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
+      )
+    ) {
+      optionsArray.push({ ...sortOption });
     }
-    this.showaddNewSortListDropdown = false;									  
-  }
-
-  showaddSortListOptions() {
-    this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
+  });
+  return optionsArray;
+}
+addSort(sort: any) {
+  this.sortList.push(sort);
+  if (this.sortList.length === sortingList.length) {
+    this.updateSortOptions = this.sortOptions;
+  } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
+  this.showaddNewSortListDropdown = false;									  
+}
 
-  showUpdateSortOptions(index: number) {
-    for(let i =0; i<6;i++){
-      if(this.showSortListDropdown[i]===true){
-        this.showSortListDropdown[i] = false;
-      }
+showaddSortListOptions() {
+  this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
+  this.sortOptions = this.getOptions(this.sortList);
+}
+
+showUpdateSortOptions(index: number) {
+  for(let i =0; i<6;i++){
+    if(this.showSortListDropdown[i]===true){
+      this.showSortListDropdown[i] = false;
     }
-    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.setupdateSortListDropdownindex = index;
   }
+  this.showSortListDropdown[index] = !this.showSortListDropdown[index];
+  this.sortOptions = this.getOptions(this.sortList);
+  this.setupdateSortListDropdownindex = index;
+}
 
-  updateSort(sort: any, index: number) {
-    this.sortList[index].label = sort.label;
-    this.sortList[index].sortBy = sort.sortBy;
+updateSort(sort: any, index: number) {
+  this.sortList[index].label = sort.label;
+  this.sortList[index].sortBy = sort.sortBy;
 
-    this.sortOptions = this.getOptions(this.sortList);
-    this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  }
+  this.sortOptions = this.getOptions(this.sortList);
+  this.showSortListDropdown[index] = false;
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
 
-  deleteSort(sort: any, index: number) {
-    this.sortList.splice(index, 1);
-    this.updateSortOptions = [];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  }
+deleteSort(sort: any, index: number) {
+  this.sortList.splice(index, 1);
+  this.updateSortOptions = [];
+  this.sortOptions = this.getOptions(this.sortList);
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
 
-  toggleSort(index: number) {
-    if (this.sortList[index].sortOrder === "asc")
-      this.sortList[index].sortOrder = "desc";
+toggleSort(index: number) {
+  if (this.sortList[index].sortOrder === "asc")
+    this.sortList[index].sortOrder = "desc";
   
-    else {
-      this.sortList[index].sortOrder = "asc";
-    }
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  else {
+    this.sortList[index].sortOrder = "asc";
   }
-  mounted() {
-    this.checkPropsIsPassedAndSetValue();
-    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-      this.filterList = response.data;
-      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
+mounted() {
+  this.checkPropsIsPassedAndSetValue();
+  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+    this.filterList = response.data;
+    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
     //   this.fetchTaskList(this.selectedfilterId, this.payload);
     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-    });
+  });
 
-    if(SocketIOService.isConnected()) {
-      SocketIOService.disconnect();
-    }
-    SocketIOService.connect((refreshedTaskId: any)=> {
-      if(this.selectedfilterId){
-        //Refreshes the Task
-        // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-      }
-    })
-    this.sortOptions = this.getOptions([]);
-  }
-
-  beforeDestroy() {
+  if(SocketIOService.isConnected()) {
     SocketIOService.disconnect();
   }
+  SocketIOService.connect((refreshedTaskId: any)=> {
+    if(this.selectedfilterId){
+      //Refreshes the Task
+      // this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    }
+  })
+  this.sortOptions = this.getOptions([]);
+}
+
+beforeDestroy() {
+  SocketIOService.disconnect();
+}
 }
 </script>
