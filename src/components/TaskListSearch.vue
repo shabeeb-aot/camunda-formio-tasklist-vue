@@ -12,12 +12,13 @@
           squared
           :disabled="selectedSearchQueries.length < 2"
           variant="outline-secondary"
-          @click="queryTypellCriteria"
+          @click="changeQueryType"
         >
           {{ queryType }}
         </b-button>
         <span class="cft-search-item-criteria"> of the criteria are met.</span>
       </div>
+
       <div v-if="selectedSearchQueries && selectedSearchQueries.length">
         <div
           class="cftf-search-item-box mr-2"
@@ -53,7 +54,7 @@
                 <span @click="updateSearchQueryOperators(x, index)">{{ x }}</span>
               </div>
             </div>
-            <div class="cft-rhs-container" v-if="item.type === 'date'">
+            <!-- <div class="cft-rhs-container" v-if="item.type === 'date'">
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
@@ -115,8 +116,8 @@
                   callProcessVariablesApi(searchItem[index], operator[index], variableValue[index])
                 "
               />
-            </div>
-            <div class="cft-rhs-container" v-else>
+            </div> -->
+            <div class="cft-rhs-container">
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
@@ -179,7 +180,7 @@
 <script lang="ts">
 import '../styles/camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-import { searchQuery, taskSearchFilters } from "../services/search-constants";
+import { getVariableOperator, searchQuery, taskSearchFilters } from "../services/search-constants";
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
 
@@ -213,12 +214,8 @@ export default class TaskListSearch extends Vue {
   cftshowSearchListElements() {
     this.showSearchList = !this.showSearchList;
   }
-  queryTypellCriteria() {
-    if (this.queryType === "ALL") {
-      this.queryType = "ANY";
-    } else {
-      this.queryType = "ALL";
-    }
+  changeQueryType() {
+    this.queryType==="ALL"? (this.queryType= "ANY") : this.queryType = "ALL"
   }
 
   showSearchQueryOperatorList(index: number) {
@@ -302,46 +299,46 @@ export default class TaskListSearch extends Vue {
     // this.fetchTaskList(this.selectedfilterId, this.payload);
   }
 
-  @Emit()
-  callSearchDateApi(
-    item: any,
-    searchItem: any,
-    comparator: string,
-    idx: number
-  ) {
-    Vue.set(this.showSearchs, idx, "s");
-    let index = 0;
-    for (let i = 0; i < searchItem["compares"].length; i++) {
-      if (searchItem["compares"][i] === comparator) {
-        index = i;
-        break;
-      }
-    }
+  // @Emit()
+  // callSearchDateApi(
+  //   item: any,
+  //   searchItem: any,
+  //   comparator: string,
+  //   idx: number
+  // ) {
+  //   Vue.set(this.showSearchs, idx, "s");
+  //   let index = 0;
+  //   for (let i = 0; i < searchItem["compares"].length; i++) {
+  //     if (searchItem["compares"][i] === comparator) {
+  //       index = i;
+  //       break;
+  //     }
+  //   }
 
-    const timearr = moment(item)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .split("+");
-    const replaceTimezone = timearr[1].replace(":", "");
-    const titem = moment(item)
-      .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-      .replace(timearr[1], replaceTimezone);
+  //   const timearr = moment(item)
+  //     .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+  //     .split("+");
+  //   const replaceTimezone = timearr[1].replace(":", "");
+  //   const titem = moment(item)
+  //     .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
+  //     .replace(timearr[1], replaceTimezone);
 
-    searchQuery[searchItem["values"][index]] = titem;
-    return [searchQuery]
-    // this.payload["orQueries"] = searchQuery;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
+  //   searchQuery[searchItem["values"][index]] = titem;
+  //   return [searchQuery]
+  //   // this.payload["orQueries"] = searchQuery;
+  //   // this.fetchTaskList(this.selectedfilterId, this.payload);
+  // }
 
-  @Emit()
-  callTaskVariablesApi(searchItem: string, operator: string, variableValue: string) {
-    const item = {"name": searchItem, "operator": operator, "value": variableValue}
-    return item;
-  }
+  // @Emit()
+  // callTaskVariablesApi(searchItem: string, operator: string, variableValue: string) {
+  //   const item = {"name": searchItem, "operator": getVariableOperator(operator), "value": variableValue}
+  //   return item;
+  // }
   
-  @Emit()
-  callProcessVariablesApi(searchItem: string, operator: string, variableValue: string) {
-    const item = {"name": searchItem, "operator": operator, "value": variableValue}
-    return item;
-  }
+  // @Emit()
+  // callProcessVariablesApi(searchItem: string, operator: string, variableValue: string) {
+  //   const item = {"name": searchItem, "operator": getVariableOperator(operator), "value": variableValue}
+  //   return item;
+  // }
 }
 </script>
