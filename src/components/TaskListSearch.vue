@@ -179,7 +179,7 @@
 <script lang="ts">
 import '../styles/camundaFormIOTaslistSearch.scss'
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-import { searchData, searchQuery } from "../services/search-constants";
+import { searchQuery, taskSearchFilters } from "../services/search-constants";
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
 
@@ -192,7 +192,7 @@ export default class TaskListSearch extends Vue {
   @Prop({}) private tasklength!: number;
 
   private activeSearchItem = 0;
-  private searchListElements: any = searchData;
+  private searchListElements: any = taskSearchFilters;
   private queryType = "ALL";
   private showSearchList = false;
   private selectedSearchQueries: any = [];
@@ -276,6 +276,8 @@ export default class TaskListSearch extends Vue {
     this.selectedSearchQueries[index].values = searchitem.values;
     this.operator[index] = searchitem.compares[0];
     this.showUpdatesearch[index] = false;
+
+    this.searchListElements = taskSearchFilters;
   }
 
   @Emit()

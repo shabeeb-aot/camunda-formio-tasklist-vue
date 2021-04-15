@@ -5,7 +5,7 @@ export const FilterSearchTypes = {
   NORMAL:"normal"
 }
   
-export const searchData = [
+export const taskSearchFilters = [
   {"label": "Task Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
   {"label": "Process Variables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
   {"label": "Process Definition Name", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING},
@@ -41,20 +41,37 @@ export const searchQuery: any = {
 
 export const getVariableOperator = (operator: string)=>{
   switch(operator){
-    case "=":
-      return 'eq';
-    case ">":
-      return "gt";
-    case ">=":
-      return "gteq";
-    case "!=":
-      return "neq";
-    case "<":
-      return "lt";
-    case "<=":
-        return "lteq";
-      case "like":
-        return "like";
-      default:
+  case "=":
+    return 'eq';
+  case ">":
+    return "gt";
+  case ">=":
+    return "gteq";
+  case "!=":
+    return "neq";
+  case "<":
+    return "lt";
+  case "<=":
+    return "lteq";
+  case "like":
+    return "like";
+  default:
   } 
-} 
+}
+
+
+
+export const FILTER_OPERATOR_TYPES = {
+  EQUAL:"=",
+  LIKE:"like",
+  BEFORE:"before",
+  AFTER:"after"
+}
+
+export const FILTER_COMPARE_OPTIONS = {
+  [FilterSearchTypes.VARIABLES]:[">", ">=", FILTER_OPERATOR_TYPES.EQUAL ,"!=", "<", "<=",FILTER_OPERATOR_TYPES.LIKE],
+  [FilterSearchTypes.DATE]:[FILTER_OPERATOR_TYPES.BEFORE, FILTER_OPERATOR_TYPES.AFTER],
+  [FilterSearchTypes.STRING]:[FILTER_OPERATOR_TYPES.EQUAL,FILTER_OPERATOR_TYPES.LIKE],
+  [FilterSearchTypes.NORMAL]:[FILTER_OPERATOR_TYPES.EQUAL]
+};
+

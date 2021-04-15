@@ -553,22 +553,22 @@ callSearchApi(item: any) {
   this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
-callSearchDateApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
+// callSearchDateApi(item: any) {
+//   this.payload["orQueries"] = item;
+//   this.fetchTaskList(this.selectedfilterId, this.payload);
+// }
 
-callTaskVariablesApi(item: any) {
-  searchQuery["taskVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
+// callTaskVariablesApi(item: any) {
+//   searchQuery["taskVariables"].push(item);
+//   this.payload["orQueries"] = [searchQuery];
+//   this.fetchTaskList(this.selectedfilterId, this.payload);
+// }
 
-callProcessVariablesApi(item: any) {
-  searchQuery["processVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
+// callProcessVariablesApi(item: any) {
+//   searchQuery["processVariables"].push(item);
+//   this.payload["orQueries"] = [searchQuery];
+//   this.fetchTaskList(this.selectedfilterId, this.payload);
+// }
 
 onFormSubmitCallback() {
   if (this.task.id) {
