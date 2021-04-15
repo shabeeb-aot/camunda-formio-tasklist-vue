@@ -79,7 +79,6 @@ import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   getFormattedDateAndTime,
   getTaskFromList,
@@ -120,18 +119,10 @@ import vueBpmn from 'vue-bpmn';
 export default class Tasklist extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
-  @Prop() private formIOResourceId!: string;
-  @Prop() private formIOReviewerId!: string;
-  @Prop() private formIOReviewer!: string;
-  @Prop() private formIOApiUrl!: string;
   @Prop() private formsflowaiApiUrl!: string;
-  @Prop() private formsflowaiUrl!: string;
-  @Prop() private formIOUserRoles!: string;
-  @Prop() private userName!: string;
-  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
+  @Prop() private formIOApiUrl!: string;
 
   private tasks: Array<object> = [];
-  private fulltasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
   private processDefinitionId = '';
@@ -140,9 +131,6 @@ export default class Tasklist extends Vue {
   private formioUrl = '';
   private activeIndex = 0;
   private task: any;
-  private setFollowup = null;
-  private setDue = null;
-  private setGroup = null;
   private selectedTaskId = '';
   private userSelected = null;
   private showfrom = false;
@@ -150,17 +138,6 @@ export default class Tasklist extends Vue {
   private perPage = 10;
   private numPages = 5;
   private tasklength = 0;
-  private readoption = { readOnly: true };
-  private options = {
-    noAlerts: false,
-    i18n: {
-      en: {
-        error: "Please fix the errors before submitting again.",
-      },
-    },
-  };
-  private filterList = [];
-  private showfilter=false;
   private editAssignee = false;
   private activefilter = 0;
   private applicationId = '';
@@ -170,20 +147,13 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
-  private sortOptions: Array<object> = [];
-  private userList: Array<object> = [];
-  private updateSortOptions: Array<object> = [];
-  private setupdateSortListDropdownindex = 0;
-  private showSortListDropdown = [false, false, false, false, false, false];
-  private showaddNewSortListDropdown = false;
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
-  
+
 @Watch('token')
   ontokenChange (newVal: string) {
   // updating token
@@ -197,42 +167,26 @@ checkPropsIsPassedAndSetValue() {
   if (!this.token || this.token === "") {
     console.warn("token prop not Passed");
   }
-  if (!this.formIOResourceId || this.formIOResourceId === "") {
-    console.warn("formIOResourceId prop not passed");
-  }
-  if (!this.formIOReviewerId || this.formIOReviewerId === "") {
-    console.warn("formIOReviewerId prop not passed");
-  }
-  if (!this.formIOApiUrl || this.formIOApiUrl === "") {
-    console.warn("formIOApiUrl prop not passed");
-  }
   if (!this.formsflowaiApiUrl || this.formsflowaiApiUrl === "") {
     console.warn("formsflow.ai API url prop not passed");
   }
-  if (!this.formsflowaiUrl || this.formsflowaiUrl === "") {
-    console.warn("formsflow.ai URL prop not passed");
-  }
-  if(!this.WEBSOCKET_ENCRYPT_KEY || this.WEBSOCKET_ENCRYPT_KEY === ""){
-    console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
-  }
+
   const engine = "/engine-rest";
   const socketUrl = "/forms-flow-bpm-socket";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
   localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
 
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
-  this.userName = val.userName;
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
+  // const val = decodeTokenValues(
+  //   this.token,
+  //   this.userName,
+  //   this.formIOUserRoles
+  // );
+  // this.userName = val.userName;
+  // this.userEmail = val.userEmail;
+  // this.formIOUserRoles = val.formIOUserRoles;
 }
 
 timedifference(date: Date) {
@@ -367,17 +321,6 @@ getOptions(options: any) {
   return optionsArray;
 }
 
-
-updateSort(sort: any, index: number) {
-  this.sortList[index].label = sort.label;
-  this.sortList[index].sortBy = sort.sortBy;
-
-  this.sortOptions = this.getOptions(this.sortList);
-  this.showSortListDropdown[index] = false;
-  this.payload["sorting"] = this.sortList;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
 fetchData() {
   if (this.selectedTaskId) {
     this.task = getTaskFromList(this.tasks, this.selectedTaskId);
@@ -442,18 +385,18 @@ mounted() {
   })
 
   this.checkPropsIsPassedAndSetValue();
-  authenticateFormio(
-    this.formIOResourceId,
-    this.formIOReviewerId,
-    this.formIOReviewer,
-    this.userEmail,
-    this.formIOUserRoles
-  );
-  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-    this.filterList = response.data;
-    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  });
+  // authenticateFormio(
+  //   this.formIOResourceId,
+  //   this.formIOReviewerId,
+  //   this.formIOReviewer,
+  //   this.userEmail,
+  //   this.formIOUserRoles
+  // );
+  // CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+  //   this.filterList = response.data;
+  //   this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+  //   this.fetchTaskList(this.selectedfilterId, this.payload);
+  // });
 
   this.fetchData();
   if(SocketIOService.isConnected()) {
@@ -471,16 +414,16 @@ mounted() {
     }
   })
 
-  this.sortOptions = this.getOptions([]);
+  // this.sortOptions = this.getOptions([]);
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
     (response) => {
       this.getProcessDefinitions = response.data;
     }
   );
-  CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-    const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
-    this.userList = result;
-  });
+  // CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
+  //   const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
+  //   this.userList = result;
+  // });
 
 }
 

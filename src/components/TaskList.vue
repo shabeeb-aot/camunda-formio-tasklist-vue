@@ -10,6 +10,8 @@
         <LeftSider
           v-if="token  && bpmApiUrl"
           :token="token"
+          :formsflowaiApiUrl="formsflowaiApiUrl"
+          :formIOApiUrl="formIOApiUrl"
           :bpmApiUrl="bpmApiUrl"
         />
       </b-col>
