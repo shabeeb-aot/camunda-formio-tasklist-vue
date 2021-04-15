@@ -221,21 +221,21 @@ mounted() {
     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   });
 
-  if(SocketIOService.isConnected()) {
-    SocketIOService.disconnect();
-  }
-  SocketIOService.connect((refreshedTaskId: any)=> {
-    if(this.selectedfilterId){
-      //Refreshes the Task
-      // this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-    }
-  })
+  // if(SocketIOService.isConnected()) {
+  //   SocketIOService.disconnect();
+  // }
+  // SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
+  //   if(this.selectedfilterId){
+  //     //Refreshes the Task
+  //     // this.fetchTaskList(this.selectedfilterId, this.payload);
+  //     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  //   }
+  // })
   this.sortOptions = this.getOptions([]);
 }
 
-beforeDestroy() {
-  SocketIOService.disconnect();
-}
+// beforeDestroy() {
+//   SocketIOService.disconnect();
+// }
 }
 </script>

@@ -376,12 +376,11 @@ checkPropsIsPassedAndSetValue() {
   const socketUrl = "/forms-flow-bpm-socket";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
+  const currentUrl = window.location.protocol + '//' +  window.location.host
+  localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
   localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("webSocketEncryptkey", this.webSocketEncryptkey)
-
   const val = decodeTokenValues(
     this.token,
     this.userName,
@@ -752,7 +751,7 @@ getBPMTaskDetail(taskId: string) {
     if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
     }
-    SocketIOService.connect((refreshedTaskId: any)=> {
+    SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
       if(this.selectedfilterId){
         //Refreshes the Task
         this.fetchTaskList(this.selectedfilterId, this.payload);
