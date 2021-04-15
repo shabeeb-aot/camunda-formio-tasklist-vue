@@ -1,141 +1,17 @@
 <template> 
 <b-container fluid class="task-outer-container">
-  <div class="main-filters my-2 mb-1">
-    <div 
-      class="cft-filter-dropdown mx-2"
-    >
-        <button class="cft-filter-dropbtn mr-0" @click="toggleshowfilter">
-          <i class="bi bi-filter-square"/>
-        </button>
-        <div v-if="showfilter" class="cft-filter-dropdown-content">
-          <b-list-group  v-if="filterList.length">
-            <b-list-group-item v-for="(filter, idx) in filterList" :key="filter.id"
-            @click="togglefilter(filter, idx)"
-            :class="{'cft-filter-selected': idx == activefilter}">
-              {{filter.name}}
-            </b-list-group-item>
-          </b-list-group>
-          <div v-else>
-            <i class="bi bi-exclamation-circle-fill"></i>
-              No Filters found  
-          </div>
-        </div>
-      </div>
-      <FormListModal :token="token" :bpmApiUrl="bpmApiUrl"/>          
-      <div class="cft-first">
-        <!-- Sorting section -->
-				<div id="cftf-dpdown-container" class="mx-2">
-					<div class="cftf-dpdown-box mr-2" v-for="(sort, idx) in sortList" :key="sort.sortBy">
-              <span v-if="sortList.length>1"
-                class="cftf-exit-button"
-                title="Remove Sorting" 
-                @click="deleteSort(sort, index)"
-              >
-                  <i class="bi bi-x"></i>
-              </span>
-							<span
-               class="cftf-span-element"
-                @click="showUpdateSortOptions(idx)"
-              >{{sortList[idx]["label"]}}</span>
-              <div
-                v-if="showSortListDropdown[idx]"
-                class="cft-sort-items"
-              >
-                <div v-for="s in sortOptions" :key="s.sortBy"
-                 @click="updateSort(s,idx)"
-                 class="mb-2 cft-sort-element"
-                >
-                  {{s.label}}
-                </div>
-              </div>
-                <a v-if="sort.sortOrder==='asc'" @click="toggleSort(idx)" href="#" title="Ascending">
-                  <i class="bi bi-chevron-up cftf-arrow"></i>
-                </a>
-                <a v-else @click="toggleSort(idx)"  href="#" title="Descending">
-                  <i class="bi bi-chevron-down cftf-arrow"></i>
-                </a>
-            </div>
-          <i v-if="updateSortOptions.length===0"
-           class="fa fa-plus fa-sm click-element cftf-add-sorting"
-           @click="showaddSortListOptions"
-           title="Add sorting"></i>
-          <TaskSortOptions
-           :sortOptions="sortOptions"
-           :showSortListDropdown="showaddNewSortListDropdown"
-           @add-sort="addSort"
-          >
-          </TaskSortOptions>
-          </div>
-				</div>					 
-  </div>
-	<b-row class="cft-service-task-list mt-1">
-		<b-col xl="3" lg="3" md="12" class="cft-first">
-      <TaskListSearch
-        @call-search-api="callSearchApi"
-        @call-search-date-api="callSearchDateApi"
-        @call-process-variables-api="callProcessVariablesApi"
-        @call-task-variables-api="callTaskVariablesApi"
-        :tasklength="tasklength"
-      />
-        <!-- Task list section -->
-        <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
-          <b-list-group-item
-            button
-            v-for="(task, idx) in tasks"
-            v-bind:key="task.id"
-            v-on:click="toggle(idx)"
-            :class="{ 'cft-selected': idx == activeIndex }"
-          >
-            <div @click="setselectedTask(task.id)" class="cft-select-task">
-              <h5 class="cft-task-title" data-title='Task Name'>{{ task.name }}</h5>
-
-              <div class="cft-task-details-assign assigne-details ">
-                <div class='cft-process-title' data-tile='Process Definition Name'>
-                  {{
-                    getProcessDataFromList(
-                      getProcessDefinitions,
-                      task.processDefinitionId,
-                      "name"
-                    )
-                  }}
-                </div>
-                <div class="cft-task-assignee" data-title="Task assignee">
-                  {{ task.assignee }}
-                </div>
-              </div>
-              <div class="cft-task-details-assign font-11">
-                <div class="created-details">
-                  <div>
-                    <span class="cft-due-date" :data-title="getExactDate(task.due)" v-if="task.due">
-                      Due {{ timedifference(task.due) }},
-                    </span>
-                    <span class="cft-due-date" :data-title="getExactDate(task.followUp)" v-if="task.followUp">
-                      Follow-up {{ timedifference(task.followUp) }},
-                    </span>
-                    <span class="cft-due-date" :data-title="getExactDate(task.created)" v-if="task.created">
-                      Created {{ timedifference(task.created) }}
-                    </span>
-                  </div>
-                  <div class="cft-priority" data-title="priority">
-                    {{ task.priority }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </b-list-group-item>
-          <b-pagination-nav
-            :link-gen="linkGen"
-            :number-of-pages="numPages"
-            v-model="currentPage"
-            class="cft-paginate"
-          />
-        </b-list-group>
-        <b-list-group cols="3" v-else>
-          <b-row class="cft-not-selected mt-2 ml-1 row">
-            <i class="bi bi-exclamation-circle-fill" scale="1"></i>
-            <p>No tasks found in the list.</p>
-          </b-row>
-        </b-list-group>
+  <Header
+  v-if="token  && bpmApiUrl"
+  :token="token"
+  :bpmApiUrl="bpmApiUrl"
+  />
+    <b-row class="cft-service-task-list mt-1">
+      <b-col xl="3" lg="3" md="12" class="cft-first">
+        <LeftSider
+          v-if="token  && bpmApiUrl"
+          :token="token"
+          :bpmApiUrl="bpmApiUrl"
+        />
       </b-col>
       <!-- Task Detail section -->
       <b-col v-if="selectedTaskId" lg="9" md="12">
@@ -349,6 +225,10 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+// eslint-disable-next-line sort-imports
+import Header from './layout/header.vue'
+import LeftSider from './layout/left-sider.vue'
+
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
@@ -388,6 +268,8 @@ import vueBpmn from 'vue-bpmn';
     vueBpmn,
     Modeler,
     BpmnJS,
+    Header,
+    LeftSider
   },
 })
 export default class Tasklist extends Vue {
@@ -513,61 +395,13 @@ timedifference(date: Date) {
   return moment(date).fromNow();											
 }													   
 
-getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
-  const process = processList.find((process) => process.id === processId);
-  return process && process[dataKey];
-}
-
-setselectedTask(task: string) {
-  this.selectedTaskId = task;
-  this.fetchData();
-}
-getExactDate(date: Date) {
-  return getFormattedDateAndTime(date);
-}
 toggle(index: number) {
   this.activeIndex = index;						  
-}
-
-toggleshowfilter() {
-  this.showfilter = ! this.showfilter;
-}
-
-togglefilter(filter: any, index: number) {
-  this.activefilter = index;
-  this.fetchTaskList(filter.id, this.payload);
-  this.showfilter = false;
 }
 
 toggleassignee()  {
   this.editAssignee = ! this.editAssignee;
   this.userSelected = this.task.assignee;
-}
-
-cftShowUserList() {
-  this.showUserList = !this.showUserList;
-}
-
-callSearchApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callSearchDateApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callTaskVariablesApi(item: any) {
-  searchQuery["taskVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callProcessVariablesApi(item: any) {
-  searchQuery["processVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 onFormSubmitCallback() {
@@ -684,7 +518,6 @@ getBPMTaskDetail(taskId: string) {
     this.getBPMTaskDetail(this.task.id);
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
- 
 
   onClaim() {
     CamundaRest.claim(
@@ -743,19 +576,6 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  numberOfPages() {
-    if (Math.ceil(this.tasks.length / this.perPage) > 1)
-      return Math.ceil(this.tasks.length / this.perPage);
-    else {
-      return 15;
-    }
-  }
-
-  linkGen() {
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
- 
-
   getOptions(options: any) {
     const optionsArray: {
       sortOrder: string;
@@ -774,31 +594,6 @@ getBPMTaskDetail(taskId: string) {
     return optionsArray;
   }
 
-  addSort(sort: any) {
-    this.sortList.push(sort);
-    if (this.sortList.length === sortingList.length) {
-      this.updateSortOptions = this.sortOptions;
-    } else {
-      this.sortOptions = this.getOptions(this.sortList);
-    }
-    this.showaddNewSortListDropdown = false;									  
-  }
-
-  showaddSortListOptions() {
-    this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
-    this.sortOptions = this.getOptions(this.sortList);
-  }
-
-  showUpdateSortOptions(index: number) {
-    for(let i =0; i<6;i++){
-      if(this.showSortListDropdown[i]===true){
-        this.showSortListDropdown[i] = false;
-      }
-    }
-    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.setupdateSortListDropdownindex = index;
-  }
 
   updateSort(sort: any, index: number) {
     this.sortList[index].label = sort.label;
@@ -806,25 +601,6 @@ getBPMTaskDetail(taskId: string) {
 
     this.sortOptions = this.getOptions(this.sortList);
     this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  deleteSort(sort: any, index: number) {
-    this.sortList.splice(index, 1);
-    this.updateSortOptions = [];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-  toggleSort(index: number) {
-    if (this.sortList[index].sortOrder === "asc")
-      this.sortList[index].sortOrder = "desc";
-  
-    else {
-      this.sortList[index].sortOrder = "asc";
-    }
     this.payload["sorting"] = this.sortList;
     this.fetchTaskList(this.selectedfilterId, this.payload);
   }
@@ -963,7 +739,11 @@ getBPMTaskDetail(taskId: string) {
   }
   
   mounted() {
-    console.log(this.token);
+    this.$root.$on('call-fetchData', (para: any) => {
+      this.selectedTaskId = para.selectedTaskId
+      this.fetchData()
+    })
+
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
