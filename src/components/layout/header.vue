@@ -82,89 +82,33 @@ import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   sortingList,
 } from '../../services/utils';
-import BpmnJS from 'bpmn-js';
 import CamundaRest from '../../services/camunda-rest';
-import DatePicker from 'vue2-datepicker'
-import { Form } from 'vue-formio';
-import FormListModal from '../../components/FormListModal.vue';
-import Modeler from 'bpmn-js/lib/Modeler';
+import FormListModal from '../FormListModal.vue';
 import {Payload} from '../../services/TasklistTypes';
 import SocketIOService from '../../services/SocketIOServices';
-import TaskHistory from '../../components/TaskHistory.vue';
-import TaskListSearch from '../../components/TasklistSearch.vue';
-import TaskSortOptions from '../../components/TasklistSortoptions.vue';
-import vueBpmn from 'vue-bpmn';
+import TaskSortOptions from '../TaskListSortoptions.vue';
 
 @Component({
   components: {
-    formio: Form,
-    DatePicker,
     FormListModal,
-    TaskHistory,
-    TaskListSearch,
-    TaskSortOptions,
-    vueBpmn,
-    Modeler,
-    BpmnJS,
-  },
+    TaskSortOptions
+  }
 })
 export default class Tasklist extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
-  @Prop() private formIOResourceId!: string;
-  @Prop() private formIOReviewerId!: string;
-  @Prop() private formIOReviewer!: string;
-  @Prop() private formIOApiUrl!: string;
-  @Prop() private formsflowaiApiUrl!: string;
-  @Prop() private formsflowaiUrl!: string;
-  @Prop() private formIOUserRoles!: string;
-  @Prop() private userName!: string;
-  @Prop({default:'formflowai'}) private WEBSOCKET_ENCRYPT_KEY !: string;
 
-  private tasks: Array<object> = [];
-  private fulltasks: Array<object> = [];
-  private getProcessDefinitions: Array<object> = [];
-  private taskProcess = null;
-  private processDefinitionId = '';
-  private formId = '';
-  private submissionId = '';
-  private formioUrl = '';
-  private activeIndex = 0;
-  private task: any;
-  private setFollowup = null;
-  private setDue = null;
-  private setGroup = null;
-  private selectedTaskId = '';
-  private userSelected = null;
-  private showfrom = false;
   private currentPage = 1;
   private perPage = 10;
   private numPages = 5;
   private tasklength = 0;
-  private readoption = { readOnly: true };
-  private options = {
-    noAlerts: false,
-    i18n: {
-      en: {
-        error: "Please fix the errors before submitting again.",
-      },
-    },
-  };
   private filterList = [];
   private showfilter=false;
-  private editAssignee = false;
   private activefilter = 0;
-  private applicationId = '';
-  private groupList = [];
-  private groupListNames: Array<string> | null = null;
-  private groupListItems: string[] = [];
-  private userEmail = 'external';
   private selectedfilterId = '';
-  private xmlData!: string;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
@@ -176,60 +120,12 @@ export default class Tasklist extends Vue {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
-  private showUserList = false;
-  private taskHistoryList: Array<object> = [];
   
 @Watch('token')
   ontokenChange (newVal: string) {
   // updating token
     localStorage.setItem("authToken", newVal);
-}
-
-checkPropsIsPassedAndSetValue() {
-  if (!this.bpmApiUrl || this.bpmApiUrl === "") {
-    console.warn("bpmApiUrl prop not Passed");
   }
-  if (!this.token || this.token === "") {
-    console.warn("token prop not Passed");
-  }
-  if (!this.formIOResourceId || this.formIOResourceId === "") {
-    console.warn("formIOResourceId prop not passed");
-  }
-  if (!this.formIOReviewerId || this.formIOReviewerId === "") {
-    console.warn("formIOReviewerId prop not passed");
-  }
-  if (!this.formIOApiUrl || this.formIOApiUrl === "") {
-    console.warn("formIOApiUrl prop not passed");
-  }
-  if (!this.formsflowaiApiUrl || this.formsflowaiApiUrl === "") {
-    console.warn("formsflow.ai API url prop not passed");
-  }
-  if (!this.formsflowaiUrl || this.formsflowaiUrl === "") {
-    console.warn("formsflow.ai URL prop not passed");
-  }
-  if(!this.WEBSOCKET_ENCRYPT_KEY || this.WEBSOCKET_ENCRYPT_KEY === ""){
-    console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
-  }
-  const engine = "/engine-rest";
-  const socketUrl = "/forms-flow-bpm-socket";
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
-  localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.url", this.formsflowaiUrl);
-  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
-  localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
-  localStorage.setItem("websocketEncryptkey", this.WEBSOCKET_ENCRYPT_KEY)
-
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
-  this.userName = val.userName;
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
-}
-
 
 toggleshowfilter() {
   this.showfilter = ! this.showfilter;
@@ -237,127 +133,109 @@ toggleshowfilter() {
 
 togglefilter(filter: any, index: number) {
   this.activefilter = index;
-//   this.fetchTaskList(filter.id, this.payload);
+  //   this.fetchTaskList(filter.id, this.payload);
   this.$root.$emit('call-fetchTaskList', {filterId: filter.id, requestData: this.payload})
   this.showfilter = false;
 }
- 
-//   fetchTaskList(filterId: string, requestData: object) {
-//     this.selectedfilterId = filterId;
-//     CamundaRest.filterTaskList(
-//       this.token,
-//       filterId,
-//       requestData,
-//       this.bpmApiUrl
-//     ).then((result) => {
-//       // this.fulltasks= result.data;
-//       this.tasks = result.data.slice(
-//         (this.currentPage - 1) * this.perPage,
-//         this.currentPage * this.perPage
-//       );
-//       this.tasklength = result.data.length;
-//       this.numPages = Math.ceil(result.data.length / this.perPage);
-//     });
-//   }
 
-  getOptions(options: any) {
-    const optionsArray: {
+getOptions(options: any) {
+  const optionsArray: {
       sortOrder: string;
       label: string;
       sortBy: string;
     }[] = [];
-    sortingList.forEach((sortOption) => {
-      if (
-        !options.some(
-          (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-        )
-      ) {
-        optionsArray.push({ ...sortOption });
-      }
-    });
-    return optionsArray;
-  }
-  addSort(sort: any) {
-    this.sortList.push(sort);
-    if (this.sortList.length === sortingList.length) {
-      this.updateSortOptions = this.sortOptions;
-    } else {
-      this.sortOptions = this.getOptions(this.sortList);
+  sortingList.forEach((sortOption) => {
+    if (
+      !options.some(
+        (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
+      )
+    ) {
+      optionsArray.push({ ...sortOption });
     }
-    this.showaddNewSortListDropdown = false;									  
-  }
-
-  showaddSortListOptions() {
-    this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
+  });
+  return optionsArray;
+}
+addSort(sort: any) {
+  this.sortList.push(sort);
+  if (this.sortList.length === sortingList.length) {
+    this.updateSortOptions = this.sortOptions;
+  } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  this.showaddNewSortListDropdown = false;									  
+}
 
-  showUpdateSortOptions(index: number) {
-    for(let i =0; i<6;i++){
-      if(this.showSortListDropdown[i]===true){
-        this.showSortListDropdown[i] = false;
-      }
+showaddSortListOptions() {
+  this.showaddNewSortListDropdown = !this.showaddNewSortListDropdown;
+  this.sortOptions = this.getOptions(this.sortList);
+}
+
+showUpdateSortOptions(index: number) {
+  for(let i =0; i<6;i++){
+    if(this.showSortListDropdown[i]===true){
+      this.showSortListDropdown[i] = false;
     }
-    this.showSortListDropdown[index] = !this.showSortListDropdown[index];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.setupdateSortListDropdownindex = index;
   }
+  this.showSortListDropdown[index] = !this.showSortListDropdown[index];
+  this.sortOptions = this.getOptions(this.sortList);
+  this.setupdateSortListDropdownindex = index;
+}
 
-  updateSort(sort: any, index: number) {
-    this.sortList[index].label = sort.label;
-    this.sortList[index].sortBy = sort.sortBy;
+updateSort(sort: any, index: number) {
+  this.sortList[index].label = sort.label;
+  this.sortList[index].sortBy = sort.sortBy;
 
-    this.sortOptions = this.getOptions(this.sortList);
-    this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  }
+  this.sortOptions = this.getOptions(this.sortList);
+  this.showSortListDropdown[index] = false;
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
 
-  deleteSort(sort: any, index: number) {
-    this.sortList.splice(index, 1);
-    this.updateSortOptions = [];
-    this.sortOptions = this.getOptions(this.sortList);
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  }
+deleteSort(sort: any, index: number) {
+  this.sortList.splice(index, 1);
+  this.updateSortOptions = [];
+  this.sortOptions = this.getOptions(this.sortList);
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
 
-  toggleSort(index: number) {
-    if (this.sortList[index].sortOrder === "asc")
-      this.sortList[index].sortOrder = "desc";
+toggleSort(index: number) {
+  if (this.sortList[index].sortOrder === "asc")
+    this.sortList[index].sortOrder = "desc";
   
-    else {
-      this.sortList[index].sortOrder = "asc";
-    }
-    this.payload["sorting"] = this.sortList;
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  else {
+    this.sortList[index].sortOrder = "asc";
   }
-  mounted() {
-    this.checkPropsIsPassedAndSetValue();
-    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-      this.filterList = response.data;
-      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+  this.payload["sorting"] = this.sortList;
+  // this.fetchTaskList(this.selectedfilterId, this.payload);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+}
+mounted() {
+  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+    this.filterList = response.data;
+    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
     //   this.fetchTaskList(this.selectedfilterId, this.payload);
     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-    });
+  });
 
-    if(SocketIOService.isConnected()) {
-      SocketIOService.disconnect();
-    }
-    SocketIOService.connect((refreshedTaskId: any)=> {
-      if(this.selectedfilterId){
-        //Refreshes the Task
-        // this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-      }
-    })
-    this.sortOptions = this.getOptions([]);
-  }
-
-  beforeDestroy() {
+  if(SocketIOService.isConnected()) {
     SocketIOService.disconnect();
   }
+  SocketIOService.connect((refreshedTaskId: any)=> {
+    if(this.selectedfilterId){
+      //Refreshes the Task
+      // this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    }
+  })
+  this.sortOptions = this.getOptions([]);
+}
+
+beforeDestroy() {
+  SocketIOService.disconnect();
+}
 }
 </script>

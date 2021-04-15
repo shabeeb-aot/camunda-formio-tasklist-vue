@@ -10,6 +10,8 @@
         <LeftSider
           v-if="token  && bpmApiUrl"
           :token="token"
+          :formsflowaiApiUrl="formsflowaiApiUrl"
+          :formIOApiUrl="formIOApiUrl"
           :bpmApiUrl="bpmApiUrl"
         />
       </b-col>
@@ -104,12 +106,13 @@
                         </b-button>
                       </b-col>
                       <b-col>
-                        <input
+                        <b-form-input
                           type="text"
                           placeholder="Group ID"
                           v-model="setGroup"
                           v-on:keyup.enter="addGroup"
-                        />
+                        >
+			</b-form-input>
                       </b-col>
                     </b-row>
                     <b-row>
@@ -246,8 +249,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
-import TaskListSearch from '../components/TasklistSearch.vue';
-import TaskSortOptions from '../components/TasklistSortoptions.vue';
+import TaskListSearch from '../components/TaskListSearch.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
@@ -264,7 +266,6 @@ import vueBpmn from 'vue-bpmn';
     FormListModal,
     TaskHistory,
     TaskListSearch,
-    TaskSortOptions,
     vueBpmn,
     Modeler,
     BpmnJS,
@@ -594,17 +595,6 @@ getBPMTaskDetail(taskId: string) {
     return optionsArray;
   }
 
-
-  updateSort(sort: any, index: number) {
-    this.sortList[index].label = sort.label;
-    this.sortList[index].sortBy = sort.sortBy;
-
-    this.sortOptions = this.getOptions(this.sortList);
-    this.showSortListDropdown[index] = false;
-    this.payload["sorting"] = this.sortList;
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
   updateFollowUpDate() {
     const referenceobject = this.task;
     referenceobject['followUp'] = getISODateTime(this.setFollowup);
@@ -740,8 +730,8 @@ getBPMTaskDetail(taskId: string) {
   
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
-        this.selectedTaskId = para.selectedTaskId
-        this.fetchData()
+      this.selectedTaskId = para.selectedTaskId
+      this.fetchData()
     })
 
     this.checkPropsIsPassedAndSetValue();

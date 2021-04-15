@@ -1,4 +1,4 @@
-import {bpmAxios} from '../axios';
+import {bpmAxios} from '../services/axios';
 
 const engine = 'engine-rest'
 const engineExt = 'engine-rest-ext'
