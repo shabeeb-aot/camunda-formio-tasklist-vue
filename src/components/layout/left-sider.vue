@@ -1,10 +1,7 @@
 <template> 
 <span>
     <TaskListSearch
-    @call-search-api="callSearchApi"
-    @call-search-date-api="callSearchDateApi"
-    @call-process-variables-api="callProcessVariablesApi"
-    @call-task-variables-api="callTaskVariablesApi"
+    @update-task-list="updateTasklistResult"
     :tasklength="tasklength"
     />
     <!-- Task list section -->
@@ -100,6 +97,7 @@ import {getFormDetails} from '../../services/get-formio';
 import {getformHistoryApi} from '../../services/formsflowai-api';
 import moment from 'moment';
 import {searchQuery} from '../../services/search-constants';
+import isEqual from 'lodash/isEqual';
 import vueBpmn from 'vue-bpmn';
 
 
@@ -121,6 +119,7 @@ export default class Tasklist extends Vue {
   @Prop() private token!: string;
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formIOApiUrl!: string;
+  @Prop() private sortList !: any;
 
   private tasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
@@ -148,7 +147,6 @@ export default class Tasklist extends Vue {
   private selectedfilterId = '';
   private xmlData!: string;
   private payload: Payload = {
-    active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
@@ -170,22 +168,6 @@ checkPropsIsPassedAndSetValue() {
   if (!this.formsflowaiApiUrl || this.formsflowaiApiUrl === "") {
     console.warn("formsflow.ai API url prop not passed");
   }
-
-  const engine = "/engine-rest";
-  const socketUrl = "/forms-flow-bpm-socket";
-  localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
-  localStorage.setItem("authToken", this.token);
-  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
-
-  // const val = decodeTokenValues(
-  //   this.token,
-  //   this.userName,
-  //   this.formIOUserRoles
-  // );
-  // this.userName = val.userName;
-  // this.userEmail = val.userEmail;
-  // this.formIOUserRoles = val.formIOUserRoles;
 }
 
 timedifference(date: Date) {
@@ -207,28 +189,6 @@ getExactDate(date: Date) {
 }
 toggle(index: number) {
   this.activeIndex = index;						  
-}
-
-callSearchApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callSearchDateApi(item: any) {
-  this.payload["orQueries"] = item;
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callTaskVariablesApi(item: any) {
-  searchQuery["taskVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
-}
-
-callProcessVariablesApi(item: any) {
-  searchQuery["processVariables"].push(item);
-  this.payload["orQueries"] = [searchQuery];
-  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
 getGroupDetails() {
@@ -320,16 +280,17 @@ getBPMTaskDetail(taskId: string) {
     return optionsArray;
   }
 
-
-  // updateSort(sort: any, index: number) {
-  //   this.sortList[index].label = sort.label;
-  //   this.sortList[index].sortBy = sort.sortBy;
-
-  //   this.sortOptions = this.getOptions(this.sortList);
-  //   this.showSortListDropdown[index] = false;
-  //   this.payload["sorting"] = this.sortList;
-  //   this.fetchTaskList(this.selectedfilterId, this.payload);
-  // }
+updateTasklistResult(queryList: object) {
+  const requiredParams = {...{sorting:this.sortList},...queryList}
+  console.log(this.payload);
+  if(!isEqual(this.payload, requiredParams)){
+    console.log("changed")
+  // const combined = { ...this.payload, ...queryList}
+    this.payload = requiredParams;
+  // this.fetchTaskList(this.selectedfilterId, combined);
+  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  }
+}
 
   fetchData() {
     if (this.selectedTaskId) {
@@ -395,50 +356,12 @@ getBPMTaskDetail(taskId: string) {
     })
 
     this.checkPropsIsPassedAndSetValue();
-    // authenticateFormio(
-    //   this.formIOResourceId,
-    //   this.formIOReviewerId,
-    //   this.formIOReviewer,
-    //   this.userEmail,
-    //   this.formIOUserRoles
-    // );
-    // CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-    //   this.filterList = response.data;
-    //   this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-    //   this.fetchTaskList(this.selectedfilterId, this.payload);
-    // });
-
     this.fetchData();
-    // if(SocketIOService.isConnected()) {
-    //   SocketIOService.disconnect();
-    // }
-    // SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
-    //   if(this.selectedfilterId){
-    //     //Refreshes the Task
-    //     this.fetchTaskList(this.selectedfilterId, this.payload);
-    //     this.fetchData();
-    //   }
-    //   if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-    //     this.fetchData()
-    //     this.reloadCurrentTask();
-    //   }
-    // })
-
-    // this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {
         this.getProcessDefinitions = response.data;
       }
     );
-    // CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-    //   const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
-    //   this.userList = result;
-    // });
-
   }
-
-  // beforeDestroy() {
-  //   SocketIOService.disconnect();
-  // }
 }
 </script>

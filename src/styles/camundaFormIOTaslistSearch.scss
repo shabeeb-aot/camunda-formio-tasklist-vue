@@ -21,14 +21,14 @@
         float: right;
     }
     .cft-rhs-container{
-        width: 46.5%;
+        // width: 46.5%;
         display: inline-block;
     }
     .cft-search-operator{
         margin-bottom: 0rem;
         display: inline-block;
-        padding-left: 20px;
-        padding-right: 10px;
+        padding-left: 35px;
+        padding-right: 15px;
     }
     .cft-operator-dropdown{
       z-index: 10;
@@ -45,7 +45,27 @@
     }
 
     .cftf-search-title {
-        padding: 10px;
+        padding-left: 10px;
     }
 
+    .cftf-x {
+        padding-left: 4px;
+    }
+
+    .cft-variable-box {
+        margin-left: 3.5px;
+        padding-left: 45px;
+    }
+
+    .cft-search-variable-input {
+        padding-right: 50px;
+    }
+
+    .cft-name-value-container {
+        font-size: 14px;
+        font-weight: 500;
+        margin-left: 5px;
+        display: block;
+        color: #0d0d0e;
+    }
 }

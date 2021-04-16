@@ -13,6 +13,7 @@
           :formsflowaiApiUrl="formsflowaiApiUrl"
           :formIOApiUrl="formIOApiUrl"
           :bpmApiUrl="bpmApiUrl"
+          :sortList="sortList"
         />
       </b-col>
       <!-- Task Detail section -->
@@ -249,12 +250,10 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
-import TaskListSearch from '../components/TaskListSearch.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
-// import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 // import {searchQuery} from '../services/search-constants';
 import vueBpmn from 'vue-bpmn';
@@ -266,7 +265,6 @@ import vueBpmn from 'vue-bpmn';
     DatePicker,
     FormListModal,
     TaskHistory,
-    TaskListSearch,
     vueBpmn,
     Modeler,
     BpmnJS,

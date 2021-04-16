@@ -25,11 +25,46 @@
           :key="query.label + index"
         >
           <span @click="deleteSearchQueryElement(query,index)">
-            <i class="fa fa-times"></i>
+            <i class="fa fa-times cftf-x"></i>
           </span>
-          <span class="cftf-search-title" title="type" @click="showUpdateSearchList(index)">{{
-            query.label
-          }}</span>
+          <span class="cftf-search-title" title="type">
+            <span @click="showUpdateSearchList(index)">
+              {{query.label}}
+            </span>
+            <span v-if="query.type === 'variables'"> 
+              <span>: </span>     
+              <span
+                v-if="showVariableValue[index] === 'a'"
+                @click="updatevariableinput(index)"
+              > ??
+              </span>
+              <span v-if="showVariableValue[index]==='i'">
+                <span class="cft-variable-box">
+                <span
+                  @click="showVariableValueItem(index)"
+                >
+                  <i class="bi bi-check cft-approve-box"></i>
+                </span>
+                <i class="bi bi-x cft-reject-box" @click="showVariableValueItem(index)"></i
+                ></span>
+                <b-row align-h="end">
+                  <b-col cols="8" class="cft-search-variable-input">
+                <b-form-input
+                  v-model="searchVariableValue[index]"
+                  v-on:keyup.enter="showVariableValueItem(index)"
+                />
+                  </b-col>
+                </b-row>
+              </span>
+              </span>
+              <span
+                v-if="showVariableValue[index] === 's'"
+                @click="updatevariableinput(index)"
+              >
+                {{ searchVariableValue[index] }}
+              </span>
+            </span>
+          <!-- </span> -->
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
             <div
               v-for="s in searchListElements"
@@ -53,69 +88,6 @@
                 <span @click="updateSearchQueryOperators(x, index)">{{ x }}</span>
               </div>
             </div>
-            <!-- <div class="cft-rhs-container" v-if="item.type === 'date'">
-              <span
-                v-if="showSearchs[index] === 'a'"
-                @click="updatesearchinput(index)"
-              >
-                ??</span
-              >
-              <DatePicker
-                type="datetime"
-                v-model="searchDate[index]"
-                @change="
-                  callSearchDateApi(searchDate[index], item, operator, index)
-                "
-              ></DatePicker>
-            </div>
-            <div class="cft-rhs-container" v-else-if="item.label === 'Task Variables'">
-              <input
-                v-if="showSearchs[index] === 'i'"
-                v-model="searchItem[index]" 
-              />
-              <span
-                v-if="showSearchs[index] === 's'"
-                @click="updateresultOnclick(index)"
-              >
-                {{ searchItem[index] }}
-              </span>
-              <span
-                v-if="showSearchs[index] === 'a'"
-                @click="updatesearchinput(index)"
-              >
-                ??</span
-              >
-              <input
-                v-model="variableValue[index]"
-                v-on:keyup.enter="
-                  callTaskVariablesApi(searchItem[index], operator[index], variableValue[index])
-                "
-              />
-            </div>
-            <div class="cft-rhs-container" v-else-if="item.label === 'Process Variables'">
-              <input
-                v-if="showSearchs[index] === 'i'"
-                v-model="searchItem[index]" 
-              />
-              <span
-                v-if="showSearchs[index] === 's'"
-                @click="updateresultOnclick(index)"
-              >
-                {{ searchItem[index] }}
-              </span>
-              <span
-                v-if="showSearchs[index] === 'a'"
-                @click="updatesearchinput(index)"
-              >
-                ??</span
-              >
-              <input
-                v-model="variableValue[index]"
-                v-on:keyup.enter="
-                  callProcessVariablesApi(searchItem[index], operator[index], variableValue[index])
-                "
-              />
-            </div> -->
             <div class="cft-rhs-container">
               <span
                 v-if="showSearchs[index] === 'a'"
@@ -123,30 +95,33 @@
               >
                 ??</span
               >
-              <span v-if="showSearchs[index] === 'i'">
+              <span v-if="showSearchs[index] === 'i' &&query.type==='date'">
+                <b-form-datepicker size="sm"></b-form-datepicker>
+              </span>
+              <span v-if="showSearchs[index] === 'i' && query.type !=='date'">
               <span class="cft-icon-actions">
                 <span
                   @click="
-                    setSearchQueryValue(searchItem[index], query, operator[index], index)
+                    setSearchQueryValue(searchValueItem[index], query, operator[index], index)
                   "
                 >
                   <i class="bi bi-check cft-approve-box"></i>
                 </span>
-                <i class="bi bi-x cft-reject-box"></i
+                <i class="bi bi-x cft-reject-box" @click="showsearchValueItem(index)"></i
               ></span>
               <b-form-input
-                v-model="searchItem[index]"
+                v-model="searchValueItem[index]"
                 v-on:keyup.enter="
-                  setSearchQueryValue(searchItem[index], query, operator[index], index)
+                  setSearchQueryValue(searchValueItem[index], query, operator[index], index)
                 "
               >
               </b-form-input>
               </span>
               <span
                 v-if="showSearchs[index] === 's'"
-                @click="updateresultOnclick(index)"
+                @click="updatesearchinput(index)"
               >
-                {{ searchItem[index] }}
+                {{ searchValueItem[index] }}
               </span>
             </div>
           </div>
@@ -173,6 +148,27 @@
           {{ s.label }}
         </b-list-group-item>
       </b-list-group>
+      <span v-if="isVariableTypeInSelectedSearchQuery">
+        <span>
+        <!-- <b-form-checkbox value="variableNamesIgnoreCase">
+          name
+        </b-form-checkbox>
+        <b-form-checkbox value="variableValuesIgnoreCase">
+          value.
+        </b-form-checkbox> -->
+        <b-form-checkbox-group
+        id="checkbox-group-2"
+        v-model="selected"
+        :aria-describedby="ariaDescribedby"
+        name="flavour-2"
+      >
+      <span class="cft-name-value-container">For Variables, ignore case of
+        <b-form-checkbox value="variableNamesIgnoreCase">name</b-form-checkbox>
+        <b-form-checkbox value="variableValuesIgnoreCase">value.</b-form-checkbox>
+      </span>
+      </b-form-checkbox-group>
+        </span>
+      </span>
     </b-col>
   </div>
 </template>
@@ -200,16 +196,18 @@ export default class TaskListSearch extends Vue {
   private showUpdatesearch: Array<boolean> = [];
   private setUpdatesearchindex = 0;
   private showSearchQueryOperators: any = [];
-  private searchItem = [];
-  private variableValue = [];
+  private searchValueItem = [];
+  private searchVariableValue = [];
   private operator: Array<string> = [];
   private showSearchs: Array<string> = [];
+  private showVariableValue: Array<string> = [];
   private searchDate: any = [];
   private setupdateSortListDropdownindex = 0;
   private queryList: any = {
     "taskVariables": [],
     "processVariables": []
   };
+  private isVariableTypeInSelectedSearchQuery = false;
 
   setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
@@ -236,26 +234,43 @@ export default class TaskListSearch extends Vue {
     Vue.set(this.showSearchs, index, "i");
   }
 
-  updateresultOnclick(index: number) {
-    Vue.set(this.showSearchs, index, "i");
+  showsearchValueItem(index: number) {
+    Vue.set(this.showSearchs, index, "s");
   }
 
   makeInputNull(index: number) {
     Vue.set(this.showSearchs, index, "a");
   }
 
+  updatevariableinput(index: number) {
+    Vue.set(this.showVariableValue, index, "i");
+  }
+
+  showVariableValueItem(index: number) {
+    Vue.set(this.showVariableValue, index, "s")
+  }
+
   addSearchElementItem(item: any) {
+    console.log("entered", item.type)
     this.selectedSearchQueries.push(item);
     if (this.selectedSearchQueries === []) {
       this.operator[0] = item["compares"][0];
       this.showSearchs[0] = "a";
       this.showUpdatesearch[0] = false;
       this.showSearchQueryOperators[0] = false;
+      if(item.type==="variables"){
+      this.showVariableValue[0] = "a";
+      this.isVariableTypeInSelectedSearchQuery = true;
+      }
     } else {
       this.operator[this.selectedSearchQueries.length - 1] = item["compares"][0];
       this.showSearchs[this.selectedSearchQueries.length - 1] = "a";
       this.showUpdatesearch[this.selectedSearchQueries.length - 1] = false;
       this.showSearchQueryOperators[this.selectedSearchQueries.length - 1] = false;
+      if(item.type==="variables"){
+      this.showVariableValue[this.selectedSearchQueries.length - 1] = 'a';
+      this.isVariableTypeInSelectedSearchQuery = true;
+      }
     }
     this.showSearchList = false;
   }
@@ -267,12 +282,8 @@ export default class TaskListSearch extends Vue {
         id = i;
       }
     }
-    if(this.queryList.length>1){
       delete this.queryList[query["values"][id]];
-    }
-    else {
-      this.queryList = {}
-    }
+    console.log(this.queryList)
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
     this.updateTasklistResult()
@@ -307,10 +318,11 @@ export default class TaskListSearch extends Vue {
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
       this.queryList[query.key].push({
-        "name": this.searchItem[idx],
+        "name": this.searchValueItem[idx],
         "operator": getVariableOperator(operator),
-        "value": this.variableValue[idx]
+        "value": this.searchVariableValue[idx]
       })
+      this.updateTasklistResult();
       break;
     }
     case FilterSearchTypes.DATE: {
@@ -347,47 +359,6 @@ export default class TaskListSearch extends Vue {
       return {orQueries: [this.queryList]}
     }
   }
-
-  // @Emit()
-  // callSearchDateApi(
-  //   item: any,
-  //   searchItem: any,
-  //   comparator: string,
-  //   idx: number
-  // ) {
-  //   Vue.set(this.showSearchs, idx, "s");
-  //   let index = 0;
-  //   for (let i = 0; i < searchItem["compares"].length; i++) {
-  //     if (searchItem["compares"][i] === comparator) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-
-  // const timearr = moment(item)
-  //   .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-  //   .split("+");
-  // const replaceTimezone = timearr[1].replace(":", "");
-  // const titem = moment(item)
-  //   .format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-  //   .replace(timearr[1], replaceTimezone);
-
-  // searchQuery[searchItem["values"][index]] = titem;
-  //   return [searchQuery]
-  //   // this.payload["orQueries"] = searchQuery;
-  //   // this.fetchTaskList(this.selectedfilterId, this.payload);
-  // }
-
-  // @Emit()
-  // callTaskVariablesApi(searchItem: string, operator: string, variableValue: string) {
-  //   const item = {"name": searchItem, "operator": getVariableOperator(operator), "value": variableValue}
-  //   return item;
-  // }
-  
-  // @Emit()
-  // callProcessVariablesApi(searchItem: string, operator: string, variableValue: string) {
-  //   const item = {"name": searchItem, "operator": getVariableOperator(operator), "value": variableValue}
-  //   return item;
-  // }
 }
+
 </script>
