@@ -177,7 +177,6 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
-  localStorage.setItem("bpmSocketUrl", this.bpmApiUrl + socketUrl)
 
   // const val = decodeTokenValues(
   //   this.token,
@@ -410,20 +409,20 @@ getBPMTaskDetail(taskId: string) {
     // });
 
     this.fetchData();
-    if(SocketIOService.isConnected()) {
-      SocketIOService.disconnect();
-    }
-    SocketIOService.connect((refreshedTaskId: any)=> {
-      if(this.selectedfilterId){
-        //Refreshes the Task
-        this.fetchTaskList(this.selectedfilterId, this.payload);
-        this.fetchData();
-      }
-      if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-        this.fetchData()
-        this.reloadCurrentTask();
-      }
-    })
+    // if(SocketIOService.isConnected()) {
+    //   SocketIOService.disconnect();
+    // }
+    // SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
+    //   if(this.selectedfilterId){
+    //     //Refreshes the Task
+    //     this.fetchTaskList(this.selectedfilterId, this.payload);
+    //     this.fetchData();
+    //   }
+    //   if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+    //     this.fetchData()
+    //     this.reloadCurrentTask();
+    //   }
+    // })
 
     // this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
@@ -438,8 +437,8 @@ getBPMTaskDetail(taskId: string) {
 
   }
 
-  beforeDestroy() {
-    SocketIOService.disconnect();
-  }
+  // beforeDestroy() {
+  //   SocketIOService.disconnect();
+  // }
 }
 </script>
