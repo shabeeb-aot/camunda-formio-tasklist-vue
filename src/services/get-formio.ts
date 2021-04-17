@@ -6,13 +6,5 @@ export const getFormDetails = (formioUrl: string, formIOProjectUrl: string) => {
   const formId: string = formArr[4];
   const submissionId: string = formArr[6];
 
-  return {formioUrl, formId, submissionId};
-}
-
-export const getFormIdandSubmissionId = (formioUrl: string) => {
-  const formArr = formioUrl.split("/");
-  const formId: string = formArr[4];
-  const submissionId: string = formArr[6];
-
-  return {formId, submissionId};
+  return {formioUrl, formId, submissionId}
 }
