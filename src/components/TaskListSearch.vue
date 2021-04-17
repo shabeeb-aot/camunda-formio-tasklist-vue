@@ -64,7 +64,6 @@
                 {{ searchVariableValue[index] }}
               </span>
             </span>
-          <!-- </span> -->
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
             <div
               v-for="s in searchListElements"
@@ -150,22 +149,15 @@
       </b-list-group>
       <span v-if="isVariableTypeInSelectedSearchQuery">
         <span>
-        <!-- <b-form-checkbox value="variableNamesIgnoreCase">
-          name
-        </b-form-checkbox>
-        <b-form-checkbox value="variableValuesIgnoreCase">
-          value.
-        </b-form-checkbox> -->
-        <b-form-checkbox-group
+      <b-form-checkbox-group
         id="checkbox-group-2"
-        v-model="selected"
-        :aria-describedby="ariaDescribedby"
+        v-model="variablesEndType"
         name="flavour-2"
       >
-      <span class="cft-name-value-container">For Variables, ignore case of
-        <b-form-checkbox value="variableNamesIgnoreCase">name</b-form-checkbox>
-        <b-form-checkbox value="variableValuesIgnoreCase">value.</b-form-checkbox>
-      </span>
+        <span class="cft-name-value-container">For Variables, ignore case of
+        <b-form-checkbox value="variableNamesIgnoreCase" @change="callTaskVariablesEndApi">name</b-form-checkbox>
+        <b-form-checkbox value="variableValuesIgnoreCase" @change="callTaskVariablesEndApi">value.</b-form-checkbox>
+        </span>
       </b-form-checkbox-group>
         </span>
       </span>
@@ -203,6 +195,7 @@ export default class TaskListSearch extends Vue {
   private showVariableValue: Array<string> = [];
   private searchDate: any = [];
   private setupdateSortListDropdownindex = 0;
+  private variablesEndType = [];
   private queryList: any = {
     "taskVariables": [],
     "processVariables": []
@@ -250,8 +243,17 @@ export default class TaskListSearch extends Vue {
     Vue.set(this.showVariableValue, index, "s")
   }
 
+  callTaskVariablesEndApi() {
+    this.queryList['variableNamesIgnoreCase'] = false;
+    this.queryList['variableValuesIgnoreCase'] = false;
+    
+    for(const variablevalue in this.variablesEndType) {
+    this.queryList[this.variablesEndType[variablevalue]] = true;
+    this.updateTasklistResult()
+    }
+  }
+
   addSearchElementItem(item: any) {
-    console.log("entered", item.type)
     this.selectedSearchQueries.push(item);
     if (this.selectedSearchQueries === []) {
       this.operator[0] = item["compares"][0];
@@ -283,7 +285,6 @@ export default class TaskListSearch extends Vue {
       }
     }
       delete this.queryList[query["values"][id]];
-    console.log(this.queryList)
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
     this.updateTasklistResult()
@@ -317,12 +318,14 @@ export default class TaskListSearch extends Vue {
     }
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
+      if(this.searchValueItem[idx] && this.searchVariableValue[idx]){
       this.queryList[query.key].push({
         "name": this.searchValueItem[idx],
         "operator": getVariableOperator(operator),
         "value": this.searchVariableValue[idx]
       })
       this.updateTasklistResult();
+      }
       break;
     }
     case FilterSearchTypes.DATE: {
@@ -348,7 +351,6 @@ export default class TaskListSearch extends Vue {
     default:
     }
   }
-
 
   @Emit('update-task-list')
   updateTasklistResult(){
