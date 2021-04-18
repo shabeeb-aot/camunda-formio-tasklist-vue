@@ -95,7 +95,13 @@
                 ??</span
               >
               <span v-if="showSearchs[index] === 'i' &&query.type==='date'">
-                <b-form-datepicker size="sm"></b-form-datepicker>
+                <b-form-datepicker
+                size="sm"
+                v-model="setDate[index]"
+                @input="setSearchQueryValue(setDate[index], query, operator[index], index)"
+                value-as-date
+                >
+                </b-form-datepicker>
               </span>
               <span v-if="showSearchs[index] === 'i' && query.type !=='date'">
               <span class="cft-icon-actions">
@@ -115,6 +121,9 @@
                 "
               >
               </b-form-input>
+              </span>
+              <span v-if="showSearchs[index] === 's'&& query.type ==='date'">
+                {{setDate[index]}}
               </span>
               <span
                 v-if="showSearchs[index] === 's'"
@@ -201,6 +210,8 @@ export default class TaskListSearch extends Vue {
     "processVariables": []
   };
   private isVariableTypeInSelectedSearchQuery = false;
+  private value = '';
+  private setDate: Array<string> = [];
 
   setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
@@ -329,7 +340,9 @@ export default class TaskListSearch extends Vue {
       break;
     }
     case FilterSearchTypes.DATE: {
+      console.log("Date", item);
       const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
+      console.log(timearr)
       const replaceTimezone = timearr[1].replace(":", "");
       const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
         .replace(timearr[1], replaceTimezone);
