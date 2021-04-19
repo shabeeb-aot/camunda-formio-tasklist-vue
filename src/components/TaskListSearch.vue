@@ -58,6 +58,7 @@
               </span>
               </span>
               <span
+                class="cft-search-cursor"
                 v-if="showVariableValue[index] === 's'"
                 @click="updatevariableinput(index)"
               >
@@ -67,8 +68,8 @@
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
             <div
               v-for="updateSearch in searchListElements"
-              :key="updateSearch.label"
-              @click="updateSearchQueryElement(s, index)"
+              :key="updateSearch.key"
+              @click="updateSearchQueryElement(updateSearch, index)"
               class="mb-2 cft-sort-element"
             >
               {{ updateSearch.label }}
@@ -91,6 +92,7 @@
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
+                class="cft-search-cursor"
               >
                 ??</span
               >
@@ -107,9 +109,9 @@
               </span>
               <span v-if="showSearchs[index] === 'i' && query.type !=='date'">
               <span class="cft-icon-actions">
-                <span
-                  @click="
-                    setSearchQueryValue(searchValueItem[index], query, operator[index], index)
+                <span @click="
+                    setSearchQueryValue(searchValueItem[index], query, operator[index], index);
+                    showsearchValueItem(index);
                   "
                 >
                   <i class="bi bi-check cft-approve-box"></i>
@@ -119,7 +121,8 @@
               <b-form-input
                 v-model="searchValueItem[index]"
                 v-on:keyup.enter="
-                  setSearchQueryValue(searchValueItem[index], query, operator[index], index)
+                  setSearchQueryValue(searchValueItem[index], query, operator[index], index);
+                  showsearchValueItem(index);
                 "
               >
               </b-form-input>
@@ -134,22 +137,27 @@
           </div>
         </div>
       </div>
-      <div>
-      <b-form-input
-        type="text"
-        class="cft-filter"
-        placeholder="Filter Tasks"
-        @click="cftshowSearchListElements"
-      />
+      <b-row>
+        <b-col cols="10">
+          <b-form-input
+            type="text"
+            class="cft-filter"
+            placeholder="Filter Tasks"
+            @click="cftshowSearchListElements"
+            size="sm"
+          />
+        </b-col>
+        <b-col cols="2">
       {{ tasklength }}
-      </div>
+        </b-col>
+      </b-row>
       <b-list-group v-if="showSearchList" class="cft-search-items">
         <b-list-group-item
           button
           v-for="(s, idx) in searchListElements"
           :key="s.label"
           @click="
-            addSearchElementItem(s);
+            addToSelectedSearchQuery(s);
             setActiveSearchItem(idx);
           "
           :class="{ 'cft-search-item-selected': idx == activeSearchItem }"
@@ -238,7 +246,7 @@ export default class TaskListSearch extends Vue {
 
   updateSearchQueryOperators(operator: any, index: number) {
     delete this.queryList[
-    searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
+      searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
     this.operator[index] = operator;
     Vue.set(this.showSearchQueryOperators, index, false);
@@ -280,7 +288,7 @@ export default class TaskListSearch extends Vue {
     //on changing to false also updating values required
   }
 
-  addSearchElementItem(item: any) {
+  addToSelectedSearchQuery(item: any) {
     this.selectedSearchQueries.push(item);
     if (this.selectedSearchQueries === []) {
       this.operator[0] = item["compares"][0];
@@ -306,14 +314,16 @@ export default class TaskListSearch extends Vue {
   }
 
   deleteSearchQueryElement(query: any, index: number) {
-    let id = 0;
-    for(let i=0; i<this.selectedSearchQueries[index]["compares"].length; i++) {
-      if(this.selectedSearchQueries[index]["compares"][i]===this.operator[index]) {
-        id = i;
-      }
-    }
+    // let id = 0;
+    // for(let i=0; i<this.selectedSearchQueries[index]["compares"].length; i++) {
+    //   if(this.selectedSearchQueries[index]["compares"][i]===this.operator[index]) {
+    //     id = i;
+    //   }
+    // }
     
-    delete this.queryList[query["values"][id]];
+    delete this.queryList[
+      searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
+    ];
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
     this.updateTasklistResult()
@@ -327,24 +337,28 @@ export default class TaskListSearch extends Vue {
   }
 
   updateSearchQueryElement(searchitem: any, index: number) {
-    this.selectedSearchQueries[index].label = searchitem.label;
-    this.selectedSearchQueries[index].compares = searchitem.compares;
-    this.selectedSearchQueries[index].values = searchitem.values;
-    this.operator[index] = searchitem.compares[0];
+    // console.log("searchitem", searchitem)
+    delete this.queryList[
+      searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
+    ];
+    this.selectedSearchQueries[index] = searchitem
+    this.operator[index] = this.selectedSearchQueries[index].compares[0];
     this.showUpdatesearch[index] = false;
-    this.updateTasklistResult()
+    this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
+    // this.updateTasklistResult()
     this.searchListElements = taskSearchFilters;
   }
 
   setSearchQueryValue(item: any, query: any, operator: string, idx: number) {
-    Vue.set(this.showSearchs, idx, "s");
-    let index = 0;
-    for (let i = 0; i < query["compares"].length; i++) {
-      if (query["compares"][i] === operator) {
-        index = i;
-        break;
-      }
-    }
+    // Vue.set(this.showSearchs, idx, "s");
+    // let index = 0;
+    // for (let i = 0; i < query["compares"].length; i++) {
+    //   if (query["compares"][i] === operator) {
+    //     index = i;
+    //     break;
+    //   }
+    // }
+    const Vindex = searchValueObject(this.selectedSearchQueries[idx].key, this.operator[idx])
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
       if(this.searchValueItem[idx] && this.searchVariableValue[idx]){
@@ -365,16 +379,16 @@ export default class TaskListSearch extends Vue {
       const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
         .replace(timearr[1], replaceTimezone);
 
-      this.queryList[query["values"][index]] = titem;
+      this.queryList[Vindex] = titem;
       this.updateTasklistResult();
       break;
     }
     case FilterSearchTypes.STRING:
     case FilterSearchTypes.NORMAL:{
-      if (query["compares"][index] === "like") {
-        this.queryList[query["values"][index]] = "%" + item + "%";
+      if (this.operator[idx] === "like") {
+        this.queryList[Vindex] = "%" + item + "%";
       } else {
-        this.queryList[query["values"][index]] = item;
+        this.queryList[Vindex] = item;
       }
       this.updateTasklistResult();
       break;
@@ -394,7 +408,8 @@ export default class TaskListSearch extends Vue {
   }
 
   mounted() {
-    console.log(this.selectedSearchQueries)
+    this.updateTasklistResult();
+
   }
 
 }
