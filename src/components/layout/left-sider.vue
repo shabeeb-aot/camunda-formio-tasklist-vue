@@ -176,7 +176,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
+  localStorage.setItem("formioApiUrl", this.formIOApiUrl);
 
   // const val = decodeTokenValues(
   //   this.token,

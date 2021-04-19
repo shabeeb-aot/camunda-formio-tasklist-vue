@@ -379,7 +379,7 @@ checkPropsIsPassedAndSetValue() {
   const currentUrl = window.location.protocol + '//' +  window.location.host
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
+  localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   const val = decodeTokenValues(
     this.token,
     this.userName,
