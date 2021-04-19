@@ -42,7 +42,7 @@ export default class FormViewSubmission extends Vue {
     if(formId&& submissionId){
       const a = document.createElement('a');
       a.href = formioUrl
-      this.formioUrlLink = formioUrl.replace(a.protocol, "https");
+      this.formioUrlLink = formioUrl.replace(a.protocol.toString(), "https:");
       this.fId = formId;
       this.sId = submissionId;
     }
