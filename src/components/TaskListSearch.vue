@@ -134,7 +134,7 @@
           </div>
         </div>
       </div>
-      <input
+      <b-form-input
         type="text"
         class="cft-filter"
         placeholder="Filter Tasks"
@@ -179,10 +179,11 @@ import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { 
   FilterSearchTypes,
   getVariableOperator,
-  taskSearchFilters
-  } from "../services/search-constants";
-import {getFormattedDateAndTime} from '../services/utils';
+  searchValueObject,
+  taskSearchFilters,
+} from "../services/search-constants";
 import DatePicker from "vue2-datepicker";
+import {getFormattedDateAndTime} from '../services/utils';
 import moment from "moment";
 
 @Component({
@@ -234,8 +235,12 @@ export default class TaskListSearch extends Vue {
   }
 
   updateSearchQueryOperators(operator: any, index: number) {
+    delete this.queryList[
+    searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
+    ];
     this.operator[index] = operator;
     Vue.set(this.showSearchQueryOperators, index, false);
+    this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
   }
 
   updatesearchinput(index: number) {
@@ -270,6 +275,7 @@ export default class TaskListSearch extends Vue {
       this.queryList[this.variablesEndType[variablevalue]] = true;
       this.updateTasklistResult()
     }
+    //on changing to false also updating values required
   }
 
   addSearchElementItem(item: any) {
@@ -324,7 +330,7 @@ export default class TaskListSearch extends Vue {
     this.selectedSearchQueries[index].values = searchitem.values;
     this.operator[index] = searchitem.compares[0];
     this.showUpdatesearch[index] = false;
-
+    this.updateTasklistResult()
     this.searchListElements = taskSearchFilters;
   }
 
@@ -384,6 +390,10 @@ export default class TaskListSearch extends Vue {
       return {orQueries: [this.queryList]}
     }
   }
-}
 
+  mounted() {
+    console.log(this.selectedSearchQueries)
+  }
+
+}
 </script>
