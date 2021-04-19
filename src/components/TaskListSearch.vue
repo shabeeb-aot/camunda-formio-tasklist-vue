@@ -134,6 +134,7 @@
           </div>
         </div>
       </div>
+      <div>
       <b-form-input
         type="text"
         class="cft-filter"
@@ -141,6 +142,7 @@
         @click="cftshowSearchListElements"
       />
       {{ tasklength }}
+      </div>
       <b-list-group v-if="showSearchList" class="cft-search-items">
         <b-list-group-item
           button

@@ -15,6 +15,8 @@
         border: 1px solid rgb(165, 163, 163);
         height: 8px;
         width: 8px;
+        cursor: pointer;
+        color: #212529;
         }
     .cft-icon-actions{
         display: block;
@@ -29,6 +31,7 @@
         display: inline-block;
         padding-left: 35px;
         padding-right: 15px;
+        cursor: pointer;
     }
     .cft-operator-dropdown{
       z-index: 10;
@@ -42,23 +45,29 @@
     .cftf-search-item-box {
         font-size: 16px;
         font-weight: 400;
+        color: #155cb5;
+        // cursor: pointer;
     }
 
     .cftf-search-title {
         padding-left: 10px;
+        cursor: pointer;
     }
 
     .cftf-x {
         padding-left: 4px;
+        cursor: pointer;
     }
 
     .cft-variable-box {
         margin-left: 3.5px;
         padding-left: 53px;
+        cursor: pointer;
     }
 
     .cft-search-variable-input {
         padding-right: 50px;
+        cursor: pointer;
     }
 
     .cft-name-value-container {
