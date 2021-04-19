@@ -237,7 +237,6 @@ import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
-  getFormattedDateAndTime,
   getTaskFromList,
   sortingList,
 } from '../services/utils';

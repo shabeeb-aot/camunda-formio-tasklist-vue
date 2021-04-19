@@ -66,12 +66,12 @@
             </span>
           <div v-if="showUpdatesearch[index]" class="cft-sort-items">
             <div
-              v-for="s in searchListElements"
-              :key="s.label"
+              v-for="updateSearch in searchListElements"
+              :key="updateSearch.label"
               @click="updateSearchQueryElement(s, index)"
               class="mb-2 cft-sort-element"
             >
-              {{ s.label }}
+              {{ updateSearch.label }}
             </div>
           </div>
           <div>
@@ -99,9 +99,11 @@
                 size="sm"
                 v-model="setDate[index]"
                 @input="setSearchQueryValue(setDate[index], query, operator[index], index)"
-                value-as-date
                 >
                 </b-form-datepicker>
+              </span>
+              <span v-if="showSearchs[index] === 's'&& query.type ==='date'" @click="updatesearchinput(index)">
+                {{formatDate(setDate[index])}}
               </span>
               <span v-if="showSearchs[index] === 'i' && query.type !=='date'">
               <span class="cft-icon-actions">
@@ -121,9 +123,6 @@
                 "
               >
               </b-form-input>
-              </span>
-              <span v-if="showSearchs[index] === 's'&& query.type ==='date'">
-                {{setDate[index]}}
               </span>
               <span
                 v-if="showSearchs[index] === 's'"
@@ -176,8 +175,13 @@
 
 <script lang="ts">
 import '../styles/camundaFormIOTaslistSearch.scss'
-import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-import { FilterSearchTypes, getVariableOperator, searchQuery, taskSearchFilters } from "../services/search-constants";
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
+import { 
+  FilterSearchTypes,
+  getVariableOperator,
+  taskSearchFilters
+  } from "../services/search-constants";
+import {getFormattedDateAndTime} from '../services/utils';
 import DatePicker from "vue2-datepicker";
 import moment from "moment";
 
@@ -254,13 +258,17 @@ export default class TaskListSearch extends Vue {
     Vue.set(this.showVariableValue, index, "s")
   }
 
+  formatDate(date: Date) {
+    return getFormattedDateAndTime(date);
+  }
+
   callTaskVariablesEndApi() {
     this.queryList['variableNamesIgnoreCase'] = false;
     this.queryList['variableValuesIgnoreCase'] = false;
     
     for(const variablevalue in this.variablesEndType) {
-    this.queryList[this.variablesEndType[variablevalue]] = true;
-    this.updateTasklistResult()
+      this.queryList[this.variablesEndType[variablevalue]] = true;
+      this.updateTasklistResult()
     }
   }
 
@@ -272,17 +280,18 @@ export default class TaskListSearch extends Vue {
       this.showUpdatesearch[0] = false;
       this.showSearchQueryOperators[0] = false;
       if(item.type==="variables"){
-      this.showVariableValue[0] = "a";
-      this.isVariableTypeInSelectedSearchQuery = true;
+        this.showVariableValue[0] = "a";
+        this.isVariableTypeInSelectedSearchQuery = true;
       }
-    } else {
+    } 
+    else {
       this.operator[this.selectedSearchQueries.length - 1] = item["compares"][0];
       this.showSearchs[this.selectedSearchQueries.length - 1] = "a";
       this.showUpdatesearch[this.selectedSearchQueries.length - 1] = false;
       this.showSearchQueryOperators[this.selectedSearchQueries.length - 1] = false;
       if(item.type==="variables"){
-      this.showVariableValue[this.selectedSearchQueries.length - 1] = 'a';
-      this.isVariableTypeInSelectedSearchQuery = true;
+        this.showVariableValue[this.selectedSearchQueries.length - 1] = 'a';
+        this.isVariableTypeInSelectedSearchQuery = true;
       }
     }
     this.showSearchList = false;
@@ -295,7 +304,8 @@ export default class TaskListSearch extends Vue {
         id = i;
       }
     }
-      delete this.queryList[query["values"][id]];
+    
+    delete this.queryList[query["values"][id]];
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
     this.updateTasklistResult()
@@ -330,12 +340,12 @@ export default class TaskListSearch extends Vue {
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
       if(this.searchValueItem[idx] && this.searchVariableValue[idx]){
-      this.queryList[query.key].push({
-        "name": this.searchValueItem[idx],
-        "operator": getVariableOperator(operator),
-        "value": this.searchVariableValue[idx]
-      })
-      this.updateTasklistResult();
+        this.queryList[query.key].push({
+          "name": this.searchValueItem[idx],
+          "operator": getVariableOperator(operator),
+          "value": this.searchVariableValue[idx]
+        })
+        this.updateTasklistResult();
       }
       break;
     }
