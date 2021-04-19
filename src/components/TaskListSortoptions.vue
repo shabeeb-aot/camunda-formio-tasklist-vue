@@ -1,8 +1,8 @@
 <template>
     <div v-if="showSortListDropdown" class="cft-sort-items">
         <div
-          v-for="(s, idx) in sortOptions" :key="s.sortBy"
-          @click="addSort(s, idx)"
+          v-for="(s) in sortOptions" :key="s.sortBy"
+          @click="addSort(s)"
           class="mb-2 cft-sort-element"
         >
             {{s.label}}
@@ -19,8 +19,8 @@ export default class TaskSortOptions extends Vue {
     @Prop({default: 'true'}) private showSortListDropdown !: boolean;
 
     @Emit()
-    addSort(sort: any, index: number){
-      return [sort, index]
+    addSort(sort: any){
+      return sort
     }
 
 }

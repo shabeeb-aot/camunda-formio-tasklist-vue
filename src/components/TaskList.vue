@@ -312,8 +312,8 @@ export default class Tasklist extends Vue {
       },
     },
   };
-  // private filterList = [];
-  // private showfilter=false;
+  private filterList = [];
+  private showfilter=false;
   private editAssignee = false;
   private activefilter = 0;
   private applicationId = '';
@@ -324,12 +324,12 @@ export default class Tasklist extends Vue {
   private selectedfilterId = '';
   private xmlData!: string;
   private userList: Array<object> = [];
-  // private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
-  // private sortOptions: Array<object> = [];
-  // private updateSortOptions: Array<object> = [];
-  // private setupdateSortListDropdownindex = 0;
-  // private showSortListDropdown: any = []; 
-  // private showaddNewSortListDropdown = false;
+  private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
+  private sortOptions: Array<object> = [];
+  private updateSortOptions: Array<object> = [];
+  private setupdateSortListDropdownindex = 0;
+  private showSortListDropdown: any = []; 
+  private showaddNewSortListDropdown = false;
   private payload: Payload = {
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
@@ -375,7 +375,7 @@ checkPropsIsPassedAndSetValue() {
   const currentUrl = window.location.protocol + '//' +  window.location.host
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
-  localStorage.setItem("formIOApiUrl", this.formIOApiUrl);
+  localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   const val = decodeTokenValues(
     this.token,
     this.userName,
@@ -571,23 +571,23 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  // getOptions(options: any) {
-  //   const optionsArray: {
-  //     sortOrder: string;
-  //     label: string;
-  //     sortBy: string;
-  //   }[] = [];
-  //   sortingList.forEach((sortOption) => {
-  //     if (
-  //       !options.some(
-  //         (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-  //       )
-  //     ) {
-  //       optionsArray.push({ ...sortOption });
-  //     }
-  //   });
-  //   return optionsArray;
-  // }
+  getOptions(options: any) {
+    const optionsArray: {
+      sortOrder: string;
+      label: string;
+      sortBy: string;
+    }[] = [];
+    sortingList.forEach((sortOption) => {
+      if (
+        !options.some(
+          (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
+        )
+      ) {
+        optionsArray.push({ ...sortOption });
+      }
+    });
+    return optionsArray;
+  }
 
   updateFollowUpDate() {
     const referenceobject = this.task;
@@ -736,12 +736,12 @@ getBPMTaskDetail(taskId: string) {
       this.userEmail,
       this.formIOUserRoles
     );
-    // CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-    //   this.filterList = response.data;
-    //   this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-    //   this.fetchTaskList(this.selectedfilterId, this.payload);
-    //   this.fetchData();
-    // });
+    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+      this.filterList = response.data;
+      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+      this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.fetchData();
+    });
 
     if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
@@ -758,7 +758,7 @@ getBPMTaskDetail(taskId: string) {
       }
     })
 
-    // this.sortOptions = this.getOptions([]);
+    this.sortOptions = this.getOptions([]);
     CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
       (response) => {
         this.getProcessDefinitions = response.data;
