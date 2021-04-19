@@ -145,7 +145,7 @@ export default class FormListModal extends Vue{
 
   storeFormValue(val: string, title: string){
     this.$bvModal.hide('modal-multi-1')
-    const forms = localStorage.getItem('formIOApiUrl') + '/form/';
+    const forms = localStorage.getItem('formioApiUrl') + '/form/';
     this.formId = val;
     this.formValueId = forms.concat(val);
     this.formTitle = title;
