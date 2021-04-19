@@ -3,7 +3,7 @@
     <CamundaTasklist
       :bpmApiUrl="configs.BPM_URL"
       :token="token"
-      :userName="configs.username"
+      :userName="configs.userName"
       :formIOApiUrl= "configs.FORM_IO_API_URL"
       :formIOResourceId = "configs.FORM_IO_RESOURCE_ID"
       :formIOReviewerId = "configs.FORM_IO_REVIEWER_ID"
