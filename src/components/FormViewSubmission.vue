@@ -52,7 +52,6 @@ export default class FormViewSubmission extends Vue {
       this.sId = this.submissionid;
       this.formioUrlLink = this.formioProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
     }
-    console.log('this.formioUrlLink=========>>', this.formioUrlLink)
     Formio.createForm(document.getElementById('formio'), this.formioUrlLink, {
       readOnly: true,
     });
