@@ -18,11 +18,9 @@
     width: 100%;
   }
 
-  .cft-filter{
-    width:90%;
-    margin: 5px;
-    border: none;
-    font-style: italic;
+  .cft-task-filter-length {
+    padding: 1px;
+    font-size: 16px;
   }
 
   .cft-filter:focus{
@@ -131,6 +129,7 @@
     border: 1px solid #949494;
     border-radius: 3%;
     position: absolute;
+    color: #212529;
     background-color: #fff;
     background-clip: padding-box;
     z-index: 5;

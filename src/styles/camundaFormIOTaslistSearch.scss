@@ -9,6 +9,14 @@
         margin-bottom: 0.5rem;
         font-size: 13px;
     }
+
+    .cft-filter{
+        width:90%;
+        margin: 5px;
+        border: none;
+        font-style: italic;
+    }
+    
     
     .cft-approve-box,.cft-reject-box{
         background-color: white;
@@ -76,5 +84,9 @@
         margin-left: 5px;
         display: block;
         color: #0d0d0e;
+    }
+
+    .cft-search-cursor {
+        cursor: pointer;
     }
 }
