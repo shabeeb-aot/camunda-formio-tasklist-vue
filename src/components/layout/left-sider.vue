@@ -168,6 +168,22 @@ checkPropsIsPassedAndSetValue() {
   if (!this.formsflowaiApiUrl || this.formsflowaiApiUrl === "") {
     console.warn("formsflow.ai API url prop not passed");
   }
+
+  const engine = "/engine-rest";
+  const socketUrl = "/forms-flow-bpm-socket";
+  localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
+  localStorage.setItem("authToken", this.token);
+  localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
+  localStorage.setItem("formioApiUrl", this.formIOApiUrl);
+
+  // const val = decodeTokenValues(
+  //   this.token,
+  //   this.userName,
+  //   this.formIOUserRoles
+  // );
+  // this.userName = val.userName;
+  // this.userEmail = val.userEmail;
+  // this.formIOUserRoles = val.formIOUserRoles;
 }
 
 timedifference(date: Date) {
