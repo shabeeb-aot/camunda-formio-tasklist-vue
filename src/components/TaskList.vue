@@ -13,6 +13,10 @@
           :formsflowaiApiUrl="formsflowaiApiUrl"
           :formIOApiUrl="formIOApiUrl"
           :bpmApiUrl="bpmApiUrl"
+          :tasks='tasks'
+          :Lentask='tasklength'
+          :perPage="perPage"
+          :selectedfilterId="selectedfilterId"
         />
       </b-col>
       <!-- Task Detail section -->
@@ -289,13 +293,13 @@ export default class Tasklist extends Vue {
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
 
   private tasks: Array<object> = [];
-  private getProcessDefinitions: Array<object> = [];
+  // private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
   private processDefinitionId = '';
   private formId = '';
   private submissionId = '';
   private formioUrl = '';
-  private activeIndex = 0;
+  // private activeIndex = 0;
   private task: any;
   private setFollowup = null;
   private setDue = null;
@@ -303,9 +307,9 @@ export default class Tasklist extends Vue {
   private selectedTaskId = '';
   private userSelected = null;
   private showfrom = false;
-  private currentPage = 1;
-  private perPage = 10;
-  private numPages = 5;
+  public currentPage = 1;
+  public perPage = 10;
+  public numPages = 5;
   private tasklength = 0;
   private readoption = { readOnly: true };
   private options = {
@@ -317,9 +321,9 @@ export default class Tasklist extends Vue {
     },
   };
   private filterList = [];
-  private showfilter=false;
+  // private showfilter=false;
   private editAssignee = false;
-  private activefilter = 0;
+  // private activefilter = 0;
   private applicationId = '';
   private groupList = [];
   private groupListNames: Array<string> | null = null;
@@ -347,6 +351,12 @@ export default class Tasklist extends Vue {
     localStorage.setItem("authToken", newVal);
   }
 
+@Watch('currentPage')
+onPageChange(newVal: number) {
+  this.payload["firstResult"] = (newVal-1)*this.perPage
+  this.payload["maxResults"] = this.perPage
+  this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (newVal-1)*this.perPage, this.perPage);
+}
 
 checkPropsIsPassedAndSetValue() {
   if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -393,10 +403,6 @@ checkPropsIsPassedAndSetValue() {
 
 timedifference(date: Date) {
   return moment(date).fromNow();
-}
-
-toggle(index: number) {
-  this.activeIndex = index;					  
 }
 
 toggleassignee()  {
@@ -511,12 +517,14 @@ getBPMTaskDetail(taskId: string) {
 
   reloadTasks() {
     this.selectedTaskId = "";
-    this.fetchTaskList(this.selectedfilterId, this.payload);
+    // this.fetchTaskList(this.selectedfilterId, this.payload);
+    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   }
 
   reloadCurrentTask() {
     this.getBPMTaskDetail(this.task.id);
-    this.fetchTaskList(this.selectedfilterId, this.payload);
+    // this.fetchTaskList(this.selectedfilterId, this.payload);
+    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   }
 
   onClaim() {
@@ -559,7 +567,7 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchTaskList(filterId: string, requestData: object) {
-    this.selectedfilterId = filterId;
+    // this.selectedfilterId = filterId;
     CamundaRest.filterTaskList(
       this.token,
       filterId,
@@ -567,12 +575,23 @@ getBPMTaskDetail(taskId: string) {
       this.bpmApiUrl
     ).then((result) => {
       // this.fulltasks= result.data;
-      this.tasks = result.data.slice(
-        (this.currentPage - 1) * this.perPage,
-        this.currentPage * this.perPage
-      );
       this.tasklength = result.data.length;
-      this.numPages = Math.ceil(result.data.length / this.perPage);
+    });
+  }
+
+  
+  fetchPaginatedTaskList(filterId: string, requestData: object, first: number, max: number) {
+    this.selectedfilterId = filterId;
+    CamundaRest.filterTaskListPagination(
+      this.token,
+      filterId,
+      requestData,
+      first,
+      max,
+      this.bpmApiUrl
+    ).then((result) =>{
+      // console.log(length(result.data));
+      this.tasks = result.data;
     });
   }
 
@@ -735,9 +754,15 @@ getBPMTaskDetail(taskId: string) {
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.selectedTaskId = para.selectedTaskId
-      this.task = para.selectedTaskId
+      // this.task = para.selectedTaskId
       this.fetchData()
     })
+
+    this.$root.$on('call-fetchPaginatedTaskList', (para: any) => {
+      this.fetchPaginatedTaskList(para.filterId, para.requestData, para.firstResult, para.maxResults);
+    })
+
+    console.log('11111111111111111')
 
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
@@ -747,10 +772,12 @@ getBPMTaskDetail(taskId: string) {
       this.userEmail,
       this.formIOUserRoles
     );
+    console.log(this.tasklength)
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
       this.fetchData();
     });
 
@@ -760,7 +787,9 @@ getBPMTaskDetail(taskId: string) {
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
       if(this.selectedfilterId){
         //Refreshes the Task
-        this.fetchTaskList(this.selectedfilterId, this.payload);
+        // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
+        console.log("reached socketIO")
         this.fetchData();
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
@@ -770,11 +799,11 @@ getBPMTaskDetail(taskId: string) {
     })
 
     this.sortOptions = this.getOptions([]);
-    CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
-      (response) => {
-        this.getProcessDefinitions = response.data;
-      }
-    );
+    // CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
+    //   (response) => {
+    //     this.getProcessDefinitions = response.data;
+    //   }
+    // );
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
       const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.userList = result;

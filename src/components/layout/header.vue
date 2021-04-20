@@ -100,10 +100,11 @@ import TaskSortOptions from '../TaskListSortoptions.vue';
 export default class Header extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
+  @Prop() private perPage !: number;
 
-  private currentPage = 1;
-  private perPage = 10;
-  private numPages = 5;
+  // private currentPage = 1;
+  // private perPage = 10;
+  // private numPages = 5;
   private tasklength = 0;
   private filterList = [];
   private showfilter=false;
@@ -162,7 +163,8 @@ addSort(sort: any) {
   } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
-  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+   this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
   this.showaddNewSortListDropdown = false;									  
 }
 
@@ -190,7 +192,7 @@ updateSort(sort: any, index: number) {
   this.showSortListDropdown[index] = false;
   this.payload["sorting"] = this.sortList;
   // this.fetchTaskList(this.selectedfilterId, this.payload);
-  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
 }
 
 deleteSort(sort: any, index: number) {
@@ -199,7 +201,8 @@ deleteSort(sort: any, index: number) {
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList;
   // this.fetchTaskList(this.selectedfilterId, this.payload);
-  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
 }
 
 toggleSort(index: number) {
@@ -211,14 +214,16 @@ toggleSort(index: number) {
   }
   this.payload["sorting"] = this.sortList;
   // this.fetchTaskList(this.selectedfilterId, this.payload);
-  this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
 }
 mounted() {
   CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
     this.filterList = response.data;
     this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
     //   this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
   });
 
   // if(SocketIOService.isConnected()) {
