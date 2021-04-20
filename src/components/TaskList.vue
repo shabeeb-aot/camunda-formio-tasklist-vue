@@ -238,6 +238,7 @@ import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
   findFilterKeyOfAllTask,
+  getFormattedDateAndTime,
   getTaskFromList,
   sortingList,
 } from '../services/utils';
@@ -250,6 +251,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
 import TaskHistory from '../components/TaskHistory.vue';
+import TaskListSearch from '../components/TaskListSearch.vue';
 import {authenticateFormio} from '../services/formio-token';
 import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
@@ -265,6 +267,7 @@ import vueBpmn from 'vue-bpmn';
     DatePicker,
     FormListModal,
     TaskHistory,
+    TaskListSearch,
     vueBpmn,
     Modeler,
     BpmnJS,
@@ -286,7 +289,6 @@ export default class Tasklist extends Vue {
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
 
   private tasks: Array<object> = [];
-  private fulltasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
   private taskProcess = null;
   private processDefinitionId = '';
@@ -325,14 +327,15 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  private userList: Array<object> = [];
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
+  private userList: Array<object> = [];
   private updateSortOptions: Array<object> = [];
   private setupdateSortListDropdownindex = 0;
-  private showSortListDropdown: any = []; 
+  private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
   private payload: Payload = {
+    active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
   };
   private showUserList = false;
@@ -389,11 +392,11 @@ checkPropsIsPassedAndSetValue() {
 }
 
 timedifference(date: Date) {
-  return moment(date).fromNow();											
-}													   
+  return moment(date).fromNow();
+}
 
 toggle(index: number) {
-  this.activeIndex = index;						  
+  this.activeIndex = index;					  
 }
 
 toggleassignee()  {
@@ -415,14 +418,12 @@ addGroup() {
     this.bpmApiUrl,
     { userId: null, groupId: this.setGroup, type: "candidate" }
   ).then(() => {
-    console.log('11111111111111111111111')
     this.getGroupDetails();
     this.reloadCurrentTask();
     this.setGroup = null;
   });
 }
 getGroupDetails() {
-  console.log(this.task,'+++++++++++++++this.taskthis.taskthis.task')
   CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
     (response) => {
       this.groupList = response.data;
@@ -442,7 +443,6 @@ deleteGroup(groupid: string) {
     groupId: groupid,
     type: "candidate",
   }).then(() => {
-    console.log('22222222222222222222222222')
     this.getGroupDetails();
     this.reloadCurrentTask();
   });
@@ -666,6 +666,8 @@ getBPMTaskDetail(taskId: string) {
   fetchData() {
     console.log('this.selectedTaskId=--------->>',this.selectedTaskId)
     if (this.selectedTaskId) {
+      console.log(this.tasks)
+      //Here old tasks are coming itself(0-10)
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       console.log(this.task, this.tasks,'+++))))))))))))')
     console.log('4444444444444444444444444444')

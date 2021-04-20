@@ -118,7 +118,7 @@ import vueBpmn from 'vue-bpmn';
     BpmnJS,
   },
 })
-export default class Tasklist extends Vue {
+export default class LeftSider extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
   @Prop() private formsflowaiApiUrl!: string;

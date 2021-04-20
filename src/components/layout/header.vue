@@ -97,7 +97,7 @@ import TaskSortOptions from '../TaskListSortoptions.vue';
     TaskSortOptions
   }
 })
-export default class Tasklist extends Vue {
+export default class Header extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
 
