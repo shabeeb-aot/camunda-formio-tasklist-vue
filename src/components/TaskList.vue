@@ -137,20 +137,15 @@
                   v-if="task.assignee"
                 >
                   <div v-if="editAssignee" class="cft-user-edit">
-                    <div class='cft-assignee-change-box'>
-                      <span @click="onSetassignee">
+                    <div class='cft-assignee-change-box row'>
+                      <v-select :options="autoUserList" :reduce="user => user" v-model="userSelected" class="col-9"/>
+                      <span @click="onSetassignee" class="col-1">
                         <i class="bi bi-check"></i>
                       </span>
-                      <span @click="toggleassignee">
+                      <span @click="toggleassignee" class="col-1">
                         <i class="fa fa-times ml-1"></i>
                       </span>
                     </div>
-                    <b-form-select
-                      class="cft-user-select"
-                      v-model="userSelected"
-                      :options="userList"
-                      >
-                    </b-form-select>
                   </div>
                   <div class="cft-user-details" v-else @click="toggleassignee"> 
                     <i class="bi bi-person-fill cft-person-fill" />
@@ -171,7 +166,7 @@
               <b-tabs class="height-100" content-class="mt-3" v-if="showfrom">
                 <b-tab title="Form">
                   <div class="ml-4 mr-4">
-                    <b-overlay
+                    <b-overlay 
                       :show="task.assignee !== userName"
                       variant="light"
                       opacity="0.75"
@@ -220,6 +215,7 @@
 </template>
 
 <script lang="ts">
+import "vue-select/src/scss/vue-select.scss";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'font-awesome/scss/font-awesome.scss';
 import 'formiojs/dist/formio.full.min.css'
@@ -231,6 +227,9 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 // eslint-disable-next-line sort-imports
 import Header from './layout/header.vue'
 import LeftSider from './layout/left-sider.vue'
+import vSelect from 'vue-select'
+
+
 
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -270,7 +269,8 @@ import vueBpmn from 'vue-bpmn';
     Modeler,
     BpmnJS,
     Header,
-    LeftSider
+    LeftSider,
+    vSelect
   },
 })
 export default class Tasklist extends Vue {
@@ -339,6 +339,7 @@ export default class Tasklist extends Vue {
   };
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
+  private autoUserList: any = []
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -490,6 +491,7 @@ getBPMTaskDetail(taskId: string) {
       this.formIOApiUrl
     );
     this.formioUrl = formioUrl;
+    
     this.submissionId = submissionId;
     this.formId = formId;
 
@@ -713,11 +715,14 @@ getBPMTaskDetail(taskId: string) {
         }
         this.applicationId = result.data["applicationId"].value;
         this.formioUrl = result.data["formUrl"].value;
+    
         const { formioUrl, formId, submissionId } = getFormDetails(
           this.formioUrl,
           this.formIOApiUrl
         );
         this.formioUrl = formioUrl;
+        
+    
         this.submissionId = submissionId;
         this.formId = formId;
         this.showfrom = true;
@@ -771,6 +776,7 @@ getBPMTaskDetail(taskId: string) {
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
       const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.userList = result;
+      this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
   }
 
