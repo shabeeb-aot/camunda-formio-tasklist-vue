@@ -42,7 +42,7 @@
     padding: 0rem 1.25rem !important;
     border-top: 1px solid #ced4da !important;
    // max-height: 80vh;
-    overflow-y: auto;
+    // overflow-y: auto;
     padding-right: 25px;
     border-right: 2px solid #D0D0D0;
   } 
@@ -50,8 +50,8 @@
   .cft-service-task-details {
     min-height: 80vh;
     // max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // overflow-y: auto;
+    // overflow-x: hidden;
     // height: 100%;
   }
 
@@ -189,6 +189,7 @@
   }
   .cft-list-container {
     margin-top: 5px;
+    overflow-y: auto;
   }
   
   .cft-task-details-assign{
@@ -438,7 +439,10 @@
   box-shadow: none;
 }
 .diagram-full-screen {
-  height: 730px;
+  height:  100vh;
+  min-height: 100vh;
 }
-
+.card{
+  white-space: normal;
+}
 }
