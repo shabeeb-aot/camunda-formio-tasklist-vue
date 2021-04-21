@@ -106,6 +106,7 @@ export default class LeftSider extends Vue {
   private processDefinitionId = '';
   private activeIndex = 0;
   private sList: any;
+  private sId = '';
   private currentPage = 1;
 
 @Watch('currentPage')
@@ -134,8 +135,7 @@ getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
 }
 
 setselectedTask(taskId: string) {
-  this.selectedTaskId = taskId;
-  this.$root.$emit('call-fetchData', {selectedTaskId: this.selectedTaskId})
+  this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
 getExactDate(date: Date) {
   return getFormattedDateAndTime(date);
@@ -145,6 +145,7 @@ toggle(index: number) {
 }
 
 updateTasklistResult(queryList: object) {
+  console.log(queryList);
   const requiredParams = {...{sorting:this.payload["sorting"]},...queryList}
   console.log(this.payload);
   if(!isEqual(this.payload, requiredParams)){
@@ -162,8 +163,9 @@ updateTasklistResult(queryList: object) {
 }
 
 mounted() {
+  this.sId = this.selectedTaskId;
   this.checkPropsIsPassedAndSetValue();
-  this.$root.$emit('call-fetchData', {selectedTaskId: this.selectedTaskId})
+  this.$root.$emit('call-fetchData', {selectedTaskId: this.sId})
 
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
     (response) => {
