@@ -4,6 +4,10 @@
   v-if="token  && bpmApiUrl"
   :token="token"
   :bpmApiUrl="bpmApiUrl"
+  :filterList="filterList"
+  :perPage="perPage"
+  :selectedfilterId="selectedfilterId"
+  :payload="payload"
   />
     <b-row class="cft-service-task-list mt-1">
       <b-col xl="3" lg="3" md="12" class="cft-first">
@@ -17,6 +21,7 @@
           :Lentask='tasklength'
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
+          :payload="payload"
         />
       </b-col>
       <!-- Task Detail section -->
@@ -321,9 +326,7 @@ export default class Tasklist extends Vue {
     },
   };
   private filterList = [];
-  // private showfilter=false;
   private editAssignee = false;
-  // private activefilter = 0;
   private applicationId = '';
   private groupList = [];
   private groupListNames: Array<string> | null = null;
@@ -341,6 +344,8 @@ export default class Tasklist extends Vue {
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
+    firstResult: 0,
+    maxResults: this.perPage
   };
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
@@ -689,7 +694,6 @@ getBPMTaskDetail(taskId: string) {
       //Here old tasks are coming itself(0-10)
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       console.log(this.task, this.tasks,'+++))))))))))))')
-    console.log('4444444444444444444444444444')
       this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
@@ -754,15 +758,15 @@ getBPMTaskDetail(taskId: string) {
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.selectedTaskId = para.selectedTaskId
-      // this.task = para.selectedTaskId
+      this.task = para.selectedTaskId
       this.fetchData()
     })
 
     this.$root.$on('call-fetchPaginatedTaskList', (para: any) => {
+      this.selectedfilterId = para.filterId;
+      this.payload = para.requestData;
       this.fetchPaginatedTaskList(para.filterId, para.requestData, para.firstResult, para.maxResults);
     })
-
-    console.log('11111111111111111')
 
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
@@ -778,7 +782,6 @@ getBPMTaskDetail(taskId: string) {
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
       this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
-      this.fetchData();
     });
 
     if(SocketIOService.isConnected()) {
