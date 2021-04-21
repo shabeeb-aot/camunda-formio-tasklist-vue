@@ -1,5 +1,5 @@
 export interface Payload{
-    active: boolean;
+    active?: boolean;
     sorting: Array<object>;
     orQueries?: Array<object>;
     maxResults?: number;

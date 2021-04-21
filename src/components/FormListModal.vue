@@ -165,7 +165,7 @@ export default class FormListModal extends Vue{
       {"formId": this.formId,"formSubmissionId": this.submissionId,
         "formUrl": this.formioUrl},
       this.token);
-    this.$bvModal.show('modal-multi-3');
+    this.$bvModal.show('modal-multi-1');
     this.$bvModal.hide('modal-multi-2');
   }
 
