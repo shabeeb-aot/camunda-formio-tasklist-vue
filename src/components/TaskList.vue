@@ -1,7 +1,11 @@
 <template> 
 <b-container fluid class="task-outer-container">
+  <b-button @click="clickMaxi" class="cft-filter-dropbtn"> 
+    <i v-if="maxi" class="bi bi-caret-left-fill"></i>
+    <i v-else class="bi bi-caret-right-fill"></i>
+</b-button>
   <Header
-  v-if="token  && bpmApiUrl"
+  v-if="token  && bpmApiUrl && maxi"
   :token="token"
   :bpmApiUrl="bpmApiUrl"
   :filterList="filterList"
@@ -10,7 +14,7 @@
   :payload="payload"
   />
     <b-row class="cft-service-task-list mt-1">
-      <b-col xl="3" lg="3" md="12" class="cft-first">
+      <b-col xl="3" lg="3" md="12" class="cft-first" v-if="maxi">
         <LeftSider
           v-if="token  && bpmApiUrl"
           :token="token"
@@ -24,8 +28,8 @@
           :payload="payload"
         />
       </b-col>
-      
-      <b-col v-if="selectedTaskId" lg="9" md="12">
+      <!-- Task Detail section -->
+      <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -118,8 +122,7 @@
                           placeholder="Group ID"
                           v-model="setGroup"
                           v-on:keyup.enter="addGroup"
-                        >
-			</b-form-input>
+                        ></b-form-input>
                       </b-col>
                     </b-row>
                     <b-row>
@@ -333,6 +336,8 @@ export default class Tasklist extends Vue {
   };
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
+  private autoUserList: any = []
+  private maxi = true
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -666,7 +671,6 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    console.log('this.selectedTaskId=--------->>',this.selectedTaskId)
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
@@ -781,6 +785,9 @@ getBPMTaskDetail(taskId: string) {
       const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.userList = result;
     });
+  }
+  clickMaxi () {
+    this.maxi = !this.maxi
   }
 
   beforeDestroy() {
