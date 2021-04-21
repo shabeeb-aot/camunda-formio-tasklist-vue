@@ -158,6 +158,8 @@
                       :options="userList"
                       >
                     </b-form-select>
+                    <!-- str -->
+                    <!-- end -->
                   </div>
                   <div class="cft-user-details" v-else @click="toggleassignee"> 
                     <i class="bi bi-person-fill cft-person-fill" />
@@ -666,7 +668,6 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    console.log('this.selectedTaskId=--------->>',this.selectedTaskId)
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
