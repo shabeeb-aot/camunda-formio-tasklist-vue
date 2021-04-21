@@ -12,6 +12,7 @@
         v-bind:key="task.id"
         v-on:click="toggle(idx)"
         :class="{ 'cft-selected': idx == activeIndex }"
+        >
         <div @click="setselectedTask(task.id)" class="cft-select-task">
             <h5 class="cft-task-title" data-title='Task Name'>{{ task.name }}</h5>
             <div class="cft-task-details-assign assigne-details ">

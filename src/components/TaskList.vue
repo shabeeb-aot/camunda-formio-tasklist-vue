@@ -734,7 +734,6 @@ getBPMTaskDetail(taskId: string) {
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.selectedTaskId = para.selectedTaskId
-      this.task = para.selectedTaskId
       this.fetchData()
     })
 
