@@ -230,6 +230,8 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import vSelect from 'vue-select'
+
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   decodeTokenValues,
