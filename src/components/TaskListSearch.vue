@@ -256,8 +256,8 @@ export default class TaskListSearch extends Vue {
   }
 
   updatesearchinput(index: number) {
-    this.searchValueItem[index] = '';
-    this.searchVariableValue[index] = '';
+    // this.searchValueItem[index] = '';
+    // this.searchVariableValue[index] = '';
     Vue.set(this.showSearchs, index, "i");
   }
 
