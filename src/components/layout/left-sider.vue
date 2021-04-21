@@ -149,7 +149,15 @@ updateTasklistResult(queryList: object) {
   console.log(this.payload);
   if(!isEqual(this.payload, requiredParams)){
     console.log("changed")
-    this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    this.$root.$emit('call-fetchTaskList', 
+      {filterId: this.selectedfilterId, requestData: requiredParams}
+    );
+    this.$root.$emit('call-fetchPaginatedTaskList', 
+      {filterId: this.selectedfilterId,
+        requestData: requiredParams,
+        firstResult: 0,
+        maxResults: this.perPage
+      })
   }
 }
 

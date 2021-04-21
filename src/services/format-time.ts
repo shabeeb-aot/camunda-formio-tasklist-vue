@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const getISODateTime=(date: Date)=>{
+export const getISODateTime=(date: Date|null)=>{
   if(date){
     const dateTimeFormat = moment(date).format("YYYY-MM-DD[T]hh:mm:ss.SSSZ");
     const dateTimeArr = dateTimeFormat.split('+');

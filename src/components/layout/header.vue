@@ -126,7 +126,10 @@ toggleshowfilter() {
 
 togglefilter(filter: any, index: number) {
   this.activefilter = index;
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: filter.id, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchTaskList', 
+    {filterId: filter.id, requestData: this.payload}
+  );
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: filter.id, requestData: this.payload, firstResult: 0, maxResults: this.perPage})
   this.showfilter = false;
 }
 
@@ -154,8 +157,7 @@ addSort(sort: any) {
   } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
-  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 0, maxResults: this.perPage})
   this.showaddNewSortListDropdown = false;									  
 }
 
@@ -182,8 +184,7 @@ updateSort(sort: any, index: number) {
   this.sortOptions = this.getOptions(this.sortList);
   this.showSortListDropdown[index] = false;
   this.payload["sorting"] = this.sortList;
-  // this.fetchTaskList(this.selectedfilterId, this.payload);
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 0, maxResults: this.perPage})
 }
 
 deleteSort(sort: any, index: number) {
@@ -191,9 +192,7 @@ deleteSort(sort: any, index: number) {
   this.updateSortOptions = [];
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList;
-  // this.fetchTaskList(this.selectedfilterId, this.payload);
-  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 0, maxResults: this.perPage})
 }
 
 toggleSort(index: number) {
@@ -204,7 +203,7 @@ toggleSort(index: number) {
     this.sortList[index].sortOrder = "asc";
   }
   this.payload["sorting"] = this.sortList;
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 0, maxResults: this.perPage})
 }
 }
 </script>

@@ -522,14 +522,12 @@ getBPMTaskDetail(taskId: string) {
 
   reloadTasks() {
     this.selectedTaskId = "";
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, 0, this.perPage);
   }
 
   reloadCurrentTask() {
     this.getBPMTaskDetail(this.task.id);
-    // this.fetchTaskList(this.selectedfilterId, this.payload);
-    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
+    // this.fetchPaginatedTaskList(this.selectedfilterId, this.payload);
   }
 
   onClaim() {
@@ -758,7 +756,6 @@ getBPMTaskDetail(taskId: string) {
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.selectedTaskId = para.selectedTaskId
-      this.task = para.selectedTaskId
       this.fetchData()
     })
 
@@ -766,6 +763,10 @@ getBPMTaskDetail(taskId: string) {
       this.selectedfilterId = para.filterId;
       this.payload = para.requestData;
       this.fetchPaginatedTaskList(para.filterId, para.requestData, para.firstResult, para.maxResults);
+    })
+
+    this.$root.$on('call-fetchTaskList', (para: any) => {
+      this.fetchTaskList(para.filterId, para.requestData)
     })
 
     this.checkPropsIsPassedAndSetValue();
@@ -776,7 +777,7 @@ getBPMTaskDetail(taskId: string) {
       this.userEmail,
       this.formIOUserRoles
     );
-    console.log(this.tasklength)
+
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
