@@ -88,7 +88,6 @@ import {
 import CamundaRest from '../../services/camunda-rest';
 import FormListModal from '../FormListModal.vue';
 import {Payload} from '../../services/TasklistTypes';
-import SocketIOService from '../../services/SocketIOServices';
 import TaskSortOptions from '../TaskListSortoptions.vue';
 
 @Component({
@@ -101,15 +100,12 @@ export default class Header extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
   @Prop() private perPage !: number;
+  @Prop() private filterList !: Array<string>;
+  @Prop() private selectedfilterId !: string;
+  @Prop() private payload !: Payload;
 
-  // private currentPage = 1;
-  // private perPage = 10;
-  // private numPages = 5;
-  private tasklength = 0;
-  private filterList = [];
   private showfilter=false;
   private activefilter = 0;
-  private selectedfilterId = '';
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
   private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
@@ -117,10 +113,6 @@ export default class Header extends Vue {
   private setupdateSortListDropdownindex = 0;
   private showSortListDropdown = [false, false, false, false, false, false];
   private showaddNewSortListDropdown = false;
-  private payload: Payload = {
-    active: true,
-    sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
-  };
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -134,8 +126,7 @@ toggleshowfilter() {
 
 togglefilter(filter: any, index: number) {
   this.activefilter = index;
-  //   this.fetchTaskList(filter.id, this.payload);
-  this.$root.$emit('call-fetchTaskList', {filterId: filter.id, requestData: this.payload})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: filter.id, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
   this.showfilter = false;
 }
 
@@ -164,7 +155,7 @@ addSort(sort: any) {
     this.sortOptions = this.getOptions(this.sortList);
   }
   // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-   this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
+  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
   this.showaddNewSortListDropdown = false;									  
 }
 
@@ -213,34 +204,7 @@ toggleSort(index: number) {
     this.sortList[index].sortOrder = "asc";
   }
   this.payload["sorting"] = this.sortList;
-  // this.fetchTaskList(this.selectedfilterId, this.payload);
-  // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
 }
-mounted() {
-  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-    this.filterList = response.data;
-    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-    //   this.fetchTaskList(this.selectedfilterId, this.payload);
-    // this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: 1, maxResults: this.perPage})
-  });
-
-  // if(SocketIOService.isConnected()) {
-  //   SocketIOService.disconnect();
-  // }
-  // SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
-  //   if(this.selectedfilterId){
-  //     //Refreshes the Task
-  //     // this.fetchTaskList(this.selectedfilterId, this.payload);
-  //     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
-  //   }
-  // })
-  this.sortOptions = this.getOptions([]);
-}
-
-// beforeDestroy() {
-//   SocketIOService.disconnect();
-// }
 }
 </script>
