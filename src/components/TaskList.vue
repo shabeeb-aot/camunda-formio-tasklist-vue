@@ -414,14 +414,12 @@ addGroup() {
     this.bpmApiUrl,
     { userId: null, groupId: this.setGroup, type: "candidate" }
   ).then(() => {
-    console.log('11111111111111111111111')
     this.getGroupDetails();
     this.reloadCurrentTask();
     this.setGroup = null;
   });
 }
 getGroupDetails() {
-  console.log(this.task,'+++++++++++++++this.taskthis.taskthis.task')
   CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
     (response) => {
       this.groupList = response.data;
@@ -441,7 +439,6 @@ deleteGroup(groupid: string) {
     groupId: groupid,
     type: "candidate",
   }).then(() => {
-    console.log('22222222222222222222222222')
     this.getGroupDetails();
     this.reloadCurrentTask();
   });
@@ -671,11 +668,8 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    console.log('this.selectedTaskId=--------->>',this.selectedTaskId)
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      console.log(this.task, this.tasks,'+++))))))))))))')
-    console.log('4444444444444444444444444444')
       this.getGroupDetails();
       CamundaRest.getTaskById(
         this.token,
