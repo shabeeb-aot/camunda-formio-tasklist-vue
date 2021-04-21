@@ -10,7 +10,7 @@
       <div class="cft-search-criteria" v-if="selectedSearchQueries.length">
         <b-button
           squared
-          variant="outline-secondary"
+          variant="primary"
           @click="changeQueryType"
         >
           {{ queryType }}
@@ -100,7 +100,10 @@
                 <b-form-datepicker
                 size="sm"
                 v-model="setDate[index]"
-                @input="setSearchQueryValue(setDate[index], query, operator[index], index)"
+                @input="
+                  setSearchQueryValue(setDate[index], query, operator[index], index); 
+                  showsearchValueItem(index); 
+                "
                 >
                 </b-form-datepicker>
               </span>
@@ -143,7 +146,7 @@
             type="text"
             class="cft-filter"
             placeholder="Filter Tasks"
-            @click="cftshowSearchListElements"
+            @click="cftshowSearchList"
             size="sm"
           />
         </b-col>
@@ -212,8 +215,8 @@ export default class TaskListSearch extends Vue {
   private showUpdatesearch: Array<boolean> = [];
   private setUpdatesearchindex = 0;
   private showSearchQueryOperators: any = [];
-  private searchValueItem = [];
-  private searchVariableValue = [];
+  private searchValueItem: any = [];
+  private searchVariableValue: any = [];
   private operator: Array<string> = [];
   private showSearchs: Array<string> = [];
   private showVariableValue: Array<string> = [];
@@ -225,14 +228,13 @@ export default class TaskListSearch extends Vue {
     "processVariables": []
   };
   private isVariableTypeInSelectedSearchQuery = false;
-  private value = '';
   private setDate: Array<string> = [];
 
   setActiveSearchItem(index: number) {
     this.activeSearchItem = index;
   }
 
-  cftshowSearchListElements() {
+  cftshowSearchList() {
     this.showSearchList = !this.showSearchList;
   }
   changeQueryType() {
@@ -254,6 +256,8 @@ export default class TaskListSearch extends Vue {
   }
 
   updatesearchinput(index: number) {
+    this.searchValueItem[index] = '';
+    this.searchVariableValue[index] = '';
     Vue.set(this.showSearchs, index, "i");
   }
 
@@ -280,12 +284,11 @@ export default class TaskListSearch extends Vue {
   callTaskVariablesEndApi() {
     this.queryList['variableNamesIgnoreCase'] = false;
     this.queryList['variableValuesIgnoreCase'] = false;
-    
     for(const variablevalue in this.variablesEndType) {
       this.queryList[this.variablesEndType[variablevalue]] = true;
       this.updateTasklistResult()
     }
-    //on changing to false also updating values required
+    this.updateTasklistResult();
   }
 
   addToSelectedSearchQuery(item: any) {
@@ -314,18 +317,18 @@ export default class TaskListSearch extends Vue {
   }
 
   deleteSearchQueryElement(query: any, index: number) {
-    // let id = 0;
-    // for(let i=0; i<this.selectedSearchQueries[index]["compares"].length; i++) {
-    //   if(this.selectedSearchQueries[index]["compares"][i]===this.operator[index]) {
-    //     id = i;
-    //   }
-    // }
-    
     delete this.queryList[
       searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
+
+    this.isVariableTypeInSelectedSearchQuery = false;
+    for (const idx in this.selectedSearchQueries) {
+      if(this.selectedSearchQueries[idx]["type"]=== "variables") {
+        this.isVariableTypeInSelectedSearchQuery = true;
+      }
+    }
     this.updateTasklistResult()
   }
 
@@ -341,7 +344,7 @@ export default class TaskListSearch extends Vue {
     delete this.queryList[
       searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
-    this.selectedSearchQueries[index] = searchitem
+    Vue.set(this.selectedSearchQueries, index, searchitem);
     this.operator[index] = this.selectedSearchQueries[index].compares[0];
     this.showUpdatesearch[index] = false;
     this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
@@ -350,14 +353,6 @@ export default class TaskListSearch extends Vue {
   }
 
   setSearchQueryValue(item: any, query: any, operator: string, idx: number) {
-    // Vue.set(this.showSearchs, idx, "s");
-    // let index = 0;
-    // for (let i = 0; i < query["compares"].length; i++) {
-    //   if (query["compares"][i] === operator) {
-    //     index = i;
-    //     break;
-    //   }
-    // }
     const Vindex = searchValueObject(this.selectedSearchQueries[idx].key, this.operator[idx])
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
@@ -372,9 +367,7 @@ export default class TaskListSearch extends Vue {
       break;
     }
     case FilterSearchTypes.DATE: {
-      console.log("Date", item);
       const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
-      console.log(timearr)
       const replaceTimezone = timearr[1].replace(":", "");
       const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
         .replace(timearr[1], replaceTimezone);
@@ -409,8 +402,6 @@ export default class TaskListSearch extends Vue {
 
   mounted() {
     this.updateTasklistResult();
-
   }
-
 }
 </script>

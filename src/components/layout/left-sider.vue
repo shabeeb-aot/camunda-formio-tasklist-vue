@@ -79,40 +79,17 @@ import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import {
-  TASK_FILTER_LIST_DEFAULT_PARAM,
-  getFormattedDateAndTime,
-} from '../../services/utils';
-import BpmnJS from 'bpmn-js';
 import CamundaRest from '../../services/camunda-rest';
-import DatePicker from 'vue2-datepicker'
-import { Form } from 'vue-formio';
-import FormListModal from '../../components/FormListModal.vue';
-import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../../services/TasklistTypes';
-import SocketIOService from '../../services/SocketIOServices';
-import TaskHistory from '../../components/TaskHistory.vue';
 import TaskListSearch from '../../components/TaskListSearch.vue';
-import TaskSortOptions from '../../components/TaskListSortoptions.vue';
-import {authenticateFormio} from '../../services/formio-token';
-import {getFormDetails} from '../../services/get-formio';
-import {getformHistoryApi} from '../../services/formsflowai-api';
-import moment from 'moment';
+import {getFormattedDateAndTime} from '../../services/utils';
 import isEqual from 'lodash/isEqual';
-import vueBpmn from 'vue-bpmn';
+import moment from 'moment';
 
 
 @Component({
   components: {
-    formio: Form,
-    DatePicker,
-    FormListModal,
-    TaskHistory,
     TaskListSearch,
-    TaskSortOptions,
-    vueBpmn,
-    Modeler,
-    BpmnJS,
   },
 })
 export default class LeftSider extends Vue {
@@ -125,34 +102,11 @@ export default class LeftSider extends Vue {
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
 
-  // private tasks: Array<object> = [];
   private getProcessDefinitions: Array<object> = [];
-  private taskProcess = null;
   private processDefinitionId = '';
-  private formId = '';
-  private submissionId = '';
-  private formioUrl = '';
   private activeIndex = 0;
-  private task: any;
-  // private selectedTaskId = '';
-  private userSelected = null;
-  private showfrom = false;
+  private sList: any;
   private currentPage = 1;
-  // private perPage = 10;
-  // private numPages = 5;
-  // private tasklength = 0;
-  // private editAssignee = false;
-  // private activefilter = 0;
-  // private applicationId = '';
-  // private groupList = [];
-  // private groupListNames: Array<string> | null = null;
-  // private groupListItems: string[] = [];
-  // private xmlData!: string;
-  // private payload: Payload = {
-  //   sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
-  // };
-  private showUserList = false;
-  private taskHistoryList: Array<object> = [];
 
 @Watch('currentPage')
   onPageChange(newVal: number) {
@@ -167,7 +121,7 @@ checkPropsIsPassedAndSetValue() {
   }
   if (!this.token || this.token === "") {
     console.warn("token prop not Passed");
-  }
+  }   
 }
 
 timedifference(date: Date) {
@@ -191,13 +145,10 @@ toggle(index: number) {
 }
 
 updateTasklistResult(queryList: object) {
-  const requiredParams = {...{sorting:this.sortList},...queryList}
+  const requiredParams = {...{sorting:this.payload["sorting"]},...queryList}
   console.log(this.payload);
   if(!isEqual(this.payload, requiredParams)){
     console.log("changed")
-    // const combined = { ...this.payload, ...queryList}
-    // this.payload = requiredParams;
-    // this.fetchTaskList(this.selectedfilterId, combined);
     this.$root.$emit('call-fetchTaskList', {filterId: this.selectedfilterId, requestData: this.payload})
   }
 }
