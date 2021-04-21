@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import CamundaTasklist from '@/components/tasklist.vue'
+import CamundaTasklist from '@/components/TaskList.vue'
 import { State } from 'vuex-class'
 // import configMap from '../utils/config-helper'
 @Component({
