@@ -59,7 +59,7 @@
               </span>
               <span
                 class="cft-search-cursor"
-                v-if="showVariableValue[index] === 's'"
+                v-if="showVariableValue[index] === 's'&&query.type === 'variables'"
                 @click="updatevariableinput(index)"
               >
                 {{ searchVariableValue[index] }}
@@ -256,7 +256,7 @@ export default class TaskListSearch extends Vue {
   }
 
   updatesearchinput(index: number) {
-    // this.searchValueItem[index] = '';
+    this.searchValueItem[index] = '';
     // this.searchVariableValue[index] = '';
     Vue.set(this.showSearchs, index, "i");
   }
@@ -270,6 +270,7 @@ export default class TaskListSearch extends Vue {
   }
 
   updatevariableinput(index: number) {
+    this.searchVariableValue[index] = '';
     Vue.set(this.showVariableValue, index, "i");
   }
 
@@ -348,7 +349,6 @@ export default class TaskListSearch extends Vue {
     this.operator[index] = this.selectedSearchQueries[index].compares[0];
     this.showUpdatesearch[index] = false;
     this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
-    // this.updateTasklistResult()
     this.searchListElements = taskSearchFilters;
   }
 
