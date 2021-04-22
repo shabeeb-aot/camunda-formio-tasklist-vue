@@ -230,11 +230,8 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import vSelect from 'vue-select'
-
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   getTaskFromList,
 } from '../services/utils';
@@ -253,6 +250,7 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
+import vSelect from 'vue-select';
 import vueBpmn from 'vue-bpmn';
 
 
@@ -317,13 +315,7 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  // private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
-  // private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
-  // private updateSortOptions: Array<object> = [];
-  // private setupdateSortListDropdownindex = 0;
-  // private showSortListDropdown = [false, false, false, false, false, false];
-  // private showaddNewSortListDropdown = false;
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -372,6 +364,7 @@ checkPropsIsPassedAndSetValue() {
   if(!this.webSocketEncryptkey || this.webSocketEncryptkey === ""){
     console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
   }
+  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
   const engine = "/engine-rest";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
@@ -379,14 +372,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
-  this.userName = val.userName;
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
+  localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
 }
 
 timedifference(date: Date) {
@@ -578,24 +564,6 @@ getBPMTaskDetail(taskId: string) {
       this.tasks = result.data;
     });
   }
-
-  // getOptions(options: any) {
-  //   const optionsArray: {
-  //     sortOrder: string;
-  //     label: string;
-  //     sortBy: string;
-  //   }[] = [];
-  //   sortingList.forEach((sortOption) => {
-  //     if (
-  //       !options.some(
-  //         (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-  //       )
-  //     ) {
-  //       optionsArray.push({ ...sortOption });
-  //     }
-  //   });
-  //   return optionsArray;
-  // }
 
   updateFollowUpDate() {
     const referenceobject = this.task;
