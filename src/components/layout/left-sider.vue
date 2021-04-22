@@ -78,6 +78,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
 import TaskListSearch from '../../components/TaskListSearch.vue';
+import cloneDeep from 'lodash/cloneDeep';
 import {getFormattedDateAndTime} from '../../services/utils';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
@@ -147,11 +148,11 @@ updateTasklistResult(queryList: object) {
   if(!isEqual(this.payload, requiredParams)){
     console.log("changed")
     this.$root.$emit('call-fetchTaskList', 
-      {filterId: this.selectedfilterId, requestData: requiredParams}
+      {filterId: this.selectedfilterId, requestData: cloneDeep(requiredParams)}
     );
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
-        requestData: requiredParams,
+        requestData: cloneDeep(requiredParams),
         firstResult: 0,
         maxResults: this.perPage
       })
