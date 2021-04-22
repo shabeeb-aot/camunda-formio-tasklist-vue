@@ -81,7 +81,7 @@ import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskListSearch from '../TaskListSearch.vue';
 import {getFormattedDateAndTime} from '../../services/utils';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';

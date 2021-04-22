@@ -1,9 +1,5 @@
 <template> 
 <b-container fluid class="task-outer-container">
-  <b-button @click="clickMaxi" class="cft-filter-dropbtn"> 
-    <i v-if="maxi" class="bi bi-caret-left-fill"></i>
-    <i v-else class="bi bi-caret-right-fill"></i>
-</b-button>
   <Header
   v-if="token  && bpmApiUrl && maxi"
   :token="token"
@@ -30,6 +26,8 @@
       </b-col>
       <!-- Task Detail section -->
       <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
+        <!-- nav here -->
+        <ExpandContract/>
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -210,6 +208,8 @@
         </div>
       </b-col>
       <b-col v-else>
+        <!-- nav here -->
+        <ExpandContract/>
         <b-row class="cft-not-selected mt-2 ml-1 row">
           <i
             class="bi bi-exclamation-circle-fill"
@@ -245,8 +245,8 @@ import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
-import Header from './layout/header.vue'
-import LeftSider from './layout/left-sider.vue'
+import Header from './layout/Header.vue'
+import LeftSider from './layout/LeftSider.vue'
 import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
@@ -257,6 +257,7 @@ import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
 import vueBpmn from 'vue-bpmn';
+import ExpandContract from './addons/ExpandContract.vue'
 
 
 @Component({
@@ -269,7 +270,8 @@ import vueBpmn from 'vue-bpmn';
     BpmnJS,
     Header,
     LeftSider,
-    vSelect
+    vSelect,
+    ExpandContract
   },
 })
 export default class Tasklist extends Vue {
@@ -753,6 +755,10 @@ getBPMTaskDetail(taskId: string) {
       this.fetchTaskList(para.filterId, para.requestData)
     })
 
+    this.$root.$on('call-managerScreen', (para: any) => {
+        this.maxi = para.maxi
+    })
+
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
@@ -789,9 +795,6 @@ getBPMTaskDetail(taskId: string) {
       this.userList = result;
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
-  }
-  clickMaxi () {
-    this.maxi = !this.maxi
   }
 
   beforeDestroy() {
