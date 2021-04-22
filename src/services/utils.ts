@@ -26,31 +26,31 @@ export const sortingList = [
   {"sortOrder": "desc", "label": "Priority", "sortBy": "priority"}
 ]
 
-export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: any) =>{
-  const decodeToken = JSON.parse(atob(token.split('.')[1]))
-  localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
-  userName = !userName ? decodeToken && decodeToken["preferred_username"] : userName
-  const userEmail = decodeToken["email"] || "external"
-  const resourceacess = decodeToken && decodeToken["resource_access"]
-  let Resourceaud: any = null;
-  if(resourceacess && resourceacess[decodeToken["aud"]]&&resourceacess[decodeToken["aud"][0]]==="forms-flow-web"){
-    Resourceaud= resourceacess[decodeToken["aud"][0]];
-  }
-  else if(resourceacess){
-    Resourceaud = resourceacess['forms-flow-web']
-  }
-  else{
-    console.error("Unable to set formio Userroles");
-  }
+// export const decodeTokenValues = (token: any, userName: any, formIOUserRoles: any) =>{
+//   const decodeToken = JSON.parse(atob(token.split('.')[1]))
+//   localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
+//   userName = !userName ? decodeToken && decodeToken["preferred_username"] : userName
+//   const userEmail = decodeToken["email"] || "external"
+//   const resourceacess = decodeToken && decodeToken["resource_access"]
+//   let Resourceaud: any = null;
+//   if(resourceacess && resourceacess[decodeToken["aud"]]&&resourceacess[decodeToken["aud"][0]]==="forms-flow-web"){
+//     Resourceaud= resourceacess[decodeToken["aud"][0]];
+//   }
+//   else if(resourceacess){
+//     Resourceaud = resourceacess['forms-flow-web']
+//   }
+//   else{
+//     console.error("Unable to set formio Userroles");
+//   }
   
-  if(Resourceaud && Array.isArray(Resourceaud["roles"]) && Resourceaud["roles"].length){
-    formIOUserRoles = !formIOUserRoles ? Resourceaud["roles"] : formIOUserRoles
-  }
-  else{
-    console.error("Unable to set formioUserRoles")
-  }
-  return {userName, userEmail, formIOUserRoles};
-}
+//   if(Resourceaud && Array.isArray(Resourceaud["roles"]) && Resourceaud["roles"].length){
+//     formIOUserRoles = !formIOUserRoles ? Resourceaud["roles"] : formIOUserRoles
+//   }
+//   else{
+//     console.error("Unable to set formioUserRoles")
+//   }
+//   return {userName, userEmail, formIOUserRoles};
+// }
 
 export const getFormattedDateAndTime = (date: Date)=>{
 

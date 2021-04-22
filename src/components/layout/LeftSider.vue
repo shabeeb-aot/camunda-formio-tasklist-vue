@@ -54,12 +54,8 @@
         v-model="currentPage"
         :total-rows="Lentask"
         :per-page="perPage"
-        />
-        <!-- <b-pagination-nav
-        :number-of-pages="numPages"
-        v-model="currentPage"
         class="cft-paginate"
-        /> -->
+        />
     </b-list-group>
     <b-list-group cols="3" v-else>
         <b-row class="cft-not-selected mt-2 ml-1 row">
@@ -81,7 +77,8 @@ import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../TaskListSearch.vue';
+import TaskListSearch from '../../components/TaskListSearch.vue';
+import cloneDeep from 'lodash/cloneDeep';
 import {getFormattedDateAndTime} from '../../services/utils';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
@@ -145,17 +142,14 @@ toggle(index: number) {
 }
 
 updateTasklistResult(queryList: object) {
-  console.log(queryList);
   const requiredParams = {...{sorting:this.payload["sorting"]},...queryList}
-  console.log(this.payload);
   if(!isEqual(this.payload, requiredParams)){
-    console.log("changed")
     this.$root.$emit('call-fetchTaskList', 
-      {filterId: this.selectedfilterId, requestData: requiredParams}
+      {filterId: this.selectedfilterId, requestData: cloneDeep(requiredParams)}
     );
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
-        requestData: requiredParams,
+        requestData: cloneDeep(requiredParams),
         firstResult: 0,
         maxResults: this.perPage
       })

@@ -28,7 +28,7 @@
             <i class="fa fa-times cftf-x"></i>
           </span>
           <span class="cftf-search-title" title="type">
-            <span @click="showUpdateSearchList(index)">
+            <span @click="showUpdateSearchQueryList(index)">
               {{query.label}}
             </span>
             <span v-if="query.type === 'variables'"> 
@@ -65,7 +65,7 @@
                 {{ searchVariableValue[index] }}
               </span>
             </span>
-          <div v-if="showUpdatesearch[index]" class="cft-sort-items">
+          <div v-if="showUpdatesearch[index]" class="cftf-sort-items">
             <div
               v-for="updateSearch in searchListElements"
               :key="updateSearch.key"
@@ -127,8 +127,7 @@
                   setSearchQueryValue(searchValueItem[index], query, operator[index], index);
                   showsearchValueItem(index);
                 "
-              >
-              </b-form-input>
+              />
               </span>
               <span
                 v-if="showSearchs[index] === 's'"
@@ -187,7 +186,7 @@
 </template>
 
 <script lang="ts">
-import '../styles/camundaFormIOTaslistSearch.scss'
+import '../styles/camundaFormIOTasklistSearch.scss'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { 
   FilterSearchTypes,
@@ -195,15 +194,10 @@ import {
   searchValueObject,
   taskSearchFilters,
 } from "../services/search-constants";
-import DatePicker from "vue2-datepicker";
 import {getFormattedDateAndTime} from '../services/utils';
-import moment from "moment";
+import {getISODateTime} from '../services/format-time';
 
-@Component({
-  components: {
-    DatePicker,
-  },
-})
+@Component
 export default class TaskListSearch extends Vue {
   @Prop({}) private tasklength!: number;
 
@@ -257,7 +251,6 @@ export default class TaskListSearch extends Vue {
 
   updatesearchinput(index: number) {
     this.searchValueItem[index] = '';
-    // this.searchVariableValue[index] = '';
     Vue.set(this.showSearchs, index, "i");
   }
 
@@ -333,7 +326,7 @@ export default class TaskListSearch extends Vue {
     this.updateTasklistResult()
   }
 
-  showUpdateSearchList(index: number) {
+  showUpdateSearchQueryList(index: number) {
     for (let i = 0; i < 12; i++) {
       this.showUpdatesearch[i] = false;
     }
@@ -341,7 +334,6 @@ export default class TaskListSearch extends Vue {
   }
 
   updateSearchQueryElement(searchitem: any, index: number) {
-    // console.log("searchitem", searchitem)
     delete this.queryList[
       searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
@@ -367,12 +359,7 @@ export default class TaskListSearch extends Vue {
       break;
     }
     case FilterSearchTypes.DATE: {
-      const timearr = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ").split("+");
-      const replaceTimezone = timearr[1].replace(":", "");
-      const titem = moment(item).format("yyyy-MM-DD[T]HH:mm:ss.SSSZ")
-        .replace(timearr[1], replaceTimezone);
-
-      this.queryList[Vindex] = titem;
+      this.queryList[Vindex] = getISODateTime(item);
       this.updateTasklistResult();
       break;
     }

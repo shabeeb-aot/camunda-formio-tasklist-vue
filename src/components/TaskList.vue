@@ -237,7 +237,6 @@ import vSelect from 'vue-select'
 
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   getTaskFromList,
 } from '../services/utils';
@@ -322,13 +321,7 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  // private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;
-  // private sortOptions: Array<object> = [];
   private userList: Array<object> = [];
-  // private updateSortOptions: Array<object> = [];
-  // private setupdateSortListDropdownindex = 0;
-  // private showSortListDropdown = [false, false, false, false, false, false];
-  // private showaddNewSortListDropdown = false;
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -379,6 +372,7 @@ checkPropsIsPassedAndSetValue() {
   if(!this.webSocketEncryptkey || this.webSocketEncryptkey === ""){
     console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
   }
+  const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
   const engine = "/engine-rest";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
   localStorage.setItem("authToken", this.token);
@@ -386,15 +380,13 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
+  localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
+  
   // this.userName = val.userName;
   this.getUserName()
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
+
+  // this.userEmail = val.userEmail;
+  // this.formIOUserRoles = val.formIOUserRoles;
 }
 
 getUserName () {
@@ -593,24 +585,6 @@ getBPMTaskDetail(taskId: string) {
     });
   }
 
-  // getOptions(options: any) {
-  //   const optionsArray: {
-  //     sortOrder: string;
-  //     label: string;
-  //     sortBy: string;
-  //   }[] = [];
-  //   sortingList.forEach((sortOption) => {
-  //     if (
-  //       !options.some(
-  //         (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-  //       )
-  //     ) {
-  //       optionsArray.push({ ...sortOption });
-  //     }
-  //   });
-  //   return optionsArray;
-  // }
-
   updateFollowUpDate() {
     const referenceobject = this.task;
     referenceobject['followUp'] = getISODateTime(this.setFollowup);
@@ -715,6 +689,8 @@ getBPMTaskDetail(taskId: string) {
       });
 
       this.showfrom = false;
+      this.applicationId = '';
+      this.taskHistoryList = [];
       CamundaRest.getVariablesByTaskId(
         this.token,
         this.selectedTaskId,
@@ -780,7 +756,7 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage-1, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {

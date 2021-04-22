@@ -42,7 +42,8 @@
         cursor: pointer;
     }
     .cft-operator-dropdown{
-      z-index: 10;
+      z-index: 2;
+      margin-left: 35px;
       width: 15%;
       background-color: white;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -88,5 +89,18 @@
 
     .cft-search-cursor {
         cursor: pointer;
+    }
+
+    .cftf-sort-items {
+        margin-left: 30px;
+        border: 1px solid #949494;
+        border-radius: 3%;
+        position: absolute;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        z-index: 2;
+        padding: 5px;
+        width: 13rem;
     }
 }
