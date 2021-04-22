@@ -732,7 +732,7 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage-1, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {
