@@ -159,9 +159,16 @@ checkPropsIsPassedAndSetValue() {
     this.userName,
     this.formIOUserRoles
   );
-  this.userName = val.userName;
+  // this.userName = val.userName;
+  this.getUserName()
   this.userEmail = val.userEmail;
   this.formIOUserRoles = val.formIOUserRoles;
+}
+
+getUserName () {
+  const userDetails: any = localStorage.getItem('UserDetails')
+  const userDetailsObj: any = JSON.parse(userDetails)
+  this.userName = userDetailsObj?.preferred_username
 }
 
 timedifference(date: Date) {

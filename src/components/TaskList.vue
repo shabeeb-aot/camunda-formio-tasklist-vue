@@ -279,7 +279,7 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
-  @Prop() private userName!: string;
+  // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
 
   private tasks: Array<object> = [];
@@ -333,6 +333,7 @@ export default class Tasklist extends Vue {
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
   private autoUserList: any = []
+  private userName: any = ''
   
 @Watch('token')
   ontokenChange (newVal: string) {
@@ -384,9 +385,16 @@ checkPropsIsPassedAndSetValue() {
     this.userName,
     this.formIOUserRoles
   );
-  this.userName = val.userName;
+  // this.userName = val.userName;
+  this.getUserName()
   this.userEmail = val.userEmail;
   this.formIOUserRoles = val.formIOUserRoles;
+}
+
+getUserName () {
+  const userDetails: any = localStorage.getItem('UserDetails')
+  const userDetailsObj: any = JSON.parse(userDetails)
+  this.userName = userDetailsObj?.preferred_username
 }
 
 timedifference(date: Date) {
