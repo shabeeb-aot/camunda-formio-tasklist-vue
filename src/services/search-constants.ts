@@ -94,3 +94,4 @@ export const searchValueObject = (searchValue: string, operator: string) => {
     return `cft-none`
   }
 }
+

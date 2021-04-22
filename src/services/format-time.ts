@@ -8,7 +8,11 @@ export const getISODateTime=(date: Date|null)=>{
       const replaceTimezone = dateTimeArr[1]?.replace(':', '');
       return dateTimeFormat.replace(dateTimeArr[1], replaceTimezone);
     }else{
-      return dateTimeFormat;
+      const dateTimeArr = dateTimeFormat.split('-');
+      if(dateTimeArr && dateTimeArr[1]){
+        const replaceTimezone = dateTimeArr[1]?.replace(':', '');
+        return dateTimeFormat.replace(dateTimeArr[1], replaceTimezone);
+      }
     }
   }else{
     return null

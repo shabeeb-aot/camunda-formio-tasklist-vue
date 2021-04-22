@@ -142,11 +142,8 @@ toggle(index: number) {
 }
 
 updateTasklistResult(queryList: object) {
-  console.log(queryList);
   const requiredParams = {...{sorting:this.payload["sorting"]},...queryList}
-  console.log(this.payload);
   if(!isEqual(this.payload, requiredParams)){
-    console.log("changed")
     this.$root.$emit('call-fetchTaskList', 
       {filterId: this.selectedfilterId, requestData: cloneDeep(requiredParams)}
     );
