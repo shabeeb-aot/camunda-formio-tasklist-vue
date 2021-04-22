@@ -54,12 +54,8 @@
         v-model="currentPage"
         :total-rows="Lentask"
         :per-page="perPage"
-        />
-        <!-- <b-pagination-nav
-        :number-of-pages="numPages"
-        v-model="currentPage"
         class="cft-paginate"
-        /> -->
+        />
     </b-list-group>
     <b-list-group cols="3" v-else>
         <b-row class="cft-not-selected mt-2 ml-1 row">
