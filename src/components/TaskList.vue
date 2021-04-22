@@ -669,6 +669,8 @@ getBPMTaskDetail(taskId: string) {
       });
 
       this.showfrom = false;
+      this.applicationId = '';
+      this.taskHistoryList = [];
       CamundaRest.getVariablesByTaskId(
         this.token,
         this.selectedTaskId,
