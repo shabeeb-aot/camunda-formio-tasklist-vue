@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts">
-import '../styles/camundaFormIOTaslistSearch.scss'
+import '../styles/camundaFormIOTasklistSearch.scss'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { 
   FilterSearchTypes,
