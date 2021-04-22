@@ -153,6 +153,13 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
+  this.getUserName()
+}
+
+getUserName () {
+  const userDetails: any = localStorage.getItem('UserDetails')
+  const userDetailsObj: any = JSON.parse(userDetails)
+  this.userName = userDetailsObj?.preferred_username
 }
 
 timedifference(date: Date) {
