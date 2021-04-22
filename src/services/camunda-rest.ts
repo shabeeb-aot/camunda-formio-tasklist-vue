@@ -73,6 +73,10 @@ const CamundaRest = {
     return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/filter/${filterId}/list`, values)
   },
 
+  filterTaskListPagination(bearerToken: string, filterId: string, values: any, firstResults: number, maxResults: number, CamundaUrl: string) {
+    return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/filter/${filterId}/list?firstResult=${firstResults}&maxResults=${maxResults}`, values)
+  },
+
   formTaskSubmit(bearerToken: string, taskId: string, values: object, CamundaUrl: string) {
     return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/task/${taskId}/submit-form`, values)
   },

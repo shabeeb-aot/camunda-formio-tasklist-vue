@@ -4,6 +4,7 @@
   text-align: left;
   font-size: 16px;
   font-family: Nunito Sans, SemiBold;
+  overflow-y: hidden;
   
   .bg-default {
     background-color: #38598a !important;
@@ -18,11 +19,9 @@
     width: 100%;
   }
 
-  .cft-filter{
-    width:90%;
-    margin: 5px;
-    border: none;
-    font-style: italic;
+  .cft-task-filter-length {
+    padding: 1px;
+    font-size: 16px;
   }
 
   .cft-filter:focus{
@@ -42,7 +41,7 @@
     padding: 0rem 1.25rem !important;
     border-top: 1px solid #ced4da !important;
    // max-height: 80vh;
-    overflow-y: auto;
+    // overflow-y: auto;
     padding-right: 25px;
     border-right: 2px solid #D0D0D0;
   } 
@@ -50,8 +49,8 @@
   .cft-service-task-details {
     min-height: 80vh;
     // max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // overflow-y: auto;
+    // overflow-x: hidden;
     // height: 100%;
   }
 
@@ -100,7 +99,7 @@
     font-weight: 500;
     font-size: 16px;
     text-align: right;
-    display: flex;
+    // display: flex;
     justify-content: flex-end;
   }
 
@@ -131,6 +130,7 @@
     border: 1px solid #949494;
     border-radius: 3%;
     position: absolute;
+    color: #212529;
     background-color: #fff;
     background-clip: padding-box;
     z-index: 5;
@@ -189,6 +189,7 @@
   }
   .cft-list-container {
     margin-top: 5px;
+    overflow-y: auto;
   }
   
   .cft-task-details-assign{
@@ -438,7 +439,10 @@
   box-shadow: none;
 }
 .diagram-full-screen {
-  height: 730px;
+  height:  100vh;
+  min-height: 100vh;
 }
-
+.card{
+  white-space: normal;
+}
 }
