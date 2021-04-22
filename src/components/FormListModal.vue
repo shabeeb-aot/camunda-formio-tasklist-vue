@@ -86,7 +86,7 @@
           >
           </Form>
         </b-modal>
-        <b-modal
+        <!-- <b-modal
           ref="modal-3"
           id="modal-multi-3"
           size="xl"
@@ -95,7 +95,7 @@
         >
         <FormViewSubmission :formid="formId" :submissionid="submissionId">
         </FormViewSubmission>
-        </b-modal>
+        </b-modal> -->
           </div>
 </template>
 
@@ -104,13 +104,12 @@ import '../styles/camundaFormIOFormList.scss'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import CamundaRest from '../services/camunda-rest'
 import { Form } from 'vue-formio';
-import FormViewSubmission from '../components/FormViewSubmission.vue';
+// import FormViewSubmission from '../components/FormViewSubmission.vue';
 import {formApplicationSubmit} from '../services/formsflowai-api';
 
 @Component({
   components: {
     Form,
-    FormViewSubmission
   }
 })
 export default class FormListModal extends Vue{

@@ -11,7 +11,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 // import Vue from 'vue'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
-  decodeTokenValues,
   findFilterKeyOfAllTask,
   getFormattedDateAndTime,
   getTaskFromList,
@@ -33,13 +32,13 @@ import vueBpmn from 'vue-bpmn';
 
 
 @Component({
-    components: {
+  components: {
     formio: Form,
     DatePicker,
     vueBpmn,
     Modeler,
     BpmnJS,
-    }
+  }
 })
 export default class TaskListMixin extends Vue {
     @Prop() private bpmApiUrl!: string;
@@ -75,12 +74,12 @@ export default class TaskListMixin extends Vue {
     private tasklength = 0;
     private readoption = { readOnly: true };
     private options = {
-        noAlerts: false,
-        i18n: {
+      noAlerts: false,
+      i18n: {
         en: {
-            error: "Please fix the errors before submitting again.",
+          error: "Please fix the errors before submitting again.",
         },
-        },
+      },
     };
     private filterList = [];
     private showfilter=false;
@@ -94,10 +93,10 @@ export default class TaskListMixin extends Vue {
     private showSortListDropdown = [false, false, false, false, false, false];
     private showaddNewSortListDropdown = false;
     private payload: Payload = {
-        active: true,
-        sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
-        firstResult: 0,
-        maxResults: this.perPage
+      active: true,
+      sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
+      firstResult: 0,
+      maxResults: this.perPage
     };
     private showUserList = false;
     private taskHistoryList: Array<object> = [];
@@ -108,10 +107,10 @@ export default class TaskListMixin extends Vue {
     private groupListItems: string[] = [];
   
 @Watch('token')
-  ontokenChange (newVal: string) {
-  // updating token
-    localStorage.setItem("authToken", newVal);
-}
+    ontokenChange (newVal: string) {
+      // updating token
+      localStorage.setItem("authToken", newVal);
+    }
 
 @Watch('currentPage')
 onPageChange(newVal: number) {
@@ -154,15 +153,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.url", currentUrl);
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
-  const val = decodeTokenValues(
-    this.token,
-    this.userName,
-    this.formIOUserRoles
-  );
-  // this.userName = val.userName;
   this.getUserName()
-  this.userEmail = val.userEmail;
-  this.formIOUserRoles = val.formIOUserRoles;
 }
 
 getUserName () {
@@ -200,50 +191,50 @@ getBPMTaskDetail(taskId: string) {
   });
 }
 	
-  reloadTasks() {
-    this.selectedTaskId = "";
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-  }
-
-reloadCurrentTask() {
-    this.getBPMTaskDetail(this.task.id);
-    this.fetchTaskList(this.selectedfilterId, this.payload);
+reloadTasks() {
+  this.selectedTaskId = "";
+  this.fetchTaskList(this.selectedfilterId, this.payload);
 }
 
-    fetchTaskList(filterId: string, requestData: object) {
-    this.selectedfilterId = filterId;
-    CamundaRest.filterTaskList(
-      this.token,
-      filterId,
-      requestData,
-      this.bpmApiUrl
-    ).then((result) => {
-      // this.fulltasks= result.data;
-      this.tasks = result.data.slice(
-        (this.currentPage - 1) * this.perPage,
-        this.currentPage * this.perPage
-      );
-      this.tasklength = result.data.length;
-      this.numPages = Math.ceil(result.data.length / this.perPage);
-    });
-  }
+reloadCurrentTask() {
+  this.getBPMTaskDetail(this.task.id);
+  this.fetchTaskList(this.selectedfilterId, this.payload);
+}
+
+fetchTaskList(filterId: string, requestData: object) {
+  this.selectedfilterId = filterId;
+  CamundaRest.filterTaskList(
+    this.token,
+    filterId,
+    requestData,
+    this.bpmApiUrl
+  ).then((result) => {
+    // this.fulltasks= result.data;
+    this.tasks = result.data.slice(
+      (this.currentPage - 1) * this.perPage,
+      this.currentPage * this.perPage
+    );
+    this.tasklength = result.data.length;
+    this.numPages = Math.ceil(result.data.length / this.perPage);
+  });
+}
 
 getOptions(options: any) {
-    const optionsArray: {
+  const optionsArray: {
         sortOrder: string;
         label: string;
         sortBy: string;
     }[] = [];
-    sortingList.forEach((sortOption) => {
-        if (
-        !options.some(
-            (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
-        )
-        ) {
-        optionsArray.push({ ...sortOption });
-        }
-    });
-    return optionsArray;
+  sortingList.forEach((sortOption) => {
+    if (
+      !options.some(
+        (option: { sortBy: string }) => option.sortBy === sortOption.sortBy
+      )
+    ) {
+      optionsArray.push({ ...sortOption });
+    }
+  });
+  return optionsArray;
 }
 
 getGroupDetails() {
@@ -263,117 +254,117 @@ getGroupDetails() {
 }
 
 fetchData() {
-    if (this.selectedTaskId) {
-      console.log(this.tasks)
-      //Here old tasks are coming itself(0-10)
-      this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      this.getGroupDetails();
-      CamundaRest.getTaskById(
+  if (this.selectedTaskId) {
+    console.log(this.tasks)
+    //Here old tasks are coming itself(0-10)
+    this.task = getTaskFromList(this.tasks, this.selectedTaskId);
+    this.getGroupDetails();
+    CamundaRest.getTaskById(
+      this.token,
+      this.selectedTaskId,
+      this.bpmApiUrl
+    ).then((result) => {
+      CamundaRest.getProcessDefinitionById(
         this.token,
-        this.selectedTaskId,
+        result.data.processDefinitionId,
         this.bpmApiUrl
-      ).then((result) => {
-        CamundaRest.getProcessDefinitionById(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then((res) => {
-          this.taskProcess = res.data.name;
-        });
-
-        CamundaRest.getVariablesByProcessId(
-          this.token,
-          result.data.processInstanceId,
-          this.bpmApiUrl
-        )
-
-        CamundaRest.getProcessDiagramXML(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then(async (res) => {
-          this.xmlData = res.data.bpmn20Xml;
-          const modeler = new Modeler({ container: "#canvas" });
-          await modeler.importXML(this.xmlData);
-        });
+      ).then((res) => {
+        this.taskProcess = res.data.name;
       });
 
-      this.showfrom = false;
-      CamundaRest.getVariablesByTaskId(
+      CamundaRest.getVariablesByProcessId(
         this.token,
-        this.selectedTaskId,
+        result.data.processInstanceId,
         this.bpmApiUrl
-      ).then((result) => {
-        if(result.data && result.data["applicationId"].value) {
-          getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
-            .then((r)=> {
-              this.taskHistoryList = r.data.applications;
-            })
-        }
-        else {
-          console.warn("The selected task has no applicationid")
-        }
-        this.applicationId = result.data["applicationId"].value;
-        this.formioUrl = result.data["formUrl"].value;
-        const { formioUrl, formId, submissionId } = getFormDetails(
-          this.formioUrl,
-          this.formIOApiUrl
-        );
-        this.formioUrl = formioUrl;
-        this.submissionId = submissionId;
-        this.formId = formId;
-        this.showfrom = true;
-        this.userSelected = this.task.assignee;
+      )
+
+      CamundaRest.getProcessDiagramXML(
+        this.token,
+        result.data.processDefinitionId,
+        this.bpmApiUrl
+      ).then(async (res) => {
+        this.xmlData = res.data.bpmn20Xml;
+        const modeler = new Modeler({ container: "#canvas" });
+        await modeler.importXML(this.xmlData);
       });
-    }
+    });
+
+    this.showfrom = false;
+    CamundaRest.getVariablesByTaskId(
+      this.token,
+      this.selectedTaskId,
+      this.bpmApiUrl
+    ).then((result) => {
+      if(result.data && result.data["applicationId"].value) {
+        getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
+          .then((r)=> {
+            this.taskHistoryList = r.data.applications;
+          })
+      }
+      else {
+        console.warn("The selected task has no applicationid")
+      }
+      this.applicationId = result.data["applicationId"].value;
+      this.formioUrl = result.data["formUrl"].value;
+      const { formioUrl, formId, submissionId } = getFormDetails(
+        this.formioUrl,
+        this.formIOApiUrl
+      );
+      this.formioUrl = formioUrl;
+      this.submissionId = submissionId;
+      this.formId = formId;
+      this.showfrom = true;
+      this.userSelected = this.task.assignee;
+    });
+  }
 }
 
 mounted() {
-    this.checkPropsIsPassedAndSetValue();
-    authenticateFormio(
-      this.formIOResourceId,
-      this.formIOReviewerId,
-      this.formIOReviewer,
-      this.userEmail,
-      this.formIOUserRoles
-    );
-    CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-      this.filterList = response.data;
-      this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-      this.fetchTaskList(this.selectedfilterId, this.payload);
-    });
+  this.checkPropsIsPassedAndSetValue();
+  authenticateFormio(
+    this.formIOResourceId,
+    this.formIOReviewerId,
+    this.formIOReviewer,
+    this.userEmail,
+    this.formIOUserRoles
+  );
+  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+    this.filterList = response.data;
+    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+    this.fetchTaskList(this.selectedfilterId, this.payload);
+  });
 
-    this.fetchData();
-    if(SocketIOService.isConnected()) {
-      SocketIOService.disconnect();
-    }
-    
-    SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
-      if(this.selectedfilterId){
-        //Refreshes the Task
-        this.fetchTaskList(this.selectedfilterId, this.payload);
-        this.fetchData();
-      }
-      if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-        this.fetchData()
-        this.reloadCurrentTask();
-      }
-    })
-
-    this.sortOptions = this.getOptions([]);
-    CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
-      (response) => {
-        this.getProcessDefinitions = response.data;
-      }
-    );
-    CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
-      this.userList = result;
-    });
-  }
-
-  beforeDestroy() {
+  this.fetchData();
+  if(SocketIOService.isConnected()) {
     SocketIOService.disconnect();
   }
+    
+  SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
+    if(this.selectedfilterId){
+      //Refreshes the Task
+      this.fetchTaskList(this.selectedfilterId, this.payload);
+      this.fetchData();
+    }
+    if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
+      this.fetchData()
+      this.reloadCurrentTask();
+    }
+  })
+
+  this.sortOptions = this.getOptions([]);
+  CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
+    (response) => {
+      this.getProcessDefinitions = response.data;
+    }
+  );
+  CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
+    const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
+    this.userList = result;
+  });
+}
+
+beforeDestroy() {
+  SocketIOService.disconnect();
+}
 }
 </script>
