@@ -22,6 +22,7 @@
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
           :payload="payload"
+          :selectedTaskId="getformsFlowTaskId"
         />
       </b-col>
       <!-- Task Detail section -->
@@ -232,6 +233,7 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
+import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import vSelect from 'vue-select'
 
@@ -285,6 +287,12 @@ export default class Tasklist extends Vue {
   @Prop() private formIOUserRoles!: string;
   // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
+
+  
+  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+
+  @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
+  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
 
   private tasks: Array<object> = [];
   private taskProcess = null;
@@ -382,11 +390,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
   
-  // this.userName = val.userName;
   this.getUserName()
-
-  // this.userEmail = val.userEmail;
-  // this.formIOUserRoles = val.formIOUserRoles;
 }
 
 getUserName () {
@@ -683,7 +687,11 @@ getBPMTaskDetail(taskId: string) {
           this.bpmApiUrl
         ).then(async (res) => {
           this.xmlData = res.data.bpmn20Xml;
-          const modeler = new Modeler({ container: "#canvas" });
+          const div = document.getElementById('canvas');
+          if(div){ 
+            div.innerHTML = ""
+          }
+          const modeler = new Modeler({ container: "#canvas" })
           await modeler.importXML(this.xmlData);
         });
       });
@@ -756,7 +764,7 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage-1, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {
@@ -764,7 +772,7 @@ getBPMTaskDetail(taskId: string) {
     }
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
       if(this.selectedfilterId){
-        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
+        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
         console.log("reached socketIO")
         this.fetchData();
       }

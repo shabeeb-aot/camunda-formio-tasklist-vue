@@ -4,7 +4,6 @@
   text-align: left;
   font-size: 16px;
   font-family: Nunito Sans, SemiBold;
-  overflow-y: hidden;
   
   .bg-default {
     background-color: #38598a !important;
@@ -180,7 +179,8 @@
   {
     font-size: large;
     display: block;
-    position: absolute;
+    // position: absolute;
+    position: fixed;
     cursor: pointer;
     background-color: #f9f9f9;
     min-width: 250px;
@@ -444,5 +444,13 @@
 }
 .card{
   white-space: normal;
+}
+li {
+  list-style-type: none;
+}
+.cft-nav-backgroup 
+{
+  background-color: #1a5a96;
+  color: white;
 }
 }

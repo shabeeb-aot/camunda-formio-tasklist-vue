@@ -74,6 +74,7 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
+import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
@@ -98,6 +99,14 @@ export default class LeftSider extends Vue {
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
+  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  @Mutation('setformsFlowTaskId') public setformsFlowTaskId: any
+  @Mutation('setformsFlowactiveIndex') public setformsFlowactiveIndex: any
+  
+  @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
+  @Getter('getformsFlowactiveIndex') private getformsFlowactiveIndex: any;
+
 
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
@@ -110,6 +119,10 @@ export default class LeftSider extends Vue {
   onPageChange(newVal: number) {
     this.payload["firstResult"] = (newVal-1)*this.perPage
     this.payload["maxResults"] = this.perPage
+    if (this.currentPage !== this.getFormsFlowTaskCurrentPage) {
+      this.activeIndex = 0
+    }
+    this.setFormsFlowTaskCurrentPage(this.currentPage)
     this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (newVal-1)*this.perPage, maxResults: this.perPage})
   }
 
@@ -123,7 +136,7 @@ checkPropsIsPassedAndSetValue() {
 }
 
 timedifference(date: Date) {
-  return moment(date).fromNow();											
+  return moment(date).fromNow();										
 }													   
 
 getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
@@ -132,13 +145,15 @@ getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
 }
 
 setselectedTask(taskId: string) {
+  this.setformsFlowTaskId(taskId)
   this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
 getExactDate(date: Date) {
   return getFormattedDateAndTime(date);
 }
 toggle(index: number) {
-  this.activeIndex = index;						  
+  this.activeIndex = index;
+  this.setformsFlowactiveIndex(this.activeIndex)					  
 }
 
 updateTasklistResult(queryList: object) {
@@ -157,6 +172,12 @@ updateTasklistResult(queryList: object) {
 }
 
 mounted() {
+  if (this.getformsFlowactiveIndex > 1) {
+    this.activeIndex = this.getformsFlowactiveIndex
+  }
+  if (this.getFormsFlowTaskCurrentPage > 0){
+    this.currentPage = this.getFormsFlowTaskCurrentPage
+  }
   this.sId = this.selectedTaskId;
   this.checkPropsIsPassedAndSetValue();
   this.$root.$emit('call-fetchData', {selectedTaskId: this.sId})
