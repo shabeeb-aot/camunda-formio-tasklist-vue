@@ -773,7 +773,6 @@ getBPMTaskDetail(taskId: string) {
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
       if(this.selectedfilterId){
         this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
-        console.log("reached socketIO")
         this.fetchData();
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
