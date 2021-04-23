@@ -233,8 +233,8 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
 import vSelect from 'vue-select'
 
 import {
@@ -748,7 +748,7 @@ getBPMTaskDetail(taskId: string) {
     })
 
     this.$root.$on('call-managerScreen', (para: any) => {
-        this.maxi = para.maxi
+      this.maxi = para.maxi
     })
 
     this.checkPropsIsPassedAndSetValue();

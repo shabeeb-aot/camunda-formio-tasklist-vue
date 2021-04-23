@@ -4,7 +4,6 @@
     @update-task-list="updateTasklistResult"
     :tasklength="Lentask"
     />
-    <!-- Task list section -->
     <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
         <b-list-group-item
         button
@@ -123,7 +122,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (newVal-1)*this.perPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -165,7 +164,7 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: 0,
+        firstResult: this.getFormsFlowTaskCurrentPage,
         maxResults: this.perPage
       })
   }
