@@ -194,8 +194,7 @@ import {
   searchValueObject,
   taskSearchFilters,
 } from "../services/search-constants";
-import {getFormattedDateAndTime} from '../services/utils';
-import {getISODateTime} from '../services/format-time';
+import {getFormattedDateAndTime,getISODateTime} from '../services/format-time';
 
 @Component
 export default class TaskListSearch extends Vue {

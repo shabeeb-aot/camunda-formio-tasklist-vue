@@ -80,7 +80,7 @@ import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
 import TaskListSearch from '../../components/TaskListSearch.vue';
 import cloneDeep from 'lodash/cloneDeep';
-import {getFormattedDateAndTime} from '../../services/utils';
+import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
