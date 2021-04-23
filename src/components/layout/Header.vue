@@ -4,7 +4,7 @@
     <div 
       class="cft-filter-dropdown mx-2"
     >
-        <button class="cft-filter-dropbtn mr-0" @click="toggleshowfilter">
+        <!-- <button class="cft-filter-dropbtn mr-0" @click="toggleshowfilter">
           <i class="bi bi-filter-square"/>
         </button>
         <div v-if="showfilter" class="cft-filter-dropdown-content">
@@ -19,7 +19,23 @@
             <i class="bi bi-exclamation-circle-fill"></i>
               No Filters found  
           </div>
-        </div>
+        </div> -->
+        <b-nav-item-dropdown class="cft-nav-backgroup mr-0">
+          <template slot="button-content">
+             <i class="bi bi-filter-square"/>
+        </template>
+          <span v-if="filterList.length">
+            <b-dropdown-item v-for="(filter, idx) in filterList" 
+              :key="filter.id" 
+              href="#"
+              @click="togglefilter(filter, idx)"
+              :class="{'cft-filter-selected': idx == activefilter}"
+              >
+              {{filter.name}}
+            </b-dropdown-item>
+          </span>
+          <b-dropdown-item v-else >No Filters found</b-dropdown-item>
+        </b-nav-item-dropdown>
       </div>
       <FormListModal :token="token" :bpmApiUrl="bpmApiUrl"/>
       <div class="cft-first">

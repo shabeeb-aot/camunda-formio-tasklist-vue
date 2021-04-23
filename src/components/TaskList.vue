@@ -1,7 +1,7 @@
 <template> 
 <b-container fluid class="task-outer-container">
   <Header
-  v-if="token  && bpmApiUrl"
+  v-if="token  && bpmApiUrl && maxi"
   :token="token"
   :bpmApiUrl="bpmApiUrl"
   :filterList="filterList"
@@ -10,7 +10,7 @@
   :payload="payload"
   />
     <b-row class="cft-service-task-list mt-1">
-      <b-col xl="3" lg="3" md="12" class="cft-first">
+      <b-col xl="3" lg="3" md="12" class="cft-first" v-if="maxi">
         <LeftSider
           v-if="token  && bpmApiUrl"
           :token="token"
@@ -22,10 +22,13 @@
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
           :payload="payload"
+          :selectedTaskId="getformsFlowTaskId"
         />
       </b-col>
-      
-      <b-col v-if="selectedTaskId" lg="9" md="12">
+      <!-- Task Detail section -->
+      <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
+        <!-- nav here -->
+        <ExpandContract/>
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
             {{ task.name }}</b-row
@@ -118,8 +121,7 @@
                           placeholder="Group ID"
                           v-model="setGroup"
                           v-on:keyup.enter="addGroup"
-                        >
-			</b-form-input>
+                        ></b-form-input>
                       </b-col>
                     </b-row>
                     <b-row>
@@ -207,6 +209,8 @@
         </div>
       </b-col>
       <b-col v-else>
+        <!-- nav here -->
+        <ExpandContract/>
         <b-row class="cft-not-selected mt-2 ml-1 row">
           <i
             class="bi bi-exclamation-circle-fill"
@@ -229,7 +233,10 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
+import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import vSelect from 'vue-select'
+
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   findFilterKeyOfAllTask,
@@ -239,8 +246,8 @@ import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import { Form } from 'vue-formio';
-import Header from './layout/header.vue'
-import LeftSider from './layout/left-sider.vue'
+import Header from './layout/Header.vue'
+import LeftSider from './layout/LeftSider.vue'
 import Modeler from 'bpmn-js/lib/Modeler';
 import {Payload} from '../services/TasklistTypes';
 import SocketIOService from '../services/SocketIOServices';
@@ -250,8 +257,8 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
-import vSelect from 'vue-select';
 import vueBpmn from 'vue-bpmn';
+import ExpandContract from './addons/ExpandContract.vue'
 
 
 @Component({
@@ -264,7 +271,8 @@ import vueBpmn from 'vue-bpmn';
     BpmnJS,
     Header,
     LeftSider,
-    vSelect
+    vSelect,
+    ExpandContract
   },
 })
 export default class Tasklist extends Vue {
@@ -279,6 +287,12 @@ export default class Tasklist extends Vue {
   @Prop() private formIOUserRoles!: string;
   // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
+
+  
+  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+
+  @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
+  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
 
   private tasks: Array<object> = [];
   private taskProcess = null;
@@ -325,6 +339,7 @@ export default class Tasklist extends Vue {
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
   private autoUserList: any = []
+  private maxi = true
   private userName: any = ''
   
 @Watch('token')
@@ -374,6 +389,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formsflow.ai.api.url", this.formsflowaiApiUrl);
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
+  
   this.getUserName()
 }
 
@@ -671,7 +687,11 @@ getBPMTaskDetail(taskId: string) {
           this.bpmApiUrl
         ).then(async (res) => {
           this.xmlData = res.data.bpmn20Xml;
-          const modeler = new Modeler({ container: "#canvas" });
+          const div = document.getElementById('canvas');
+          if(div){ 
+            div.innerHTML = ""
+          }
+          const modeler = new Modeler({ container: "#canvas" })
           await modeler.importXML(this.xmlData);
         });
       });
@@ -727,6 +747,10 @@ getBPMTaskDetail(taskId: string) {
       this.fetchTaskList(para.filterId, para.requestData)
     })
 
+    this.$root.$on('call-managerScreen', (para: any) => {
+        this.maxi = para.maxi
+    })
+
     this.checkPropsIsPassedAndSetValue();
     authenticateFormio(
       this.formIOResourceId,
@@ -740,7 +764,7 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage-1, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {
@@ -748,7 +772,7 @@ getBPMTaskDetail(taskId: string) {
     }
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
       if(this.selectedfilterId){
-        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.currentPage, this.perPage);
+        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
         console.log("reached socketIO")
         this.fetchData();
       }
