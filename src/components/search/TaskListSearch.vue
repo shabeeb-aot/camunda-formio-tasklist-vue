@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts">
-import '../styles/camundaFormIOTasklistSearch.scss'
+import '../../styles/camundaFormIOTasklistSearch.scss'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { 
   FilterSearchTypes,
@@ -194,8 +194,8 @@ import {
   getVariableOperator,
   searchValueObject,
   taskSearchFilters,
-} from "../services/search-constants";
-import {getFormattedDateAndTime, getISODateTime} from '../services/format-time';
+} from "../../services/search-constants";
+import {getFormattedDateAndTime, getISODateTime} from '../../services/format-time';
 
 @Component
 export default class TaskListSearch extends Vue {

@@ -74,11 +74,11 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskListSearch from '../search/TaskListSearch.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
