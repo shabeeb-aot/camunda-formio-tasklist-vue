@@ -22,7 +22,7 @@
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
           :payload="payload"
-          :selectedTaskId="getformsFlowTaskId"
+          :selectedTaskId="getFormsFlowTaskId"
         />
       </b-col>
       <!-- Task Detail section -->
@@ -43,14 +43,14 @@
           >
           <div class="cft-actionable-container">
             <b-row class="cft-actionable">
-              <b-col v-if='task.followUp'>
+              <b-col v-if='task.followUp' cols="12" md="3">
                 <span>
                   <i class="fa fa-calendar"></i>
                   {{timedifference(task.followUp)}}
                   <i class="bi bi-x-circle" @click="removeFollowupDate"></i>
                 </span>
               </b-col>
-              <b-col v-else>
+              <b-col v-else cols="12" md="3">
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
@@ -58,14 +58,14 @@
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
-              <b-col v-if='task.due'>
+              <b-col v-if='task.due' cols="12" md="3">
                 <span>
                   <i class="fa fa-calendar"></i>
                   {{timedifference(task.due)}}
                   <i class="bi bi-x-circle" @click="removeDueDate"></i>
                 </span>
               </b-col>
-              <b-col v-else>
+              <b-col v-else cols="12" md="3">
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
@@ -73,7 +73,7 @@
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
-              <b-col>
+              <b-col cols="12" md="3">
                 <div
                     v-b-modal.AddGroupModal
                     v-if="groupListNames"
@@ -140,18 +140,15 @@
                   </div>
                 </b-modal>
               </b-col>
-              <b-col>
-                <div
-                  class="cft-task-assignee"
-                  v-if="task.assignee"
-                >
+              <b-col v-if="task.assignee" cols="12" :md="editAssignee ? 3: 2">
+                <div>
                   <div v-if="editAssignee" class="cft-user-edit">
                     <div class='cft-assignee-change-box row'>
-                      <v-select :options="autoUserList" :reduce="user => user" v-model="userSelected" class="col-9"/>
-                      <span @click="onSetassignee" class="col-1">
+                      <v-select :options="autoUserList" :reduce="user => user" v-model="userSelected" class="col-9 col-md-9"/>
+                      <span @click="onSetassignee" class="col-9 col-md-1">
                         <i class="bi bi-check"></i>
                       </span>
-                      <span @click="toggleassignee" class="col-1">
+                      <span @click="toggleassignee" class="col-9 col-md-1">
                         <i class="fa fa-times ml-1"></i>
                       </span>
                     </div>
@@ -164,7 +161,9 @@
                     <i class="fa fa-times ml-1 cft-remove-user"  data-title="Reset assignee" @click="onUnClaim" />
                   </div>
                 </div>
-                <div class="cft-task-assignee" v-else @click="onClaim" data-title="Set assignee">
+              </b-col>
+              <b-col v-else cols="12" md="1">
+                <div @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />
                   Claim
                 </div>
@@ -233,8 +232,8 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
 import vSelect from 'vue-select'
 
 import {
@@ -286,13 +285,19 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
   // @Prop() private userName!: string;
-  @Prop({default:'formflowai'}) private webSocketEncryptkey !: string;
-
+  @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
   @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
 
   @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
-  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
+  @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+
+  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  
+
+
+  
 
   private tasks: Array<object> = [];
   private taskProcess = null;
@@ -659,6 +664,8 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
+    this.setFollowup = null
+    this.setDue = null
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
@@ -733,6 +740,7 @@ getBPMTaskDetail(taskId: string) {
   
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
+      this.editAssignee = false
       this.selectedTaskId = para.selectedTaskId
       this.fetchData()
     })
@@ -748,7 +756,7 @@ getBPMTaskDetail(taskId: string) {
     })
 
     this.$root.$on('call-managerScreen', (para: any) => {
-        this.maxi = para.maxi
+      this.maxi = para.maxi
     })
 
     this.checkPropsIsPassedAndSetValue();
@@ -764,22 +772,24 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*10, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {
       SocketIOService.disconnect();
     }
-    SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
+    SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
       if(this.selectedfilterId){
-        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, this.getFormsFlowTaskCurrentPage, this.perPage);
-        console.log("reached socketIO")
+        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*10, this.perPage);
         this.fetchData();
+        if (eventName === "create") {
+          this.$root.$emit('call-pagination')
+        }
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
         this.fetchData()
         this.reloadCurrentTask();
-      }
+      } 
     })
 
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
@@ -791,6 +801,11 @@ getBPMTaskDetail(taskId: string) {
 
   beforeDestroy() {
     SocketIOService.disconnect();
+    this.$root.$off('call-fetchData')
+    this.$root.$off('call-fetchPaginatedTaskList')
+    this.$root.$off('call-fetchTaskList')
+    this.$root.$off('call-managerScreen')
+
   }
 }
 </script>

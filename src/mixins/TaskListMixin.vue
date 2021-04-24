@@ -113,7 +113,6 @@ export default class TaskListMixin extends Vue {
 
 @Watch('currentPage')
 onPageChange(newVal: number) {
-  console.log(newVal)
   this.payload["firstResult"] = (newVal-1)*this.perPage
   this.payload["maxResults"] = this.perPage
 //   this.fetchTaskPaginatedList(this.selectedfilterId, this.payload, (newVal-1)*this.perPage, this.perPage);
@@ -254,7 +253,6 @@ getGroupDetails() {
 
 fetchData() {
   if (this.selectedTaskId) {
-    console.log(this.tasks)
     //Here old tasks are coming itself(0-10)
     this.task = getTaskFromList(this.tasks, this.selectedTaskId);
     this.getGroupDetails();
@@ -338,7 +336,7 @@ mounted() {
     SocketIOService.disconnect();
   }
     
-  SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any)=> {
+    SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
     if(this.selectedfilterId){
       //Refreshes the Task
       this.fetchTaskList(this.selectedfilterId, this.payload);

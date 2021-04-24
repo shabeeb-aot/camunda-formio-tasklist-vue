@@ -4,7 +4,6 @@
     @update-task-list="updateTasklistResult"
     :tasklength="Lentask"
     />
-    <!-- Task list section -->
     <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
         <b-list-group-item
         button
@@ -74,11 +73,11 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskListSearch from '../search/TaskListSearch.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
@@ -100,13 +99,11 @@ export default class LeftSider extends Vue {
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
   @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  @Mutation('setformsFlowTaskId') public setformsFlowTaskId: any
-  @Mutation('setformsFlowactiveIndex') public setformsFlowactiveIndex: any
+  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
   @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
-  @Getter('getformsFlowactiveIndex') private getformsFlowactiveIndex: any;
-
+  @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
@@ -123,7 +120,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (newVal-1)*this.perPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -145,7 +142,7 @@ getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
 }
 
 setselectedTask(taskId: string) {
-  this.setformsFlowTaskId(taskId)
+  this.setFormsFlowTaskId(taskId)
   this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
 getExactDate(date: Date) {
@@ -153,7 +150,7 @@ getExactDate(date: Date) {
 }
 toggle(index: number) {
   this.activeIndex = index;
-  this.setformsFlowactiveIndex(this.activeIndex)					  
+  this.setFormsFlowactiveIndex(this.activeIndex)					  
 }
 
 updateTasklistResult(queryList: object) {
@@ -165,19 +162,20 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: 0,
+        firstResult: this.getFormsFlowTaskCurrentPage,
         maxResults: this.perPage
       })
   }
 }
 
 mounted() {
-  if (this.getformsFlowactiveIndex > 1) {
-    this.activeIndex = this.getformsFlowactiveIndex
+  this.$root.$on('call-pagination', () => {
+    this.resetPaginationStore()
+  })
+  if (this.getFormsFlowactiveIndex > 0) {
+    this.activeIndex = this.getFormsFlowactiveIndex
   }
-  if (this.getFormsFlowTaskCurrentPage > 0){
-    this.currentPage = this.getFormsFlowTaskCurrentPage
-  }
+  this.currentPage = this.getFormsFlowTaskCurrentPage
   this.sId = this.selectedTaskId;
   this.checkPropsIsPassedAndSetValue();
   this.$root.$emit('call-fetchData', {selectedTaskId: this.sId})
@@ -187,6 +185,22 @@ mounted() {
       this.getProcessDefinitions = response.data;
     }
   );
+}
+
+resetPaginationStore() {
+  if ((this.getFormsFlowactiveIndex < 9)) {
+      this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
+      this.activeIndex = this.getFormsFlowactiveIndex
+  } else if (this.getFormsFlowactiveIndex === 9) {
+    this.setFormsFlowactiveIndex(0)
+    this.activeIndex = 0
+    this.setFormsFlowTaskCurrentPage(this.getFormsFlowTaskCurrentPage+1)
+    this.currentPage = this.getFormsFlowTaskCurrentPage
+  }
+}
+
+beforeDestroy() {
+  this.$root.$off('call-pagination')
 }
 
 }

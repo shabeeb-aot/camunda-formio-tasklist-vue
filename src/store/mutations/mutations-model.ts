@@ -1,7 +1,7 @@
-import { StateModelIF } from '@/interfaces'
+import { FormsFlowStateModelIF } from '@/interfaces'
 
-export const commonMutation: any = {
-  setFormsFlowTaskCurrentPage: (state: StateModelIF, payload: number) => (state.formsFlowTaskCurrentPage = payload),
-  setformsFlowTaskId: (state: StateModelIF, payload: string) => (state.formsFlowTaskId = payload),
-  setformsFlowactiveIndex: (state: StateModelIF, payload: number) => (state.formsFlowactiveIndex = payload),
+export const FormsFlowcommonMutation: any = {
+  setFormsFlowTaskCurrentPage: (state: FormsFlowStateModelIF, payload: number) => (state.formsFlowTaskCurrentPage = payload),
+  setFormsFlowTaskId: (state: FormsFlowStateModelIF, payload: string) => (state.formsFlowTaskId = payload),
+  setFormsFlowactiveIndex: (state: FormsFlowStateModelIF, payload: number) => (state.formsFlowactiveIndex = payload),
 }

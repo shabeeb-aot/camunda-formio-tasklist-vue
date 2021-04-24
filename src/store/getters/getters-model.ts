@@ -1,11 +1,11 @@
-export const commonGetters: any = {
+export const FormsFlowcommonGetters: any = {
   getFormsFlowTaskCurrentPage (state: any) {
     return state.formsFlowTaskCurrentPage
   },
-  getformsFlowTaskId (state: any) {
+  getFormsFlowTaskId (state: any) {
     return state.formsFlowTaskId
   },
-  getformsFlowactiveIndex (state: any) {
+  getFormsFlowactiveIndex (state: any) {
     return state.formsFlowactiveIndex
   },
 }

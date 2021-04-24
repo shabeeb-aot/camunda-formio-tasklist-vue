@@ -1,7 +1,7 @@
-import { StateModelIF } from '@/interfaces'
+import { FormsFlowStateModelIF } from '@/interfaces'
 
-export const stateModel: StateModelIF = {
-  formsFlowTaskCurrentPage: 0,
+export const FormsFlowstateModel: FormsFlowStateModelIF = {
+  formsFlowTaskCurrentPage: 1,
   formsFlowTaskId: '',
   formsFlowactiveIndex: 0
 }
