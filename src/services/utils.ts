@@ -25,3 +25,13 @@ export const sortingList = [
   {"sortOrder": "desc" ,"label": "Assignee" , "sortBy": "assignee"},
   {"sortOrder": "desc", "label": "Priority", "sortBy": "priority"}
 ]
+
+export const getFormattedDateAndTime = (date: Date)=>{
+
+  return new Date(date).toLocaleDateString('en-us',  {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+
+};
+
+export const getLocalDateTime = (date: any) => {
+  return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
+}

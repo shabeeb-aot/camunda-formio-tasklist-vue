@@ -2,10 +2,10 @@ export const commonGetters: any = {
   getFormsFlowTaskCurrentPage (state: any) {
     return state.formsFlowTaskCurrentPage
   },
-  getformsFlowTaskId (state: any) {
+  getFormsFlowTaskId (state: any) {
     return state.formsFlowTaskId
   },
-  getformsFlowactiveIndex (state: any) {
+  getFormsFlowactiveIndex (state: any) {
     return state.formsFlowactiveIndex
   },
 }

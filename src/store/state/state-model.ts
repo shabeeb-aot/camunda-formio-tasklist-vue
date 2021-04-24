@@ -1,7 +1,7 @@
 import { StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
-  formsFlowTaskCurrentPage: 0,
+  formsFlowTaskCurrentPage: 1,
   formsFlowTaskId: '',
   formsFlowactiveIndex: 0
 }
