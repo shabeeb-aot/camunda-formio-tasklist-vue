@@ -99,14 +99,12 @@ export default class LeftSider extends Vue {
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
-
   @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
   @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
   @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
   @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
-
 
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
