@@ -120,7 +120,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -162,7 +162,7 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: this.getFormsFlowTaskCurrentPage,
+        firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
         maxResults: this.perPage
       })
   }
@@ -189,8 +189,8 @@ mounted() {
 
 resetPaginationStore() {
   if ((this.getFormsFlowactiveIndex < 9)) {
-      this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
-      this.activeIndex = this.getFormsFlowactiveIndex
+    this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
+    this.activeIndex = this.getFormsFlowactiveIndex
   } else if (this.getFormsFlowactiveIndex === 9) {
     this.setFormsFlowactiveIndex(0)
     this.activeIndex = 0
