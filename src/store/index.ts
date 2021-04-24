@@ -1,24 +1,24 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { stateModel } from './state'
-import { commonMutation } from './mutations'
-import { commonGetters } from './getters'
+import { FormsFlowstateModel } from './state'
+import { FormsFlowcommonMutation } from './mutations'
+import { FormsFlowcommonGetters } from './getters'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    ...stateModel
+    ...FormsFlowstateModel
   },
   mutations: {
-    ...commonMutation
+    ...FormsFlowcommonMutation
   },
   actions: {
   },
   modules: {
   },
   getters: {
-    ...commonGetters
+    ...FormsFlowcommonGetters
   },
 })
