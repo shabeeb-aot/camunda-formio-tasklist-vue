@@ -4,7 +4,6 @@
     @update-task-list="updateTasklistResult"
     :tasklength="Lentask"
     />
-    <!-- Task list section -->
     <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
         <b-list-group-item
         button
@@ -74,13 +73,13 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskListSearch from '../search/TaskListSearch.vue';
 import cloneDeep from 'lodash/cloneDeep';
-import {getFormattedDateAndTime} from '../../services/utils';
+import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
@@ -121,7 +120,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (newVal-1)*this.perPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -163,7 +162,7 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: 0,
+        firstResult: this.getFormsFlowTaskCurrentPage,
         maxResults: this.perPage
       })
   }
