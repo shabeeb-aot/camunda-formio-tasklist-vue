@@ -24,7 +24,7 @@ const connect = (encryptKey: any, reloadCallback: any)=>{
     if(isConnected()){
       stompClient.subscribe('/topic/task-event', function(output: any){
         const taskUpdate = JSON.parse(output.body);
-        reloadCallback(taskUpdate.id);
+        reloadCallback(taskUpdate.id, taskUpdate?.eventName);
       });
     }
   });

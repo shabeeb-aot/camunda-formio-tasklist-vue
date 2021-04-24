@@ -99,13 +99,13 @@ export default class LeftSider extends Vue {
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
+
   @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  @Mutation('setformsFlowTaskId') public setformsFlowTaskId: any
-  @Mutation('setformsFlowactiveIndex') public setformsFlowactiveIndex: any
+  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
   @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  @Getter('getformsFlowTaskId') private getformsFlowTaskId: any;
-  @Getter('getformsFlowactiveIndex') private getformsFlowactiveIndex: any;
+  @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
 
   private getProcessDefinitions: Array<object> = [];
@@ -145,7 +145,7 @@ getProcessDataFromList(processList: any[], processId: string, dataKey: string) {
 }
 
 setselectedTask(taskId: string) {
-  this.setformsFlowTaskId(taskId)
+  this.setFormsFlowTaskId(taskId)
   this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
 getExactDate(date: Date) {
@@ -153,7 +153,7 @@ getExactDate(date: Date) {
 }
 toggle(index: number) {
   this.activeIndex = index;
-  this.setformsFlowactiveIndex(this.activeIndex)					  
+  this.setFormsFlowactiveIndex(this.activeIndex)					  
 }
 
 updateTasklistResult(queryList: object) {
@@ -172,12 +172,13 @@ updateTasklistResult(queryList: object) {
 }
 
 mounted() {
-  if (this.getformsFlowactiveIndex > 1) {
-    this.activeIndex = this.getformsFlowactiveIndex
+  this.$root.$on('call-pagination', () => {
+    this.resetPaginationStore()
+  })
+  if (this.getFormsFlowactiveIndex > 0) {
+    this.activeIndex = this.getFormsFlowactiveIndex
   }
-  if (this.getFormsFlowTaskCurrentPage > 0){
-    this.currentPage = this.getFormsFlowTaskCurrentPage
-  }
+  this.currentPage = this.getFormsFlowTaskCurrentPage
   this.sId = this.selectedTaskId;
   this.checkPropsIsPassedAndSetValue();
   this.$root.$emit('call-fetchData', {selectedTaskId: this.sId})
@@ -187,6 +188,22 @@ mounted() {
       this.getProcessDefinitions = response.data;
     }
   );
+}
+
+resetPaginationStore() {
+  if ((this.getFormsFlowactiveIndex < 9)) {
+      this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
+      this.activeIndex = this.getFormsFlowactiveIndex
+  } else if (this.getFormsFlowactiveIndex === 9) {
+    this.setFormsFlowactiveIndex(0)
+    this.activeIndex = 0
+    this.setFormsFlowTaskCurrentPage(this.getFormsFlowTaskCurrentPage+1)
+    this.currentPage = this.getFormsFlowTaskCurrentPage
+  }
+}
+
+beforeDestroy() {
+  this.$root.$off('call-pagination')
 }
 
 }
