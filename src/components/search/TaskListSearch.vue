@@ -28,6 +28,7 @@
             <i class="fa fa-times cftf-x"></i>
           </span>
           <span class="cftf-search-title" title="type">
+            <!-- <v-select :options="searchLabels" v-model="query.label"/> -->
             <span @click="showUpdateSearchQueryList(index)">
               {{query.label}}
             </span>
@@ -141,32 +142,21 @@
       </div>
       <b-row>
         <b-col cols="10">
-          <b-form-input
-            type="text"
-            class="cft-filter"
-            placeholder="Filter Tasks"
-            @click="cftshowSearchList"
-            size="sm"
-          />
+          <b-nav-item-dropdown text="Filter Tasks" class="cft-search-item-nav">
+            <b-dropdown-item button v-for="(s, idx) in searchListElements"
+              :key="s.label" 
+              @click="
+                addToSelectedSearchQuery(s);
+                setActiveSearchItem(idx);"
+              :class="{ 'cft-search-item-selected': idx == activeSearchItem }"
+            > {{s.label}}
+            </b-dropdown-item>
+          </b-nav-item-dropdown>
         </b-col>
         <b-col cols="2">
       {{ tasklength }}
         </b-col>
       </b-row>
-      <b-list-group v-if="showSearchList" class="cft-search-items">
-        <b-list-group-item
-          button
-          v-for="(s, idx) in searchListElements"
-          :key="s.label"
-          @click="
-            addToSelectedSearchQuery(s);
-            setActiveSearchItem(idx);
-          "
-          :class="{ 'cft-search-item-selected': idx == activeSearchItem }"
-        >
-          {{ s.label }}
-        </b-list-group-item>
-      </b-list-group>
       <span v-if="isVariableTypeInSelectedSearchQuery">
         <span>
       <b-form-checkbox-group
@@ -196,13 +186,19 @@ import {
   taskSearchFilters,
 } from "../../services/search-constants";
 import {getFormattedDateAndTime, getISODateTime} from '../../services/format-time';
+import vSelect from 'vue-select'
 
-@Component
+@Component({
+  components: {
+    vSelect
+  }
+})
 export default class TaskListSearch extends Vue {
   @Prop({}) private tasklength!: number;
 
   private activeSearchItem = 0;
   private searchListElements: any = taskSearchFilters;
+  private searchLabels: any = (Object.values(taskSearchFilters).map((values: any) => values.label));
   private queryType = "ALL";
   private showSearchList = false;
   private selectedSearchQueries: any = [];
@@ -292,8 +288,8 @@ export default class TaskListSearch extends Vue {
       this.showSearchs[0] = "a";
       this.showUpdatesearch[0] = false;
       this.showSearchQueryOperators[0] = false;
+      this.showVariableValue[0] = "a";
       if(item.type==="variables"){
-        this.showVariableValue[0] = "a";
         this.isVariableTypeInSelectedSearchQuery = true;
       }
     } 
@@ -302,8 +298,8 @@ export default class TaskListSearch extends Vue {
       this.showSearchs[this.selectedSearchQueries.length - 1] = "a";
       this.showUpdatesearch[this.selectedSearchQueries.length - 1] = false;
       this.showSearchQueryOperators[this.selectedSearchQueries.length - 1] = false;
+      this.showVariableValue[this.selectedSearchQueries.length - 1] = "a";
       if(item.type==="variables"){
-        this.showVariableValue[this.selectedSearchQueries.length - 1] = 'a';
         this.isVariableTypeInSelectedSearchQuery = true;
       }
     }

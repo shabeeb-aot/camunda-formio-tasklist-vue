@@ -25,9 +25,7 @@
           :selectedTaskId="getFormsFlowTaskId"
         />
       </b-col>
-      <!-- Task Detail section -->
       <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
-        <!-- nav here -->
         <ExpandContract/>
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
@@ -170,7 +168,6 @@
               </b-col>
             </b-row>
             <div class="height-100">
-              <!-- form section -->
               <b-tabs class="height-100" content-class="mt-3">
                 <b-tab title="Form">
                   <div v-if="showfrom" class="ml-4 mr-4">
@@ -334,7 +331,6 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  private userList: Array<object> = [];
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -542,7 +538,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
-    this.editAssignee = false;
+    // this.editAssignee = false;
   }
 
   onUnClaim() {				  
@@ -553,6 +549,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
+    // this.toggleassignee();
   }
 
   onSetassignee() {
@@ -793,8 +790,7 @@ getBPMTaskDetail(taskId: string) {
     })
 
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
-      this.userList = result;
+      // const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
   }
