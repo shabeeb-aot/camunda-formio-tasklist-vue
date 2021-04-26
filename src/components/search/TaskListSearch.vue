@@ -388,5 +388,9 @@ export default class TaskListSearch extends Vue {
       this.updateTasklistResult();
     })
   }
+
+  beforeDestroy() {
+    this.$root.$off('call-updateTaskList');
+  }
 }
 </script>
