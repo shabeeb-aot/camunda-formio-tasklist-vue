@@ -72,13 +72,6 @@
 </template>
 
 <script lang="ts">
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'font-awesome/scss/font-awesome.scss';
-import 'formiojs/dist/formio.full.min.css'
-import 'vue2-datepicker/index.css';
-import 'semantic-ui-css/semantic.min.css';
-import '../../styles/user-styles.css'
-import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
