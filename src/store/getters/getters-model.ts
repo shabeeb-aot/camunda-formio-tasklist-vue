@@ -1,4 +1,4 @@
-export const commonGetters: any = {
+export const FormsFlowcommonGetters: any = {
   getFormsFlowTaskCurrentPage (state: any) {
     return state.formsFlowTaskCurrentPage
   },

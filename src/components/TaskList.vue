@@ -538,7 +538,7 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
-    // this.editAssignee = false;
+    this.editAssignee = false;
   }
 
   onUnClaim() {				  
@@ -549,7 +549,6 @@ getBPMTaskDetail(taskId: string) {
       .catch((error) => {
         console.error("Error", error);
       });
-    // this.toggleassignee();
   }
 
   onSetassignee() {
@@ -661,8 +660,8 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    this.setFollowup = null
-    this.setDue = null
+    // this.setFollowup = null
+    // this.setDue = null
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
@@ -769,7 +768,7 @@ getBPMTaskDetail(taskId: string) {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
       this.fetchTaskList(this.selectedfilterId, this.payload);
-      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*10, this.perPage);
+      this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
     });
 
     if(SocketIOService.isConnected()) {
@@ -777,10 +776,11 @@ getBPMTaskDetail(taskId: string) {
     }
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
       if(this.selectedfilterId){
-        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*10, this.perPage);
+        this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
         this.fetchData();
         if (eventName === "create") {
           this.$root.$emit('call-pagination')
+          this.fetchTaskList(this.selectedfilterId, this.payload);
         }
       }
       if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
@@ -790,7 +790,6 @@ getBPMTaskDetail(taskId: string) {
     })
 
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      // const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
   }

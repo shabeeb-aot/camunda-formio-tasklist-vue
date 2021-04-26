@@ -125,7 +125,7 @@ togglefilter(filter: any, index: number) {
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: filter.id,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: 0,
     maxResults: this.perPage
   })
   this.showfilter = false;
@@ -158,7 +158,7 @@ addSort(sort: any) {
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: 0,
     maxResults: this.perPage
   })
   this.showaddNewSortListDropdown = false;									  
@@ -190,7 +190,7 @@ updateSort(sort: any, index: number) {
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: 0,
     maxResults: this.perPage
   })
 }
@@ -203,7 +203,7 @@ deleteSort(sort: any, index: number) {
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: 0,
     maxResults: this.perPage
   })
 }
