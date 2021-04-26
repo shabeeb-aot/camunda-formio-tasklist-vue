@@ -7,16 +7,7 @@
       md="12"
       sm="12"
     >
-      <div class="cft-search-criteria" v-if="selectedSearchQueries.length">
-        <b-button
-          squared
-          variant="primary"
-          @click="changeQueryType"
-        >
-          {{ queryType }}
-        </b-button>
-        <span class="cft-search-item-criteria"> of the criteria are met.</span>
-      </div>
+      <TaskListSearchType :selectedSearchQueries="selectedSearchQueries"/>
 
       <div v-if="selectedSearchQueries && selectedSearchQueries.length">
         <div
@@ -143,14 +134,16 @@
       <b-row>
         <b-col cols="10">
           <b-nav-item-dropdown text="Filter Tasks" class="cft-search-item-nav">
-            <b-dropdown-item button v-for="(s, idx) in searchListElements"
+            <b-dropdown-item-button v-for="(s, idx) in searchListElements"
+              size="sm"
+              split
               :key="s.label" 
               @click="
                 addToSelectedSearchQuery(s);
                 setActiveSearchItem(idx);"
               :class="{ 'cft-search-item-selected': idx == activeSearchItem }"
             > {{s.label}}
-            </b-dropdown-item>
+            </b-dropdown-item-button>
           </b-nav-item-dropdown>
         </b-col>
         <b-col cols="2">
@@ -186,10 +179,12 @@ import {
   taskSearchFilters,
 } from "../../services/search-constants";
 import {getFormattedDateAndTime, getISODateTime} from '../../services/format-time';
+import TaskListSearchType from './TaskListSearchType.vue';
 import vSelect from 'vue-select'
 
 @Component({
   components: {
+    TaskListSearchType,
     vSelect
   }
 })
@@ -226,10 +221,6 @@ export default class TaskListSearch extends Vue {
 
   cftshowSearchList() {
     this.showSearchList = !this.showSearchList;
-  }
-  changeQueryType() {
-    this.queryType==="ALL"? (this.queryType= "ANY") : this.queryType = "ALL"
-    this.updateTasklistResult();
   }
 
   toggleSearchQueryOperatorList(index: number) {
@@ -392,6 +383,10 @@ export default class TaskListSearch extends Vue {
 
   mounted() {
     this.updateTasklistResult();
+    this.$root.$on('call-updateTaskList', (para: any) => {
+      this.queryType = para.queryType;
+      this.updateTasklistResult();
+    })
   }
 }
 </script>
