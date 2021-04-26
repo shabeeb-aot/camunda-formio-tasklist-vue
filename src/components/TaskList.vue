@@ -642,7 +642,7 @@ getBPMTaskDetail(taskId: string) {
       this.bpmApiUrl,
       referenceobject
     ).then(() => {
-      this.reloadCurrentTask();
+      // this.reloadCurrentTask();
     })
   }
 
@@ -660,8 +660,8 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    // this.setFollowup = null
-    // this.setDue = null
+    this.setFollowup = null
+    this.setDue = null
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
