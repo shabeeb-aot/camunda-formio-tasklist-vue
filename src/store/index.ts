@@ -1,9 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import  serviceFlowModule from './modules/serviceFlow-module'
+
+
 import { FormsFlowstateModel } from './state'
-import { FormsFlowcommonMutation } from './mutations'
-import { FormsFlowcommonGetters } from './getters'
+
+
+
 
 Vue.use(Vuex)
 
@@ -12,13 +16,12 @@ export default new Vuex.Store({
     ...FormsFlowstateModel
   },
   mutations: {
-    ...FormsFlowcommonMutation
   },
   actions: {
   },
   modules: {
+    serviceFlowModule,
   },
   getters: {
-    ...FormsFlowcommonGetters
   },
 })

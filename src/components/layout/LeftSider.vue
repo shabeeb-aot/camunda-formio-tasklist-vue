@@ -74,7 +74,7 @@ import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter, Mutation } from 'vuex-class'
+import { Getter, Mutation, namespace } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
 import TaskListSearch from '../search/TaskListSearch.vue';
@@ -83,6 +83,7 @@ import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
+const serviceFlowModule = namespace('serviceFlowModule')
 
 @Component({
   components: {
@@ -98,12 +99,22 @@ export default class LeftSider extends Vue {
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
-  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+
   
-  @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
+
+
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+
+  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  
+  // @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  // @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
@@ -145,12 +156,14 @@ setselectedTask(taskId: string) {
   this.setFormsFlowTaskId(taskId)
   this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
+
 getExactDate(date: Date) {
   return getFormattedDateAndTime(date);
 }
+
 toggle(index: number) {
   this.activeIndex = index;
-  this.setFormsFlowactiveIndex(this.activeIndex)					  
+  this.setFormsFlowactiveIndex(this.activeIndex)			  
 }
 
 updateTasklistResult(queryList: object) {
