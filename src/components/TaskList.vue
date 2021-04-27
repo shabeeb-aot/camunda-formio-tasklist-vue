@@ -283,7 +283,6 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
-  // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
   // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
@@ -526,12 +525,12 @@ getBPMTaskDetail(taskId: string) {
 
   reloadTasks() {
     this.selectedTaskId = "";
-    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, 0, this.perPage);
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
   }
 
   reloadCurrentTask() {
     this.getBPMTaskDetail(this.task.id);
-    // this.fetchPaginatedTaskList(this.selectedfilterId, this.payload);
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
   }
 
   onClaim() {
