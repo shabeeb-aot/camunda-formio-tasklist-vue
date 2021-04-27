@@ -72,13 +72,6 @@
 </template>
 
 <script lang="ts">
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'font-awesome/scss/font-awesome.scss';
-import 'formiojs/dist/formio.full.min.css'
-import 'vue2-datepicker/index.css';
-import 'semantic-ui-css/semantic.min.css';
-import '../../styles/user-styles.css'
-import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -107,6 +100,7 @@ export default class Header extends Vue {
 
   
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any;
 
   // @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   private showfilter=false;
@@ -134,10 +128,11 @@ togglefilter(filter: any, index: number) {
   this.$root.$emit('call-fetchTaskList', 
     {filterId: filter.id, requestData: this.payload}
   );
+  // this.setFormsFlowTaskCurrentPage(1);
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: filter.id,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
     maxResults: this.perPage
   })
   this.showfilter = false;
@@ -167,10 +162,11 @@ addSort(sort: any) {
   } else {
     this.sortOptions = this.getOptions(this.sortList);
   }
+  // this.setFormsFlowTaskCurrentPage(1);
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
     maxResults: this.perPage
   })
   this.showaddNewSortListDropdown = false;									  
@@ -199,10 +195,11 @@ updateSort(sort: any, index: number) {
   this.sortOptions = this.getOptions(this.sortList);
   this.showSortListDropdown[index] = false;
   this.payload["sorting"] = this.sortList;
+  // this.setFormsFlowTaskCurrentPage(1);
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
     maxResults: this.perPage
   })
 }
@@ -212,10 +209,11 @@ deleteSort(sort: any, index: number) {
   this.updateSortOptions = [];
   this.sortOptions = this.getOptions(this.sortList);
   this.payload["sorting"] = this.sortList;
+  // this.setFormsFlowTaskCurrentPage(1);
   this.$root.$emit('call-fetchPaginatedTaskList', {
     filterId: this.selectedfilterId,
     requestData: this.payload,
-    firstResult: this.getFormsFlowTaskCurrentPage,
+    firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
     maxResults: this.perPage
   })
 }
@@ -228,7 +226,13 @@ toggleSort(index: number) {
     this.sortList[index].sortOrder = "asc";
   }
   this.payload["sorting"] = this.sortList;
-  this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
+  // this.setFormsFlowTaskCurrentPage(1);
+  this.$root.$emit('call-fetchPaginatedTaskList', {
+    filterId: this.selectedfilterId,
+    requestData: this.payload,
+    firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
+    maxResults: this.perPage
+  })
 }
 }
 </script>
