@@ -1,24 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { stateModel } from './state'
-import { commonMutation } from './mutations'
-import { commonGetters } from './getters'
+import  serviceFlowModule from './modules/serviceFlow-module'
+
+
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-    ...stateModel
-  },
-  mutations: {
-    ...commonMutation
-  },
-  actions: {
-  },
-  modules: {
-  },
-  getters: {
-    ...commonGetters
-  },
-})
+const store = new Vuex.Store({  })
+export default function install (store: any) {
+  store.registerModule('serviceFlowModule', serviceFlowModule)
+}
+

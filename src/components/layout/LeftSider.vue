@@ -4,7 +4,6 @@
     @update-task-list="updateTasklistResult"
     :tasklength="Lentask"
     />
-    <!-- Task list section -->
     <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
         <b-list-group-item
         button
@@ -74,16 +73,17 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../../styles/user-styles.css'
 import '../../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation, namespace } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
-import TaskListSearch from '../../components/TaskListSearch.vue';
+import TaskListSearch from '../search/TaskListSearch.vue';
 import cloneDeep from 'lodash/cloneDeep';
-import {getFormattedDateAndTime} from '../../services/utils';
+import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
+const serviceFlowModule = namespace('serviceFlowModule')
 
 @Component({
   components: {
@@ -99,12 +99,15 @@ export default class LeftSider extends Vue {
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
-  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+
   
-  @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
+
+
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
 
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
@@ -121,7 +124,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (newVal-1)*this.perPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -146,12 +149,14 @@ setselectedTask(taskId: string) {
   this.setFormsFlowTaskId(taskId)
   this.$root.$emit('call-fetchData', {selectedTaskId: taskId})
 }
+
 getExactDate(date: Date) {
   return getFormattedDateAndTime(date);
 }
+
 toggle(index: number) {
   this.activeIndex = index;
-  this.setFormsFlowactiveIndex(this.activeIndex)					  
+  this.setFormsFlowactiveIndex(this.activeIndex)			  
 }
 
 updateTasklistResult(queryList: object) {
@@ -163,7 +168,7 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: 0,
+        firstResult: this.getFormsFlowTaskCurrentPage,
         maxResults: this.perPage
       })
   }

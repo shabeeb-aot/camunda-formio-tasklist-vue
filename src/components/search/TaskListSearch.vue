@@ -186,16 +186,16 @@
 </template>
 
 <script lang="ts">
-import '../styles/camundaFormIOTasklistSearch.scss'
+import '../../styles/camundaFormIOTasklistSearch.scss'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import { 
   FilterSearchTypes,
+  getDeletedVariableIndex,
   getVariableOperator,
   searchValueObject,
   taskSearchFilters,
-} from "../services/search-constants";
-import {getFormattedDateAndTime} from '../services/utils';
-import {getISODateTime} from '../services/format-time';
+} from "../../services/search-constants";
+import {getFormattedDateAndTime, getISODateTime} from '../../services/format-time';
 
 @Component
 export default class TaskListSearch extends Vue {
@@ -311,9 +311,14 @@ export default class TaskListSearch extends Vue {
   }
 
   deleteSearchQueryElement(query: any, index: number) {
-    delete this.queryList[
-      searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
-    ];
+    if(query.type==='variables'){
+      this.queryList = getDeletedVariableIndex(query, this.selectedSearchQueries, this.selectedSearchQueries[index]["key"], this.queryList);
+    }
+    else {
+      delete this.queryList[
+        searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
+      ];
+    }
     this.selectedSearchQueries.splice(index, 1);
     this.operator.splice(index, 1);
 
@@ -348,6 +353,8 @@ export default class TaskListSearch extends Vue {
     const Vindex = searchValueObject(this.selectedSearchQueries[idx].key, this.operator[idx])
     switch(query.type) {
     case FilterSearchTypes.VARIABLES: {
+      this.selectedSearchQueries[idx]["variable"] = this.searchVariableValue[idx];
+      this.selectedSearchQueries[idx]["name"] = this.searchValueItem[idx];
       if(this.searchValueItem[idx] && this.searchVariableValue[idx]){
         this.queryList[query.key].push({
           "name": this.searchValueItem[idx],

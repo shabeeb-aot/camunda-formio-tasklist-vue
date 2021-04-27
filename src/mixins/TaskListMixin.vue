@@ -12,7 +12,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   findFilterKeyOfAllTask,
-  getFormattedDateAndTime,
   getTaskFromList,
   sortingList,
 } from '../services/utils';

@@ -4,10 +4,10 @@ export const FilterSearchTypes = {
   DATE:"date",
   NORMAL:"normal"
 }
-  
+
 export const taskSearchFilters = [
-  {"label": "Task Variables", "key": "taskVariables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
-  {"label": "Process Variables", "key": "processVariables" ,"compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES},
+  {"label": "Task Variables", "key": "taskVariables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:""},
+  {"label": "Process Variables", "key": "processVariables" ,"compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:""},
   {"label": "Process Definition Name", "key": "processDefinitionName", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING},
   {"label": "Assignee", "compares": ["like", "="],"key": "assignee", "values": ["assigneeLike", "assignee"], "type": FilterSearchTypes.STRING},
   {"label":"Candidate Group", "compares": ["="],"key": "candidateGroup", "values": ["candidateGroup"], "type": FilterSearchTypes.NORMAL},
@@ -19,25 +19,6 @@ export const taskSearchFilters = [
   {"label":"Follow up Date", "compares": ["before", "after"],"key": "followUp", "values": ["followUpBefore", "followUpAfter"], "type": FilterSearchTypes.DATE},
   {"label":"Created", "compares": ["before", "after"], "key": "created","values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE},
 ]
-  
-export const searchQuery: any = {
-  "assignee": null,
-  "assigneeLike": null,
-  "created": null,
-  "followUp": null,
-  "due": null,
-  "description": null,
-  "descriptionLike": null,
-  "processVariables": [],
-  "taskVariables": [],
-  "processDefinitionNameLike": null,
-  "processDefinitionName": null,
-  "priority": null,
-  "name": null,
-  "nameLike": null,
-  "candidateGroup":null,
-  "candidateUser": null
-}
 
 export const getVariableOperator = (operator: string)=>{
   switch(operator){
@@ -58,8 +39,6 @@ export const getVariableOperator = (operator: string)=>{
   default:
   } 
 }
-
-
 
 export const FILTER_OPERATOR_TYPES = {
   EQUAL:"=",
@@ -93,4 +72,13 @@ export const searchValueObject = (searchValue: string, operator: string) => {
   else {
     return `cft-none`
   }
+}
+
+export const getDeletedVariableIndex = (deletequery: any, selectetedSearchList: any, key: string, queryList: any) => {
+  for(let i=0; i<queryList[key].length; i++){
+    if((queryList[key][i]["name"]===deletequery["name"]) && (queryList[key]["value"]===deletequery["value"])) {
+      queryList[key].splice(i, 1);
+    }
+  }
+  return queryList;
 }

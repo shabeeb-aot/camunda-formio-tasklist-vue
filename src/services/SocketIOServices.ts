@@ -20,7 +20,6 @@ const connect = (encryptKey: any, reloadCallback: any)=>{
   const socket = new SockJS(socketUrl);
   stompClient = Stomp.over(socket);
   stompClient.connect({}, function(frame: any){
-    console.log('Connected- frame: ' + frame);
     if(isConnected()){
       stompClient.subscribe('/topic/task-event', function(output: any){
         const taskUpdate = JSON.parse(output.body);
@@ -32,7 +31,6 @@ const connect = (encryptKey: any, reloadCallback: any)=>{
 
 const disconnect = ()=>{
   stompClient.disconnect();
-  console.log("Disconnected");
 }
 
 const SocketIOService = {

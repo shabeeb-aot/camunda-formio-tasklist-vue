@@ -232,8 +232,8 @@ import 'vue2-datepicker/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
-import { Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Getter, Mutation, namespace } from 'vuex-class'
 import vSelect from 'vue-select'
 
 import {
@@ -258,6 +258,8 @@ import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
 import vueBpmn from 'vue-bpmn';
 import ExpandContract from './addons/ExpandContract.vue'
+
+const serviceFlowModule = namespace('serviceFlowModule')
 
 
 @Component({
@@ -287,13 +289,20 @@ export default class Tasklist extends Vue {
   // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
-  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
 
-  @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
-  @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+  // @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
+  // @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
 
-  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+
+
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
 
 
@@ -756,7 +765,7 @@ getBPMTaskDetail(taskId: string) {
     })
 
     this.$root.$on('call-managerScreen', (para: any) => {
-        this.maxi = para.maxi
+      this.maxi = para.maxi
     })
 
     this.checkPropsIsPassedAndSetValue();
@@ -767,7 +776,6 @@ getBPMTaskDetail(taskId: string) {
       this.userEmail,
       this.formIOUserRoles
     );
-
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
@@ -781,7 +789,6 @@ getBPMTaskDetail(taskId: string) {
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
       if(this.selectedfilterId){
         this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*10, this.perPage);
-        console.log("reached socketIO")
         this.fetchData();
         if (eventName === "create") {
           this.$root.$emit('call-pagination')
