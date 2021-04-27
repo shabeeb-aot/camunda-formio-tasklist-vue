@@ -189,7 +189,7 @@
   }
   .cft-list-container {
     margin-top: 5px;
-    overflow-y: auto;
+    // overflow-y: auto;
   }
   
   .cft-task-details-assign{
@@ -447,7 +447,7 @@
 li {
   list-style-type: none;
 }
-.cft-nav-backgroup 
+.cft-nav-backgroup, .cft-nav-backgroup:hover
 {
   background-color: #1a5a96;
   color: white;
