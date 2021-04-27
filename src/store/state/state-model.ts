@@ -1,4 +1,4 @@
-import { FormsFlowStateModelIF } from '@/interfaces'
+import { FormsFlowStateModelIF } from '../../interfaces'
 
 export const FormsFlowstateModel: FormsFlowStateModelIF = {
   formsFlowTaskCurrentPage: 1,

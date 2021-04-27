@@ -109,13 +109,6 @@ export default class LeftSider extends Vue {
   @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
   @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
 
-  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
-  
-  // @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  // @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
-
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
   private activeIndex = 0;

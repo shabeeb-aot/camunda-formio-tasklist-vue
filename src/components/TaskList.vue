@@ -162,7 +162,7 @@
                   </div>
                 </div>
               </b-col>
-              <b-col v-else cols="12" md="1">
+              <b-col v-else cols="12" md="2">
                 <div @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />
                   Claim
