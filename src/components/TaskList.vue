@@ -650,7 +650,7 @@ getBPMTaskDetail(taskId: string) {
       this.bpmApiUrl,
       referenceobject
     ).then(() => {
-      // this.reloadCurrentTask();
+      this.reloadCurrentTask();
     })
   }
 
