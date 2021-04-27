@@ -4,24 +4,11 @@ import Vuex from 'vuex'
 import  serviceFlowModule from './modules/serviceFlow-module'
 
 
-import { FormsFlowstateModel } from './state'
-
-
-
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-    ...FormsFlowstateModel
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-    serviceFlowModule,
-  },
-  getters: {
-  },
-})
+const store = new Vuex.Store({  })
+export default function install (store: any) {
+  store.registerModule('serviceFlowModule', serviceFlowModule)
+}
+
