@@ -66,13 +66,6 @@
 </template>
 
 <script lang="ts">
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'font-awesome/scss/font-awesome.scss';
-import 'formiojs/dist/formio.full.min.css'
-import 'vue2-datepicker/index.css';
-import 'semantic-ui-css/semantic.min.css';
-import '../../styles/user-styles.css'
-import '../../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Getter, Mutation, namespace } from 'vuex-class'
 import CamundaRest from '../../services/camunda-rest';
@@ -109,13 +102,6 @@ export default class LeftSider extends Vue {
   @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
   @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
 
-  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
-  
-  // @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
-  // @Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
-
   private getProcessDefinitions: Array<object> = [];
   private processDefinitionId = '';
   private activeIndex = 0;
@@ -131,7 +117,7 @@ export default class LeftSider extends Vue {
       this.activeIndex = 0
     }
     this.setFormsFlowTaskCurrentPage(this.currentPage)
-    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: this.getFormsFlowTaskCurrentPage, maxResults: this.perPage})
+    this.$root.$emit('call-fetchPaginatedTaskList', {filterId: this.selectedfilterId, requestData: this.payload, firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage, maxResults: this.perPage})
   }
 
 checkPropsIsPassedAndSetValue() {
@@ -175,7 +161,7 @@ updateTasklistResult(queryList: object) {
     this.$root.$emit('call-fetchPaginatedTaskList', 
       {filterId: this.selectedfilterId,
         requestData: cloneDeep(requiredParams),
-        firstResult: this.getFormsFlowTaskCurrentPage,
+        firstResult: (this.getFormsFlowTaskCurrentPage-1)*this.perPage,
         maxResults: this.perPage
       })
   }
@@ -202,8 +188,8 @@ mounted() {
 
 resetPaginationStore() {
   if ((this.getFormsFlowactiveIndex < 9)) {
-      this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
-      this.activeIndex = this.getFormsFlowactiveIndex
+    this.setFormsFlowactiveIndex(this.getFormsFlowactiveIndex+1)
+    this.activeIndex = this.getFormsFlowactiveIndex
   } else if (this.getFormsFlowactiveIndex === 9) {
     this.setFormsFlowactiveIndex(0)
     this.activeIndex = 0
