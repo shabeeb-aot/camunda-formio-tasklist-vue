@@ -11,9 +11,10 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/',
+    path: '/:taskIdName?',
     name: 'Tasklist',
-    component: Tasklist
+    component: Tasklist,
+    props: true
   },
   {
     path: '/form/:formId/submission/:submissionId',
