@@ -171,6 +171,9 @@ mounted() {
   this.$root.$on('call-pagination', () => {
     this.resetPaginationStore()
   })
+  this.$root.$on('update-pagination-currentpage', (para: any) => {
+    this.currentPage = para.page;
+  })
   if (this.getFormsFlowactiveIndex > 0) {
     this.activeIndex = this.getFormsFlowactiveIndex
   }
@@ -200,6 +203,7 @@ resetPaginationStore() {
 
 beforeDestroy() {
   this.$root.$off('call-pagination')
+  this.$root.$off('update-pagination-currentpage')
 }
 
 }
