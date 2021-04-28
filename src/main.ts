@@ -14,6 +14,6 @@ Vue.use(BootstrapVue)
 
 new Vue({
   router,
-  // store,
+  store,
   render: h => h(App),
 }).$mount('#app')
