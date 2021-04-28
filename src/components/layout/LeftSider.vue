@@ -14,7 +14,8 @@
         >
         <div @click="setselectedTask(task.id)" class="cft-select-task">
             <h5 class="cft-task-title" data-title='Task Name'>{{ task.name }}</h5>
-            <div class="cft-task-details-assign assigne-details ">
+            <b-row>
+              <b-col cols="7">
             <div class='cft-process-title' data-tile='Process Definition Name'>
                 {{
                 getProcessDataFromList(
@@ -24,13 +25,16 @@
                 )
                 }}
             </div>
+              </b-col>
+              <b-col cols="5">
             <div class="cft-task-assignee" data-title="Task assignee">
                 {{ task.assignee }}
             </div>
-            </div>
-            <div class="cft-task-details-assign font-11">
-            <div class="created-details">
-                <div>
+              </b-col>
+            </b-row>
+            <b-row>
+            <div class="created-details font-11 cft-task-details-assign">
+                <b-col cols="9">
                 <span class="cft-due-date" :data-title="getExactDate(task.due)" v-if="task.due">
                     Due {{ timedifference(task.due) }},
                 </span>
@@ -40,12 +44,12 @@
                 <span class="cft-due-date" :data-title="getExactDate(task.created)" v-if="task.created">
                     Created {{ timedifference(task.created) }}
                 </span>
-                </div>
-                <div class="cft-priority" data-title="priority">
+                </b-col>
+                <b-col cols="3" class="cft-priority" data-title="priority">
                 {{ task.priority }}
-                </div>
+                </b-col>
             </div>
-            </div>
+            </b-row>
         </div>
         </b-list-group-item>
 

@@ -39,18 +39,12 @@
     clip-path: inset(0px -15px 0px 0px);
     padding: 0rem 1.25rem !important;
     border-top: 1px solid #ced4da !important;
-   // max-height: 80vh;
-    // overflow-y: auto;
     padding-right: 25px;
     border-right: 2px solid #D0D0D0;
   } 
 
   .cft-service-task-details {
     min-height: 80vh;
-    // max-height: 80vh;
-    // overflow-y: auto;
-    // overflow-x: hidden;
-    // height: 100%;
   }
 
   .task-header {
@@ -98,7 +92,6 @@
     font-weight: 500;
     font-size: 16px;
     text-align: right;
-    // display: flex;
     justify-content: flex-end;
   }
 
@@ -106,14 +99,10 @@
   {
     background-color: #1a5a96;
     color: white;
-    // padding-top: 0.5rem;
-    // padding-bottom: 0.5rem;
     font-size: 20px;
-    // width: 20%;
     border: none;
     cursor: pointer;
     padding: 5px 9px;
-    //float: right;
   }
   .cft-input-filter{
     display: flex;
@@ -179,7 +168,6 @@
   {
     font-size: large;
     display: block;
-    // position: absolute;
     position: fixed;
     cursor: pointer;
     background-color: #f9f9f9;
@@ -189,7 +177,6 @@
   }
   .cft-list-container {
     margin-top: 5px;
-    // overflow-y: auto;
   }
   
   .cft-task-details-assign{
@@ -202,7 +189,6 @@
   .assigne-details{
     font-size: 15px;
     font-weight: 500;
-    // margin-bottom: 3px;
     margin-top: 10px;
 
   }
@@ -227,7 +213,6 @@
     flex-wrap: wrap;
     padding: calc(6px + 2px) 15px calc(6px - 2px) 15px;
     box-shadow: 0 2px 6px -4px #555;
-    // margin-bottom: 0.5rem;
     background-color: #fafafa;
   }
   
@@ -322,6 +307,10 @@
     min-height: 100%;
   }
 
+  .cft-priority{
+    text-align: right;
+  }
+
 .cft-process-title[data-title]:hover:after,
 .cft-task-title[data-title]:hover:after,
 .cft-priority[data-title]:hover:after,
@@ -356,12 +345,6 @@
   background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
   background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
 }
-// .cft-process-name[data-title]:hover:after,.task-header-title[data-title]:hover:after,
-// .cft-application-id[data-title]:hover:after{
-//   right: 0;
-//   position: relative;
-//   height: 26px;
-// }
 .cft-application-id{
   display: block;
   height: auto;
@@ -386,7 +369,7 @@
   height: 20px;
 }
 .cft-task-assignee[data-title]:hover:after {
-  width: 40%;
+  width: 80%;
 }
 
 .cftf-form-conatiner{
