@@ -6,18 +6,18 @@ export const FilterSearchTypes = {
 }
 
 export const taskSearchFilters = [
-  {"label": "Task Variables", "key": "taskVariables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:""},
-  {"label": "Process Variables", "key": "processVariables" ,"compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:""},
-  {"label": "Process Definition Name", "key": "processDefinitionName", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING},
-  {"label": "Assignee", "compares": ["like", "="],"key": "assignee", "values": ["assigneeLike", "assignee"], "type": FilterSearchTypes.STRING},
-  {"label":"Candidate Group", "compares": ["="],"key": "candidateGroup", "values": ["candidateGroup"], "type": FilterSearchTypes.NORMAL},
-  {"label":"Candidate User", "compares": ["="], "key": "candidateUser","values": ["candidateUser"], "type": FilterSearchTypes.NORMAL},
-  {"label":"Name", "compares": ["like", "="], "key": "name","values": ["nameLike", "name"], "type": FilterSearchTypes.STRING},
-  {"label": "Description","compares": ["like", "="], "key": "description","values": ["descriptionLike", "description"], "type": FilterSearchTypes.STRING },
-  {"label":"Priority", "compares": ["="],"key": "priority", "values": ["priority"], "type": FilterSearchTypes.NORMAL},
-  {"label":"Due Date", "compares": ["before", "after"], "key": "due", "values": ["dueBefore", "dueAfter"], "type": FilterSearchTypes.DATE},
-  {"label":"Follow up Date", "compares": ["before", "after"],"key": "followUp", "values": ["followUpBefore", "followUpAfter"], "type": FilterSearchTypes.DATE},
-  {"label":"Created", "compares": ["before", "after"], "key": "created","values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE},
+  {"label": "Task Variables", "key": "taskVariables", "compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:"", operator: ">"},
+  {"label": "Process Variables", "key": "processVariables" ,"compares": [">", ">=", "=","!=", "<", "<="], "values": ["gt", "gte","eq", "neq","lt", "lte"], "type": FilterSearchTypes.VARIABLES, variable:"", name:"", operator: ">"},
+  {"label": "Process Definition Name", "key": "processDefinitionName", "compares": ["like", "="], "values": ["processDefinitionNameLike", "processDefinitionName"], "type": FilterSearchTypes.STRING, operator: ""},
+  {"label": "Assignee", "compares": ["like", "="],"key": "assignee", "values": ["assigneeLike", "assignee"], "type": FilterSearchTypes.STRING, name: "", operator: ""},
+  {"label":"Candidate Group", "compares": ["="],"key": "candidateGroup", "values": ["candidateGroup"], "type": FilterSearchTypes.NORMAL, name: "", operator: ""},
+  {"label":"Candidate User", "compares": ["="], "key": "candidateUser","values": ["candidateUser"], "type": FilterSearchTypes.NORMAL, name: "", operator: ""},
+  {"label":"Name", "compares": ["like", "="], "key": "name","values": ["nameLike", "name"], "type": FilterSearchTypes.STRING, name: "", operator: ""},
+  {"label": "Description","compares": ["like", "="], "key": "description","values": ["descriptionLike", "description"], "type": FilterSearchTypes.STRING, name: "", operator: ""},
+  {"label":"Priority", "compares": ["="],"key": "priority", "values": ["priority"], "type": FilterSearchTypes.NORMAL, name: "", operator: ""},
+  {"label":"Due Date", "compares": ["before", "after"], "key": "due", "values": ["dueBefore", "dueAfter"], "type": FilterSearchTypes.DATE, name: "", operator: ""},
+  {"label":"Follow up Date", "compares": ["before", "after"],"key": "followUp", "values": ["followUpBefore", "followUpAfter"], "type": FilterSearchTypes.DATE, name: "", operator: ""},
+  {"label":"Created", "compares": ["before", "after"], "key": "created","values": ["createdBefore", "createdAfter"], "type": FilterSearchTypes.DATE, name: "", operator: ""},
 ]
 
 export const getVariableOperator = (operator: string)=>{

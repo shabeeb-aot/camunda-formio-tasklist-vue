@@ -25,9 +25,7 @@
           :selectedTaskId="getFormsFlowTaskId"
         />
       </b-col>
-      <!-- Task Detail section -->
       <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
-        <!-- nav here -->
         <ExpandContract/>
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
@@ -162,7 +160,7 @@
                   </div>
                 </div>
               </b-col>
-              <b-col v-else cols="12" md="1">
+              <b-col v-else cols="12" md="2">
                 <div @click="onClaim" data-title="Set assignee">
                   <i class="bi bi-person-fill" />
                   Claim
@@ -170,7 +168,6 @@
               </b-col>
             </b-row>
             <div class="height-100">
-              <!-- form section -->
               <b-tabs class="height-100" content-class="mt-3">
                 <b-tab title="Form">
                   <div v-if="showfrom" class="ml-4 mr-4">
@@ -233,7 +230,7 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter, Mutation } from 'vuex-class'
+import { Getter, Mutation, namespace } from 'vuex-class'
 import vSelect from 'vue-select'
 
 import {
@@ -258,6 +255,8 @@ import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
 import vueBpmn from 'vue-bpmn';
 import ExpandContract from './addons/ExpandContract.vue'
+
+const serviceFlowModule = namespace('serviceFlowModule')
 
 
 @Component({
@@ -284,16 +283,22 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
-  // @Prop() private userName!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
-  @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
 
-  @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
-  @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+  // @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
+  // @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
 
-  @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+
+
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
+  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
+  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
 
 
@@ -334,7 +339,6 @@ export default class Tasklist extends Vue {
   private userEmail = 'external';
   private selectedfilterId = '';
   private xmlData!: string;
-  private userList: Array<object> = [];
   private payload: Payload = {
     active: true,
     sorting: TASK_FILTER_LIST_DEFAULT_PARAM,
@@ -521,12 +525,12 @@ getBPMTaskDetail(taskId: string) {
 
   reloadTasks() {
     this.selectedTaskId = "";
-    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, 0, this.perPage);
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
   }
 
   reloadCurrentTask() {
     this.getBPMTaskDetail(this.task.id);
-    // this.fetchPaginatedTaskList(this.selectedfilterId, this.payload);
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
   }
 
   onClaim() {
@@ -767,7 +771,6 @@ getBPMTaskDetail(taskId: string) {
       this.userEmail,
       this.formIOUserRoles
     );
-
     CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
       this.filterList = response.data;
       this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
@@ -794,8 +797,6 @@ getBPMTaskDetail(taskId: string) {
     })
 
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
-      const result = response.data.map((e: { id: number }) => ({ value: e.id,text:e.id }));
-      this.userList = result;
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
   }
