@@ -15,12 +15,10 @@
           :key="query.label + index"
         >
         <b-row>
-          <b-col cols="1">
-          <span @click="deleteSearchQueryElement(query,index)">
+          <b-col cols="1" @click="deleteSearchQueryElement(query,index)">
             <i class="fa fa-times cftf-x" @click="deleteSearchQueryElement(query,index)"></i>
-          </span>
           </b-col>
-          <b-col cols="4">
+          <b-col cols="5">
             <b-nav-item-dropdown :text=query.label>
               <b-dropdown-item-button
                 v-for="updateSearch in searchListElements"
@@ -31,7 +29,7 @@
               </b-dropdown-item-button>
             </b-nav-item-dropdown>
           </b-col>
-            <b-col cols="*">
+            <b-col cols="5">
             <span v-if="query.type === 'variables'"> 
               <span>: </span>     
               <span
@@ -65,15 +63,19 @@
             </b-col>
         </b-row>
 
-        <b-row>
+        <b-row align-h="end">
+          <b-col cols="3">
           <b-nav-item-dropdown :text=operator[index]>
             <b-dropdown-item-button
             v-for="x in query.compares"
             :key="x"
-            @click="updateSearchQueryOperators(x, index)">
+            @click="updateSearchQueryOperators(x, index)"
+            v-model="operator[index]">
             {{x}}
             </b-dropdown-item-button>
           </b-nav-item-dropdown>
+          </b-col>
+          <b-col cols="7">
             <div class="cft-rhs-container">
               <span
                 v-if="showSearchs[index] === 'a'"
@@ -119,9 +121,10 @@
                 v-if="showSearchs[index] === 's' && query.type !=='date'"
                 @click="updatesearchinput(index)"
               >
-                {{ query.name }}
+                {{ searchValueItem[index] }}
               </span>
             </div>
+          </b-col>
         </b-row>
         </div>
       </div>
@@ -181,7 +184,8 @@ export default class TaskListSearch extends Vue {
       searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
     this.operator[index] = operator;
-    this.setSearchQueryValue(this.selectedSearchQueries[index]["name"], this.selectedSearchQueries[index], this.operator[index], index);
+    console.log('entered operator update-> operator value->', operator)
+    this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
   }
 
   updatesearchinput(index: number) {
