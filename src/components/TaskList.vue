@@ -181,7 +181,7 @@
                       <formio
                         :src="formioUrl"
                         :options="
-                          task.assignee === userName ? options : readoption
+                          task.assignee === userName ? options : { readOnly: true }
                         "
                         v-on:submit="onFormSubmitCallback"
                         v-on:customEvent="oncustomEventCallback"
@@ -230,7 +230,7 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter, Mutation, namespace } from 'vuex-class'
+import { namespace } from 'vuex-class'
 import vSelect from 'vue-select'
 
 import {
@@ -283,15 +283,10 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
+  @Prop() private getTaskId!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
-  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
 
-  // @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
-  // @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
-
-  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
 
@@ -301,8 +296,6 @@ export default class Tasklist extends Vue {
   @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   
 
-
-  
 
   private tasks: Array<object> = [];
   private taskProcess = null;
@@ -321,14 +314,8 @@ export default class Tasklist extends Vue {
   public perPage = 10;
   public numPages = 5;
   private tasklength = 0;
-  private readoption = { readOnly: true };
-  private options = {
-    noAlerts: false,
-    i18n: {
-      en: {
-        error: "Please fix the errors before submitting again.",
-      },
-    },
+  private options = {noAlerts: false,i18n: {
+    en: {error: "Please fix the errors before submitting again.",},},
   };
   private filterList = [];
   private editAssignee = false;
@@ -348,6 +335,7 @@ export default class Tasklist extends Vue {
   private showUserList = false;
   private taskHistoryList: Array<object> = [];
   private autoUserList: any = []
+  private taskIdValue = '';
   private maxi = true
   private userName: any = ''
   
@@ -357,12 +345,6 @@ export default class Tasklist extends Vue {
     localStorage.setItem("authToken", newVal);
   }
 
-@Watch('currentPage')
-onPageChange(newVal: number) {
-  this.payload["firstResult"] = (newVal-1)*this.perPage
-  this.payload["maxResults"] = this.perPage
-  this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (newVal-1)*this.perPage, this.perPage);
-}
 
 checkPropsIsPassedAndSetValue() {
   if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -388,6 +370,16 @@ checkPropsIsPassedAndSetValue() {
   }
   if(!this.webSocketEncryptkey || this.webSocketEncryptkey === ""){
     console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
+  }
+  if(this.getTaskId) {
+    this.taskIdValue = this.getTaskId;
+  }
+  if(!this.getTaskId) {
+    const routeparams = this.$route?.query?.taskId;
+    console.log(typeof(this.$route.query), "value", this.$route.query)
+    if(typeof(routeparams) ==='string' && this.$route.query.taskId) {
+      this.taskIdValue = routeparams;
+    }
   }
   const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
   const engine = "/engine-rest";
@@ -715,7 +707,8 @@ getBPMTaskDetail(taskId: string) {
         this.selectedTaskId,
         this.bpmApiUrl
       ).then((result) => {
-        if(result.data && result.data["applicationId"].value) {
+        if(result.data && result.data["applicationId"]?.value) {
+          this.applicationId = result.data["applicationId"].value;
           getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
             .then((r)=> {
               this.taskHistoryList = r.data.applications;
@@ -724,8 +717,7 @@ getBPMTaskDetail(taskId: string) {
         else {
           console.warn("The selected task has no applicationid")
         }
-        this.applicationId = result.data["applicationId"].value;
-        this.formioUrl = result.data["formUrl"].value;
+        this.formioUrl = result.data["formUrl"]?.value;
     
         const { formioUrl, formId, submissionId } = getFormDetails(
           this.formioUrl,
