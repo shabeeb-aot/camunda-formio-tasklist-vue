@@ -4,7 +4,10 @@
   "description": "Vue components to integrate formsflow.ai",
   "private": false,
   "main": "./dist/camunda-formio-tasklist-vue.common.js",
-  "author": "faiz.shabeeb@aot-technologies.com",
+  "author": "support@aot-technologies.com",
+  "contributors": [
+    "Shabeeb <faiz.shabeeb@aot-technologies.com> (https://github.com/shabeeb-aot)"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
