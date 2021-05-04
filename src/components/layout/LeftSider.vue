@@ -66,8 +66,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter, Mutation, namespace } from 'vuex-class'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import CamundaRest from '../../services/camunda-rest';
 import {Payload} from '../../services/TasklistTypes';
 import TaskListSearch from '../search/TaskListSearch.vue';
@@ -75,6 +74,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {getFormattedDateAndTime} from '../../services/format-time';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+import { namespace } from 'vuex-class'
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
@@ -87,7 +87,6 @@ export default class LeftSider extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
   @Prop() private tasks !: Array<object>;
-  @Prop() private selectedTaskId !: string;
   @Prop() private Lentask !: number;
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
@@ -95,6 +94,7 @@ export default class LeftSider extends Vue {
 
   
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
   @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
 
@@ -106,7 +106,6 @@ export default class LeftSider extends Vue {
   private processDefinitionId = '';
   private activeIndex = 0;
   private sList: any;
-  private sId = '';
   private currentPage = 1;
 
 @Watch('currentPage')
@@ -174,13 +173,15 @@ mounted() {
   this.$root.$on('update-pagination-currentpage', (para: any) => {
     this.currentPage = para.page;
   })
+  this.$root.$on('update-activeIndex-pagination', (para: any) => {
+    this.activeIndex = para.activeindex;
+  })
   if (this.getFormsFlowactiveIndex > 0) {
     this.activeIndex = this.getFormsFlowactiveIndex
   }
   this.currentPage = this.getFormsFlowTaskCurrentPage
-  this.sId = this.selectedTaskId;
   this.checkPropsIsPassedAndSetValue();
-  this.$root.$emit('call-fetchData', {selectedTaskId: this.sId})
+  this.$root.$emit('call-fetchData', {selectedTaskId: this.getFormsFlowTaskId})
 
   CamundaRest.getProcessDefinitions(this.token, this.bpmApiUrl).then(
     (response) => {
