@@ -205,7 +205,6 @@
         </div>
       </b-col>
       <b-col v-else>
-        <!-- nav here -->
         <ExpandContract/>
         <b-row class="cft-not-selected mt-2 ml-1 row">
           <i
@@ -230,9 +229,6 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { namespace } from 'vuex-class'
-import vSelect from 'vue-select'
-
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   findFilterKeyOfAllTask,
@@ -241,6 +237,7 @@ import {
 import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
+import ExpandContract from './addons/ExpandContract.vue'
 import { Form } from 'vue-formio';
 import Header from './layout/Header.vue'
 import LeftSider from './layout/LeftSider.vue'
@@ -253,8 +250,9 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
+import { namespace } from 'vuex-class'
+import vSelect from 'vue-select'
 import vueBpmn from 'vue-bpmn';
-import ExpandContract from './addons/ExpandContract.vue'
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
@@ -310,9 +308,7 @@ export default class Tasklist extends Vue {
   private selectedTaskId = '';
   private userSelected = null;
   private showfrom = false;
-  public currentPage = 1;
   public perPage = 10;
-  public numPages = 5;
   private tasklength = 0;
   private options = {noAlerts: false,i18n: {
     en: {error: "Please fix the errors before submitting again.",},},
@@ -660,8 +656,8 @@ getBPMTaskDetail(taskId: string) {
   }
 
   fetchData() {
-    // this.setFollowup = null
-    // this.setDue = null
+    this.setFollowup = null
+    this.setDue = null
     if (this.selectedTaskId) {
       this.task = getTaskFromList(this.tasks, this.selectedTaskId);
       this.getGroupDetails();
@@ -791,6 +787,11 @@ getBPMTaskDetail(taskId: string) {
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
+  }
+
+  beforeUpdate() {
+    console.log("get tasks", this.getTaskId)
+    console.log("tasks", this.tasks);
   }
 
   beforeDestroy() {
