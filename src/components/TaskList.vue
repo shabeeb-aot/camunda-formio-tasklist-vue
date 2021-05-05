@@ -677,6 +677,7 @@ removeFollowupDate() {
   })
 }
 
+
 findPassedRouterIndex(taskId: string, tasks: any) {
   this.task = getTaskFromList(tasks, taskId);
   console.log("4->", this.task)
@@ -769,6 +770,24 @@ fetchData(){
 }
 
 
+created() {
+  this.checkPropsIsPassedAndSetValue();
+  authenticateFormio(
+    this.formIOResourceId,
+    this.formIOReviewerId,
+    this.formIOReviewer,
+    this.userEmail,
+    this.formIOUserRoles
+  );
+  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
+    this.filterList = response.data;
+    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
+    this.fetchTaskList(this.selectedfilterId, this.payload);
+    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
+  });
+}
+
+
 mounted() {
   this.$root.$on('call-fetchData', (para: any) => {
     this.editAssignee = false
@@ -789,21 +808,6 @@ mounted() {
   this.$root.$on('call-managerScreen', (para: any) => {
     this.maxi = para.maxi
   })
-
-  this.checkPropsIsPassedAndSetValue();
-  authenticateFormio(
-    this.formIOResourceId,
-    this.formIOReviewerId,
-    this.formIOReviewer,
-    this.userEmail,
-    this.formIOUserRoles
-  );
-  CamundaRest.filterList(this.token, this.bpmApiUrl).then((response) => {
-    this.filterList = response.data;
-    this.selectedfilterId = findFilterKeyOfAllTask(this.filterList, "name", "All tasks");
-    this.fetchTaskList(this.selectedfilterId, this.payload);
-    this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
-  });
 
   if(SocketIOService.isConnected()) {
     SocketIOService.disconnect();
