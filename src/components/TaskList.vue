@@ -18,7 +18,6 @@
           :formIOApiUrl="formIOApiUrl"
           :bpmApiUrl="bpmApiUrl"
           :tasks='tasks'
-          :Lentask='tasklength'
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
           :payload="payload"
@@ -289,9 +288,10 @@ export default class Tasklist extends Vue {
   @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
 
-  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
-  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
+  @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any;
+  @serviceFlowModule.Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any;
+  @serviceFlowModule.Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any;
+  @serviceFlowModule.Mutation('setFormsFlowTaskLength') public setFormsFlowTaskLength: any;
   
 
 
@@ -309,7 +309,6 @@ export default class Tasklist extends Vue {
   private userSelected = null;
   private showfrom = false;
   public perPage = 10;
-  private tasklength = 0;
   private options = {noAlerts: false,i18n: {
     en: {error: "Please fix the errors before submitting again.",},},
   };
@@ -586,7 +585,7 @@ fetchTaskList(filterId: string, requestData: object) {
     this.bpmApiUrl
   ).then((result) => {
     this.fulltasks = result.data;
-    this.tasklength = result.data.length;
+    this.setFormsFlowTaskLength(result.data.length);
   });
 }
 
@@ -690,7 +689,6 @@ findPassedRouterIndex(taskId: string, tasks: any) {
   this.$root.$emit('update-activeIndex-pagination', {activeindex: this.getFormsFlowactiveIndex})
   this.setFormsFlowTaskCurrentPage(Math.floor(pos/this.perPage)+1);
   this.$root.$emit('update-pagination-currentpage', {page: this.getFormsFlowTaskCurrentPage});
-  console.log("current page router->", this.getFormsFlowTaskCurrentPage);
     
 }
 
@@ -770,7 +768,7 @@ fetchData(){
   }
 }
 
-// Lifecycle hooks
+
 mounted() {
   this.$root.$on('call-fetchData', (para: any) => {
     this.editAssignee = false
@@ -828,9 +826,7 @@ mounted() {
   CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
     this.autoUserList = response.data.map((e: { id: number }) => (e.id));
   });
-  console.log("1", this);
 
-  console.log("taskId details 1->", this.taskIdValue);
   if((this.taskId2 !== this.taskIdValue)) {
     console.log("Entered details", this.taskIdValue)
     this.taskId2 = this.taskIdValue;
@@ -842,9 +838,6 @@ mounted() {
 
 
 updated() {
-  console.log("get tasksId 2->", this.taskIdValue)
-  console.log("tasks 3->", this.fulltasks);
-  console.log("taskId 33->", this.taskId2)
   if((this.fulltasks.length)&& (this.taskId2 !== '')){
     console.log("entered before update statement-->01")
     this.findPassedRouterIndex(this.taskId2, this.fulltasks);

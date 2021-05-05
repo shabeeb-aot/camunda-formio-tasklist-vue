@@ -16,6 +16,9 @@ export default {
     getFormsFlowactiveIndex (state: any) {
       return state.formsFlowactiveIndex
     },
+    getFormsFlowTaskLength (state: any) {
+      return state.formsFlowTaskLength
+    }
   },
   actions: {
   },
@@ -23,5 +26,6 @@ export default {
     setFormsFlowTaskCurrentPage: (state: FormsFlowStateModelIF, payload: number) => (state.formsFlowTaskCurrentPage = payload),
     setFormsFlowTaskId: (state: FormsFlowStateModelIF, payload: string) => (state.formsFlowTaskId = payload),
     setFormsFlowactiveIndex: (state: FormsFlowStateModelIF, payload: number) => (state.formsFlowactiveIndex = payload),
+    setFormsFlowTaskLength: (state: FormsFlowStateModelIF, payload: number) => (state.formsFlowTaskLength = payload),
   }
 }

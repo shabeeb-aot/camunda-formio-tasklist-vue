@@ -134,7 +134,6 @@
       <TaskListAddSearchIgnoreCase
         :queryList="queryList"
         :queryType="queryType"
-        :tasklength="tasklength"
         :isVariableTypeInSelectedSearchQuery="isVariableTypeInSelectedSearchQuery"
         :searchListElements="searchListElements"
         @add-to-selected-search-query="addToSelectedSearchQuery"
@@ -166,8 +165,6 @@ import vSelect from 'vue-select'
   }
 })
 export default class TaskListSearch extends Vue {
-  @Prop({}) private tasklength!: number;
-
   private searchListElements: any = taskSearchFilters;
   // private searchLabels: any = (Object.values(taskSearchFilters).map((values: any) => values.label));
   private queryType = "ALL";

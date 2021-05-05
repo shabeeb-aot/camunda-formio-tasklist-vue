@@ -102,7 +102,6 @@ export default class Header extends Vue {
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any;
 
-  // @Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   private showfilter=false;
   private activefilter = 0;
   private sortList = TASK_FILTER_LIST_DEFAULT_PARAM;

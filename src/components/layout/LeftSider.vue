@@ -2,7 +2,6 @@
 <span>
     <TaskListSearch
     @update-task-list="updateTasklistResult"
-    :tasklength="Lentask"
     />
     <b-list-group class="cft-list-container" v-if="tasks && tasks.length">
         <b-list-group-item
@@ -51,7 +50,7 @@
 
         <b-pagination
         v-model="currentPage"
-        :total-rows="Lentask"
+        :total-rows="getFormsFlowTaskLength"
         :per-page="perPage"
         class="cft-paginate"
         />
@@ -87,7 +86,6 @@ export default class LeftSider extends Vue {
   @Prop() private bpmApiUrl!: string;
   @Prop() private token!: string;
   @Prop() private tasks !: Array<object>;
-  @Prop() private Lentask !: number;
   @Prop() private perPage !: number;
   @Prop() private selectedfilterId !: string;
   @Prop() private payload !: Payload;
@@ -96,6 +94,7 @@ export default class LeftSider extends Vue {
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
   @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
+  @serviceFlowModule.Getter('getFormsFlowTaskLength') private getFormsFlowTaskLength: any;
 
 
   @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
