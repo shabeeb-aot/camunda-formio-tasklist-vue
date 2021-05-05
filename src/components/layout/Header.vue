@@ -78,9 +78,9 @@ import {
   sortingList,
 } from '../../services/utils';
 import FormListModal from '../FormListModal.vue';
-import { Getter, namespace } from 'vuex-class';
 import {Payload} from '../../services/TasklistTypes';
 import TaskSortOptions from '../TaskListSortoptions.vue';
+import { namespace } from 'vuex-class';
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
