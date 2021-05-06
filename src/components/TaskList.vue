@@ -167,8 +167,8 @@
               </b-col>
             </b-row>
             <div class="height-100">
-              <b-tabs class="height-100" content-class="mt-3">
-                <b-tab title="Form">
+              <b-tabs pills class="height-100" content-class="mt-3">
+                <b-tab title="Form" active>
                   <div v-if="showfrom" class="ml-4 mr-4">
                     <b-overlay
                       :show="task.assignee !== userName"
@@ -188,16 +188,13 @@
                     </b-overlay>
                   </div>
                 </b-tab>
-                <b-tab title="History"
-                  @click="getTaskHistoryDetails(getFormsFlowTaskId)"
-                >
+                <b-tab title="History">
                   <TaskHistory :taskHistoryList='taskHistoryList' :applicationId="applicationId"/>
                 </b-tab>
                 <b-tab
                   class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
-                  @click="getTaskProcessDiagramDetails(task)"
                 >
                   <div class="diagram-full-screen" id="canvas"></div>
                 </b-tab>
@@ -502,7 +499,7 @@ getTaskFormIODetails(taskId: string) {
     taskId,
     this.bpmApiUrl
   ).then((result) => {
-    if(result.data["formUrl"].value)
+    if(result.data["formUrl"]?.value)
     {
       this.formioUrl = result.data["formUrl"].value;
       const { formioUrl, formId, submissionId } = getFormDetails(
@@ -514,6 +511,9 @@ getTaskFormIODetails(taskId: string) {
       this.submissionId = submissionId;
       this.formId = formId;
     }
+    // else {
+    //   console.warn("Form details missing")
+    // }
     this.showfrom = true;
   });
 }
@@ -534,9 +534,9 @@ getTaskHistoryDetails(taskId: string) {
           this.taskHistoryList = r.data.applications;
         })
     }
-    else {
-      console.warn("The selected task has no applicationid")
-    }
+    // else {
+    //   console.warn("The selected task has no applicationid")
+    // }
   })
 }
 
@@ -678,7 +678,6 @@ getTaskProcessDiagramDetails(task: any) {
         referenceobject
       )
         .then(() => {
-          console.warn("Update due date");
           this.reloadCurrentTask();
         })
         .catch((error) => {
@@ -689,6 +688,7 @@ getTaskProcessDiagramDetails(task: any) {
 
   removeDueDate() {
     const referenceobject = this.task;
+    this.setFollowup = null
     referenceobject["due"] = null;
     CamundaRest.updateTasksByID(
       this.token,
@@ -703,6 +703,7 @@ getTaskProcessDiagramDetails(task: any) {
   removeFollowupDate() {
     const referenceobject = this.task;
     referenceobject["followUp"] = null;
+    this.setDue = null;
     CamundaRest.updateTasksByID(
       this.token,
       this.task.id,
@@ -713,87 +714,24 @@ getTaskProcessDiagramDetails(task: any) {
     })
   }
 
-
-  fetchData(){
-    this.setFollowup = null
-    this.setDue = null
-    if (this.getFormsFlowTaskId) {
-      this.task = getTaskFromList(this.tasks, this.getFormsFlowTaskId);
-      this.getGroupDetails();
-      CamundaRest.getTaskById(
-        this.token,
-        this.getFormsFlowTaskId,
-        this.bpmApiUrl
-      ).then((result) => {
-        CamundaRest.getProcessDefinitionById(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then((res) => {
-          this.taskProcess = res.data.name;
-        });
-
-        CamundaRest.getVariablesByProcessId(
-          this.token,
-          result.data.processInstanceId,
-          this.bpmApiUrl
-        )
-
-        CamundaRest.getProcessDiagramXML(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then(async (res) => {
-          this.xmlData = res.data.bpmn20Xml;
-          const div = document.getElementById('canvas');
-          if(div){ 
-            div.innerHTML = ""
-          }
-          const modeler = new Modeler({ container: "#canvas" })
-          await modeler.importXML(this.xmlData);
-        });
-      });
-
-      this.showfrom = false;
-      this.applicationId = '';
-      this.taskHistoryList = [];
-      CamundaRest.getVariablesByTaskId(
-        this.token,
-        this.getFormsFlowTaskId,
-        this.bpmApiUrl
-      ).then((result) => {
-        if(result.data && result.data["applicationId"]?.value) {
-          this.applicationId = result.data["applicationId"].value;
-          getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
-            .then((r)=> {
-              this.taskHistoryList = r.data.applications;
-            })
-        }
-        else {
-          console.warn("The selected task has no applicationid")
-        }
-        this.formioUrl = result.data["formUrl"]?.value;
-    
-        const { formioUrl, formId, submissionId } = getFormDetails(
-          this.formioUrl,
-          this.formIOApiUrl
-        );
-        this.formioUrl = formioUrl;
-        
-    
-        this.submissionId = submissionId;
-        this.formId = formId;
-        this.showfrom = true;
-        this.userSelected = this.task.assignee;
-      });
-    }
+  fetchTaskData(taskId: string) {
+    this.task = getTaskFromList(this.tasks, taskId);
+    this.getBPMTaskDetail(taskId);
+    CamundaRest.getVariablesByProcessId(
+      this.token,
+      this.task.processInstanceId,
+      this.bpmApiUrl
+    )
+    this.getTaskFormIODetails(taskId);
+    this.getTaskHistoryDetails(taskId);
+    this.getTaskProcessDiagramDetails(this.task);
   }
-  
+
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.editAssignee = false
       this.setFormsFlowTaskId(para.selectedTaskId);
-      this.fetchData()
+      this.fetchTaskData(this.getFormsFlowTaskId)
     })
 
     this.$root.$on('call-fetchPaginatedTaskList', (para: any) => {
@@ -831,14 +769,14 @@ getTaskProcessDiagramDetails(task: any) {
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
       if(this.selectedfilterId){
         this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
-        this.fetchData();
+        this.fetchTaskData(this.getFormsFlowTaskId);
         if (eventName === "create") {
           this.$root.$emit('call-pagination')
           this.fetchTaskList(this.selectedfilterId, this.payload);
         }
       }
       if(this.getFormsFlowTaskId && refreshedTaskId===this.getFormsFlowTaskId){
-        this.fetchData()
+        this.fetchTaskData(this.getFormsFlowTaskId);
         this.reloadCurrentTask();
       } 
     })
@@ -872,8 +810,10 @@ getTaskProcessDiagramDetails(task: any) {
   updated() {
     if((this.fulltasks.length)&& (this.taskId2 !== '')){
       this.findPassedRouterIndex(this.taskId2, this.fulltasks);
-      this.getBPMTaskDetail(this.getFormsFlowTaskId);
-      this.getTaskFormIODetails(this.getFormsFlowTaskId);
+      this.getBPMTaskDetail(this.taskId2);
+      this.getTaskFormIODetails(this.taskId2);
+      this.getTaskHistoryDetails(this.taskId2);
+      this.getTaskProcessDiagramDetails(this.task);
       this.taskId2='';
     }
   }
