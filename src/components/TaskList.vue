@@ -188,13 +188,16 @@
                     </b-overlay>
                   </div>
                 </b-tab>
-                <b-tab title="History">
+                <b-tab title="History"
+                  @click="getTaskHistoryDetails(getFormsFlowTaskId)"
+                >
                   <TaskHistory :taskHistoryList='taskHistoryList' :applicationId="applicationId"/>
                 </b-tab>
                 <b-tab
                   class="cft-diagram-container"
                   id="diagramContainer"
                   title="Diagram"
+                  @click="getTaskProcessDiagramDetails(task)"
                 >
                   <div class="diagram-full-screen" id="canvas"></div>
                 </b-tab>
@@ -474,32 +477,86 @@ onBPMTaskFormSubmit(taskId: string) {
     });
 }
 
+
 getBPMTaskDetail(taskId: string) {
   CamundaRest.getTaskById(this.token, taskId, this.bpmApiUrl).then(
     (result) => {
       this.task = result.data;
+      CamundaRest.getProcessDefinitionById(
+        this.token,
+        this.task.processDefinitionId,
+        this.bpmApiUrl
+      ).then((res) => {
+        this.taskProcess = res.data.name;
+      });
     }		   
   );
+  this.getGroupDetails();
+}
+
+
+getTaskFormIODetails(taskId: string) {
   this.showfrom = false;
   CamundaRest.getVariablesByTaskId(
     this.token,
-    this.getFormsFlowTaskId,
+    taskId,
     this.bpmApiUrl
   ).then((result) => {
-    this.formioUrl = result.data["formUrl"].value;
-    const { formioUrl, formId, submissionId } = getFormDetails(
-      this.formioUrl,
-      this.formIOApiUrl
-    );
-    this.formioUrl = formioUrl;
-    
-    this.submissionId = submissionId;
-    this.formId = formId;
+    if(result.data["formUrl"].value)
+    {
+      this.formioUrl = result.data["formUrl"].value;
+      const { formioUrl, formId, submissionId } = getFormDetails(
+        this.formioUrl,
+        this.formIOApiUrl
+      );
 
+      this.formioUrl = formioUrl;
+      this.submissionId = submissionId;
+      this.formId = formId;
+    }
     this.showfrom = true;
   });
 }
-	
+
+
+getTaskHistoryDetails(taskId: string) {
+  this.applicationId = '';
+  this.taskHistoryList = [];
+  CamundaRest.getVariablesByTaskId(
+    this.token,
+    taskId,
+    this.bpmApiUrl
+  ).then((result) => {
+    if(result.data && result.data["applicationId"]?.value) {
+      this.applicationId = result.data["applicationId"].value;
+      getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
+        .then((r)=> {
+          this.taskHistoryList = r.data.applications;
+        })
+    }
+    else {
+      console.warn("The selected task has no applicationid")
+    }
+  })
+}
+
+
+getTaskProcessDiagramDetails(task: any) {
+  CamundaRest.getProcessDiagramXML(
+    this.token,
+    task.processDefinitionId,
+    this.bpmApiUrl
+  ).then(async (res) => {
+    this.xmlData = res.data.bpmn20Xml;
+    const div = document.getElementById('canvas');
+    if(div){ 
+      div.innerHTML = ""
+    }
+    const modeler = new Modeler({ container: "#canvas" })
+    await modeler.importXML(this.xmlData);
+  });
+}
+
   oncustomEventCallback = (customEvent: any) => {
     switch (customEvent.type) {
     case "reloadTasks":
@@ -815,28 +872,8 @@ getBPMTaskDetail(taskId: string) {
   updated() {
     if((this.fulltasks.length)&& (this.taskId2 !== '')){
       this.findPassedRouterIndex(this.taskId2, this.fulltasks);
-      this.getGroupDetails();
-      CamundaRest.getProcessDefinitionById(
-        this.token,
-        this.task.processDefinitionId,
-        this.bpmApiUrl
-      ).then((res) => {
-        this.taskProcess = res.data.name;
-      });
       this.getBPMTaskDetail(this.getFormsFlowTaskId);
-      CamundaRest.getProcessDiagramXML(
-        this.token,
-        this.task.processDefinitionId,
-        this.bpmApiUrl
-      ).then(async (res) => {
-        this.xmlData = res.data.bpmn20Xml;
-        const div = document.getElementById('canvas');
-        if(div){ 
-          div.innerHTML = ""
-        }
-        const modeler = new Modeler({ container: "#canvas" })
-        await modeler.importXML(this.xmlData);
-      });
+      this.getTaskFormIODetails(this.getFormsFlowTaskId);
       this.taskId2='';
     }
   }
