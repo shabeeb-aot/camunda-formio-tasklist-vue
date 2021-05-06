@@ -11,7 +11,7 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/:taskIdName?',
+    path: '/:getTaskId?',
     name: 'Tasklist',
     component: Tasklist,
     props: true

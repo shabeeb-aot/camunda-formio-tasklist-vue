@@ -1,5 +1,5 @@
 <template>
-    <div class="cft-search-criteria" v-if="selectedSearchQueries.length">
+    <div class="cft-search-criteria">
         <b-button
           squared
           variant="primary"
@@ -18,7 +18,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class TaskListSearchType extends Vue {
 
   private queryType = 'ALL';
-  @Prop() private selectedSearchQueries !: any;
 
   changeQueryType() {
     this.queryType==="ALL"? (this.queryType= "ANY") : this.queryType = "ALL"

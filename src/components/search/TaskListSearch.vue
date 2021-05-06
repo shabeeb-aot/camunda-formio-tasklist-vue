@@ -7,8 +7,8 @@
       md="12"
       sm="12"
     >
-      <TaskListSearchType :selectedSearchQueries="selectedSearchQueries"/>
       <div v-if="selectedSearchQueries.length">
+        <TaskListSearchType/>
         <div
           class="cftf-search-item-box mr-2"
           v-for="(query, index) in selectedSearchQueries"

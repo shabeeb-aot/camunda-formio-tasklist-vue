@@ -22,10 +22,9 @@
           :perPage="perPage"
           :selectedfilterId="selectedfilterId"
           :payload="payload"
-          :selectedTaskId="getFormsFlowTaskId"
         />
       </b-col>
-      <b-col v-if="selectedTaskId" :lg="maxi ? 9 : 12" md="12">
+      <b-col v-if="getFormsFlowTaskId" :lg="maxi ? 9 : 12" md="12">
         <ExpandContract/>
         <div class="cft-service-task-details">
           <b-row class="ml-0 task-header task-header-title" data-title="Task Name">
@@ -52,7 +51,7 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
-                  v-model="setFollowup"
+                  v-model="setFollowup[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
@@ -67,7 +66,7 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
-                  v-model="setDue"
+                  v-model="setDue[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
@@ -168,8 +167,8 @@
               </b-col>
             </b-row>
             <div class="height-100">
-              <b-tabs class="height-100" content-class="mt-3">
-                <b-tab title="Form">
+              <b-tabs pills class="height-100" content-class="mt-3">
+                <b-tab title="Form" active>
                   <div v-if="showfrom" class="ml-4 mr-4">
                     <b-overlay
                       :show="task.assignee !== userName"
@@ -181,7 +180,7 @@
                       <formio
                         :src="formioUrl"
                         :options="
-                          task.assignee === userName ? options : readoption
+                          task.assignee === userName ? options : { readOnly: true }
                         "
                         v-on:submit="onFormSubmitCallback"
                         v-on:customEvent="oncustomEventCallback"
@@ -205,7 +204,6 @@
         </div>
       </b-col>
       <b-col v-else>
-        <!-- nav here -->
         <ExpandContract/>
         <b-row class="cft-not-selected mt-2 ml-1 row">
           <i
@@ -230,17 +228,15 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/user-styles.css'
 import '../styles/camundaFormIOTasklist.scss'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Getter, Mutation, namespace } from 'vuex-class'
-import vSelect from 'vue-select'
-
 import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   findFilterKeyOfAllTask,
   getTaskFromList,
+  getUserName
 } from '../services/utils';
-import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
+import ExpandContract from './addons/ExpandContract.vue'
 import { Form } from 'vue-formio';
 import Header from './layout/Header.vue'
 import LeftSider from './layout/LeftSider.vue'
@@ -253,8 +249,8 @@ import {getFormDetails} from '../services/get-formio';
 import {getISODateTime} from '../services/format-time';
 import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
-import vueBpmn from 'vue-bpmn';
-import ExpandContract from './addons/ExpandContract.vue'
+import { namespace } from 'vuex-class'
+import vSelect from 'vue-select'
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
@@ -264,9 +260,7 @@ const serviceFlowModule = namespace('serviceFlowModule')
     formio: Form,
     DatePicker,
     TaskHistory,
-    vueBpmn,
     Modeler,
-    BpmnJS,
     Header,
     LeftSider,
     vSelect,
@@ -283,17 +277,13 @@ export default class Tasklist extends Vue {
   @Prop() private formsflowaiApiUrl!: string;
   @Prop() private formsflowaiUrl!: string;
   @Prop() private formIOUserRoles!: string;
+  @Prop() private getTaskId!: string;
   @Prop({default:'formflowai'}) private webSocketEncryptkey !: string
   
-  // @Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
 
-  // @Getter('getFormsFlowTaskCurrentPage') public getFormsFlowTaskCurrentPage: any;
-  // @Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
-
-  // @Mutation('setFormsFlowTaskId') public setFormsFlowTaskId: any
-  // @Mutation('setFormsFlowactiveIndex') public setFormsFlowactiveIndex: any
   @serviceFlowModule.Getter('getFormsFlowTaskCurrentPage') private getFormsFlowTaskCurrentPage: any;
   @serviceFlowModule.Getter('getFormsFlowTaskId') private getFormsFlowTaskId: any;
+  @serviceFlowModule.Getter('getFormsFlowactiveIndex') private getFormsFlowactiveIndex: any;
 
 
   @serviceFlowModule.Mutation('setFormsFlowTaskCurrentPage') public setFormsFlowTaskCurrentPage: any
@@ -302,33 +292,23 @@ export default class Tasklist extends Vue {
   
 
 
-  
-
   private tasks: Array<object> = [];
+  private fulltasks: Array<object> = [];
   private taskProcess = null;
   private processDefinitionId = '';
   private formId = '';
   private submissionId = '';
   private formioUrl = '';
   private task: any;
-  private setFollowup = null;
-  private setDue = null;
+  private setFollowup: any = [];
+  private setDue: any = [];
   private setGroup = null;
-  private selectedTaskId = '';
   private userSelected = null;
   private showfrom = false;
-  public currentPage = 1;
   public perPage = 10;
-  public numPages = 5;
   private tasklength = 0;
-  private readoption = { readOnly: true };
-  private options = {
-    noAlerts: false,
-    i18n: {
-      en: {
-        error: "Please fix the errors before submitting again.",
-      },
-    },
+  private options = {noAlerts: false,i18n: {
+    en: {error: "Please fix the errors before submitting again.",},},
   };
   private filterList = [];
   private editAssignee = false;
@@ -345,9 +325,10 @@ export default class Tasklist extends Vue {
     firstResult: 0,
     maxResults: this.perPage
   };
-  private showUserList = false;
   private taskHistoryList: Array<object> = [];
   private autoUserList: any = []
+  private taskIdValue = '';
+  private taskId2 = '';
   private maxi = true
   private userName: any = ''
   
@@ -357,12 +338,6 @@ export default class Tasklist extends Vue {
     localStorage.setItem("authToken", newVal);
   }
 
-@Watch('currentPage')
-onPageChange(newVal: number) {
-  this.payload["firstResult"] = (newVal-1)*this.perPage
-  this.payload["maxResults"] = this.perPage
-  this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (newVal-1)*this.perPage, this.perPage);
-}
 
 checkPropsIsPassedAndSetValue() {
   if (!this.bpmApiUrl || this.bpmApiUrl === "") {
@@ -389,6 +364,15 @@ checkPropsIsPassedAndSetValue() {
   if(!this.webSocketEncryptkey || this.webSocketEncryptkey === ""){
     console.warn('WEBSOCKET_ENCRYPT_KEY prop not passed')
   }
+  if(this.getTaskId) {
+    this.taskIdValue = this.getTaskId;
+  }
+  if(!this.getTaskId) {
+    const routeparams = this.$route?.query?.taskId;
+    if(typeof(routeparams) ==='string' && this.$route.query.taskId) {
+      this.taskIdValue = routeparams;
+    }
+  }
   const decodeToken = JSON.parse(atob(this.token.split('.')[1]))
   const engine = "/engine-rest";
   localStorage.setItem("bpmApiUrl", this.bpmApiUrl + engine);
@@ -399,13 +383,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
   
-  this.getUserName()
-}
-
-getUserName () {
-  const userDetails: any = localStorage.getItem('UserDetails')
-  const userDetailsObj: any = JSON.parse(userDetails)
-  this.userName = userDetailsObj?.preferred_username
+  this.userName = getUserName()
 }
 
 timedifference(date: Date) {
@@ -436,20 +414,17 @@ addGroup() {
     this.setGroup = null;
   });
 }
-getGroupDetails() {
-  CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
-    (response) => {
-      this.groupList = response.data;
-      this.groupListItems = [];
-      this.groupListNames = null;
-      for (const group of response.data) {
-        this.groupListItems.push(group.groupId);
-      }
-      if (this.groupListItems.length) {
-        this.groupListNames = this.groupListItems;
-      }
-    }
-  );
+async getGroupDetails() {
+  const grouplist = await CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl);
+  this.groupList = grouplist.data;
+  this.groupListItems = [];
+  this.groupListNames = null;
+  for (const group of grouplist.data) {
+    this.groupListItems.push(group.groupId);
+  }
+  if (this.groupListItems.length) {
+    this.groupListNames = this.groupListItems;
+  }
 }
 deleteGroup(groupid: string) {		 
   CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
@@ -486,32 +461,89 @@ onBPMTaskFormSubmit(taskId: string) {
     });
 }
 
+
 getBPMTaskDetail(taskId: string) {
   CamundaRest.getTaskById(this.token, taskId, this.bpmApiUrl).then(
     (result) => {
       this.task = result.data;
+      CamundaRest.getProcessDefinitionById(
+        this.token,
+        this.task.processDefinitionId,
+        this.bpmApiUrl
+      ).then((res) => {
+        this.taskProcess = res.data.name;
+      });
     }		   
   );
+  this.getGroupDetails();
+}
+
+
+getTaskFormIODetails(taskId: string) {
   this.showfrom = false;
   CamundaRest.getVariablesByTaskId(
     this.token,
-    this.selectedTaskId,
+    taskId,
     this.bpmApiUrl
   ).then((result) => {
-    this.formioUrl = result.data["formUrl"].value;
-    const { formioUrl, formId, submissionId } = getFormDetails(
-      this.formioUrl,
-      this.formIOApiUrl
-    );
-    this.formioUrl = formioUrl;
-    
-    this.submissionId = submissionId;
-    this.formId = formId;
+    if(result.data["formUrl"]?.value)
+    {
+      this.formioUrl = result.data["formUrl"].value;
+      const { formioUrl, formId, submissionId } = getFormDetails(
+        this.formioUrl,
+        this.formIOApiUrl
+      );
 
+      this.formioUrl = formioUrl;
+      this.submissionId = submissionId;
+      this.formId = formId;
+    }
+    // else {
+    //   console.warn("Form details missing")
+    // }
     this.showfrom = true;
   });
 }
-	
+
+
+getTaskHistoryDetails(taskId: string) {
+  this.applicationId = '';
+  this.taskHistoryList = [];
+  CamundaRest.getVariablesByTaskId(
+    this.token,
+    taskId,
+    this.bpmApiUrl
+  ).then((result) => {
+    if(result.data && result.data["applicationId"]?.value) {
+      this.applicationId = result.data["applicationId"].value;
+      getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
+        .then((r)=> {
+          this.taskHistoryList = r.data.applications;
+        })
+    }
+    // else {
+    //   console.warn("The selected task has no applicationid")
+    // }
+  })
+}
+
+
+getTaskProcessDiagramDetails(task: any) {
+  CamundaRest.getProcessDiagramXML(
+    this.token,
+    task.processDefinitionId,
+    this.bpmApiUrl
+  ).then(async (res) => {
+    this.xmlData = res.data.bpmn20Xml;
+    const div = document.getElementById('canvas');
+    if(div){ 
+      div.innerHTML = ""
+    }
+    const modeler = new Modeler({ container: "#canvas" })
+    await modeler.importXML(this.xmlData);
+  });
+}
+
   oncustomEventCallback = (customEvent: any) => {
     switch (customEvent.type) {
     case "reloadTasks":
@@ -524,7 +556,7 @@ getBPMTaskDetail(taskId: string) {
   };
 
   reloadTasks() {
-    this.selectedTaskId = "";
+    this.setFormsFlowTaskId("");
     this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
   }
 
@@ -579,6 +611,7 @@ getBPMTaskDetail(taskId: string) {
       requestData,
       this.bpmApiUrl
     ).then((result) => {
+      this.fulltasks = result.data;
       this.tasklength = result.data.length;
     });
   }
@@ -600,8 +633,8 @@ getBPMTaskDetail(taskId: string) {
 
   updateFollowUpDate() {
     const referenceobject = this.task;
-    referenceobject['followUp'] = getISODateTime(this.setFollowup);
-    if(this.setFollowup && referenceobject['followUp']){
+    referenceobject['followUp'] = getISODateTime(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
+    if(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['followUp']){
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -623,8 +656,8 @@ getBPMTaskDetail(taskId: string) {
 
   updateDueDate() {
     const referenceobject = this.task;
-    referenceobject['due'] = getISODateTime(this.setDue);
-    if(this.setFollowup && referenceobject['due']){
+    referenceobject['due'] = getISODateTime(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
+    if(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['due']){
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -632,7 +665,6 @@ getBPMTaskDetail(taskId: string) {
         referenceobject
       )
         .then(() => {
-          console.warn("Update due date");
           this.reloadCurrentTask();
         })
         .catch((error) => {
@@ -643,6 +675,7 @@ getBPMTaskDetail(taskId: string) {
 
   removeDueDate() {
     const referenceobject = this.task;
+    this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null
     referenceobject["due"] = null;
     CamundaRest.updateTasksByID(
       this.token,
@@ -657,6 +690,7 @@ getBPMTaskDetail(taskId: string) {
   removeFollowupDate() {
     const referenceobject = this.task;
     referenceobject["followUp"] = null;
+    this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null;
     CamundaRest.updateTasksByID(
       this.token,
       this.task.id,
@@ -667,86 +701,24 @@ getBPMTaskDetail(taskId: string) {
     })
   }
 
-  fetchData() {
-    this.setFollowup = null
-    this.setDue = null
-    if (this.selectedTaskId) {
-      this.task = getTaskFromList(this.tasks, this.selectedTaskId);
-      this.getGroupDetails();
-      CamundaRest.getTaskById(
-        this.token,
-        this.selectedTaskId,
-        this.bpmApiUrl
-      ).then((result) => {
-        CamundaRest.getProcessDefinitionById(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then((res) => {
-          this.taskProcess = res.data.name;
-        });
-
-        CamundaRest.getVariablesByProcessId(
-          this.token,
-          result.data.processInstanceId,
-          this.bpmApiUrl
-        )
-
-        CamundaRest.getProcessDiagramXML(
-          this.token,
-          result.data.processDefinitionId,
-          this.bpmApiUrl
-        ).then(async (res) => {
-          this.xmlData = res.data.bpmn20Xml;
-          const div = document.getElementById('canvas');
-          if(div){ 
-            div.innerHTML = ""
-          }
-          const modeler = new Modeler({ container: "#canvas" })
-          await modeler.importXML(this.xmlData);
-        });
-      });
-
-      this.showfrom = false;
-      this.applicationId = '';
-      this.taskHistoryList = [];
-      CamundaRest.getVariablesByTaskId(
-        this.token,
-        this.selectedTaskId,
-        this.bpmApiUrl
-      ).then((result) => {
-        if(result.data && result.data["applicationId"].value) {
-          getformHistoryApi(this.formsflowaiApiUrl, result.data["applicationId"].value, this.token)
-            .then((r)=> {
-              this.taskHistoryList = r.data.applications;
-            })
-        }
-        else {
-          console.warn("The selected task has no applicationid")
-        }
-        this.applicationId = result.data["applicationId"].value;
-        this.formioUrl = result.data["formUrl"].value;
-    
-        const { formioUrl, formId, submissionId } = getFormDetails(
-          this.formioUrl,
-          this.formIOApiUrl
-        );
-        this.formioUrl = formioUrl;
-        
-    
-        this.submissionId = submissionId;
-        this.formId = formId;
-        this.showfrom = true;
-        this.userSelected = this.task.assignee;
-      });
-    }
+  fetchTaskData(taskId: string) {
+    this.task = getTaskFromList(this.tasks, taskId);
+    this.getBPMTaskDetail(taskId);
+    CamundaRest.getVariablesByProcessId(
+      this.token,
+      this.task.processInstanceId,
+      this.bpmApiUrl
+    )
+    this.getTaskFormIODetails(taskId);
+    this.getTaskHistoryDetails(taskId);
+    this.getTaskProcessDiagramDetails(this.task);
   }
-  
+
   mounted() {
     this.$root.$on('call-fetchData', (para: any) => {
       this.editAssignee = false
-      this.selectedTaskId = para.selectedTaskId
-      this.fetchData()
+      this.setFormsFlowTaskId(para.selectedTaskId);
+      this.fetchTaskData(this.getFormsFlowTaskId)
     })
 
     this.$root.$on('call-fetchPaginatedTaskList', (para: any) => {
@@ -784,14 +756,14 @@ getBPMTaskDetail(taskId: string) {
     SocketIOService.connect(this.webSocketEncryptkey, (refreshedTaskId: any, eventName: any)=> {
       if(this.selectedfilterId){
         this.fetchPaginatedTaskList(this.selectedfilterId, this.payload, (this.getFormsFlowTaskCurrentPage-1)*this.perPage, this.perPage);
-        this.fetchData();
+        this.fetchTaskData(this.getFormsFlowTaskId);
         if (eventName === "create") {
           this.$root.$emit('call-pagination')
           this.fetchTaskList(this.selectedfilterId, this.payload);
         }
       }
-      if(this.selectedTaskId && refreshedTaskId===this.selectedTaskId){
-        this.fetchData()
+      if(this.getFormsFlowTaskId && refreshedTaskId===this.getFormsFlowTaskId){
+        this.fetchTaskData(this.getFormsFlowTaskId);
         this.reloadCurrentTask();
       } 
     })
@@ -799,6 +771,39 @@ getBPMTaskDetail(taskId: string) {
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
+    // we used two variables - taskId2 and taskIdValue because the router value from gettaskId is always
+    // constant, so on calling the required task details for using other tasks we need to remove taskId2 details
+    if((this.taskId2 !== this.taskIdValue)) {
+      this.taskId2 = this.taskIdValue;
+    }
+    else {
+      this.taskId2 = '';
+    }
+  }
+
+  findPassedRouterIndex(taskId: string, tasks: any) {
+    this.task = getTaskFromList(tasks, taskId);
+    this.setFormsFlowTaskId(this.taskIdValue);
+    const pos = tasks.map(function(e: any) {
+      return e.id;
+    }).indexOf(this.taskIdValue)
+    this.setFormsFlowactiveIndex(pos%this.perPage);
+    this.$root.$emit('update-activeIndex-pagination', {activeindex: this.getFormsFlowactiveIndex})
+    this.setFormsFlowTaskCurrentPage(Math.floor(pos/this.perPage)+1);
+    this.$root.$emit('update-pagination-currentpage', {page: this.getFormsFlowTaskCurrentPage});
+    
+  }
+ 
+ 
+  updated() {
+    if((this.fulltasks.length)&& (this.taskId2 !== '')){
+      this.findPassedRouterIndex(this.taskId2, this.fulltasks);
+      this.getBPMTaskDetail(this.taskId2);
+      this.getTaskFormIODetails(this.taskId2);
+      this.getTaskHistoryDetails(this.taskId2);
+      this.getTaskProcessDiagramDetails(this.task);
+      this.taskId2='';
+    }
   }
 
   beforeDestroy() {

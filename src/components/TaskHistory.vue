@@ -1,7 +1,7 @@
 <template>
     <div>
     <h3> <i class="bi bi-list-task"></i> Application History </h3>
-                  <b-col v-if="applicationId">
+                  <b-col v-if="applicationId&&taskHistoryList.length">
                   <b-table-simple
                     caption-top
                     responsive
