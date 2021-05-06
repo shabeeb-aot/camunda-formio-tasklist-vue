@@ -771,7 +771,8 @@ getTaskProcessDiagramDetails(task: any) {
     CamundaRest.getUsers(this.token, this.bpmApiUrl).then((response) => {
       this.autoUserList = response.data.map((e: { id: number }) => (e.id));
     });
-
+    // we used two variables - taskId2 and taskIdValue because the router value from gettaskId is always
+    // constant, so on calling the required task details for using other tasks we need to remove taskId2 details
     if((this.taskId2 !== this.taskIdValue)) {
       this.taskId2 = this.taskIdValue;
     }
