@@ -83,6 +83,7 @@
             submission=""
             options=""
             v-on:submit="onSubmit"
+            v-on:customEvent="oncustomEventCallback"
           >
           </Form>
         </b-modal>
@@ -157,6 +158,15 @@ export default class FormListModal extends Vue{
     this.$bvModal.show('modal-multi-1');
     this.$bvModal.hide('modal-multi-2');
   }
+
+  oncustomEventCallback = (customEvent: any) => {
+    switch (customEvent.type) {
+    case "customSubmitDone":
+      this.$bvModal.show('modal-multi-1');
+      this.$bvModal.hide('modal-multi-2');
+      break;
+    }
+  };
 
   mounted() {
     CamundaRest.listForms(this.token, this.bpmApiUrl).then((response) =>
