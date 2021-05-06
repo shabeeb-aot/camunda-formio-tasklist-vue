@@ -51,7 +51,7 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
-                  v-model="setFollowup"
+                  v-model="setFollowup[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
@@ -66,7 +66,7 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
-                  v-model="setDue"
+                  v-model="setDue[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
@@ -232,8 +232,8 @@ import {
   TASK_FILTER_LIST_DEFAULT_PARAM,
   findFilterKeyOfAllTask,
   getTaskFromList,
+  getUserName
 } from '../services/utils';
-import BpmnJS from 'bpmn-js';
 import CamundaRest from '../services/camunda-rest';
 import DatePicker from 'vue2-datepicker'
 import ExpandContract from './addons/ExpandContract.vue'
@@ -251,7 +251,6 @@ import {getformHistoryApi} from '../services/formsflowai-api';
 import moment from 'moment';
 import { namespace } from 'vuex-class'
 import vSelect from 'vue-select'
-import vueBpmn from 'vue-bpmn';
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
@@ -261,9 +260,7 @@ const serviceFlowModule = namespace('serviceFlowModule')
     formio: Form,
     DatePicker,
     TaskHistory,
-    vueBpmn,
     Modeler,
-    BpmnJS,
     Header,
     LeftSider,
     vSelect,
@@ -303,8 +300,8 @@ export default class Tasklist extends Vue {
   private submissionId = '';
   private formioUrl = '';
   private task: any;
-  private setFollowup = null;
-  private setDue = null;
+  private setFollowup: any = [];
+  private setDue: any = [];
   private setGroup = null;
   private userSelected = null;
   private showfrom = false;
@@ -328,7 +325,6 @@ export default class Tasklist extends Vue {
     firstResult: 0,
     maxResults: this.perPage
   };
-  private showUserList = false;
   private taskHistoryList: Array<object> = [];
   private autoUserList: any = []
   private taskIdValue = '';
@@ -387,13 +383,7 @@ checkPropsIsPassedAndSetValue() {
   localStorage.setItem("formioApiUrl", this.formIOApiUrl);
   localStorage.setItem("UserDetails", JSON.stringify(decodeToken))
   
-  this.getUserName()
-}
-
-getUserName () {
-  const userDetails: any = localStorage.getItem('UserDetails')
-  const userDetailsObj: any = JSON.parse(userDetails)
-  this.userName = userDetailsObj?.preferred_username
+  this.userName = getUserName()
 }
 
 timedifference(date: Date) {
@@ -424,20 +414,17 @@ addGroup() {
     this.setGroup = null;
   });
 }
-getGroupDetails() {
-  CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl).then(
-    (response) => {
-      this.groupList = response.data;
-      this.groupListItems = [];
-      this.groupListNames = null;
-      for (const group of response.data) {
-        this.groupListItems.push(group.groupId);
-      }
-      if (this.groupListItems.length) {
-        this.groupListNames = this.groupListItems;
-      }
-    }
-  );
+async getGroupDetails() {
+  const grouplist = await CamundaRest.getTaskGroupByID(this.token, this.task.id, this.bpmApiUrl);
+  this.groupList = grouplist.data;
+  this.groupListItems = [];
+  this.groupListNames = null;
+  for (const group of grouplist.data) {
+    this.groupListItems.push(group.groupId);
+  }
+  if (this.groupListItems.length) {
+    this.groupListNames = this.groupListItems;
+  }
 }
 deleteGroup(groupid: string) {		 
   CamundaRest.deleteTaskGroupByID(this.token, this.task.id, this.bpmApiUrl, {
@@ -646,8 +633,8 @@ getTaskProcessDiagramDetails(task: any) {
 
   updateFollowUpDate() {
     const referenceobject = this.task;
-    referenceobject['followUp'] = getISODateTime(this.setFollowup);
-    if(this.setFollowup && referenceobject['followUp']){
+    referenceobject['followUp'] = getISODateTime(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
+    if(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['followUp']){
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -669,8 +656,8 @@ getTaskProcessDiagramDetails(task: any) {
 
   updateDueDate() {
     const referenceobject = this.task;
-    referenceobject['due'] = getISODateTime(this.setDue);
-    if(this.setFollowup && referenceobject['due']){
+    referenceobject['due'] = getISODateTime(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
+    if(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['due']){
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -688,7 +675,7 @@ getTaskProcessDiagramDetails(task: any) {
 
   removeDueDate() {
     const referenceobject = this.task;
-    this.setFollowup = null
+    this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null
     referenceobject["due"] = null;
     CamundaRest.updateTasksByID(
       this.token,
@@ -703,7 +690,7 @@ getTaskProcessDiagramDetails(task: any) {
   removeFollowupDate() {
     const referenceobject = this.task;
     referenceobject["followUp"] = null;
-    this.setDue = null;
+    this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null;
     CamundaRest.updateTasksByID(
       this.token,
       this.task.id,

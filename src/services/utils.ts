@@ -25,3 +25,9 @@ export const sortingList = [
   {"sortOrder": "desc" ,"label": "Assignee" , "sortBy": "assignee"},
   {"sortOrder": "desc", "label": "Priority", "sortBy": "priority"}
 ]
+
+export const getUserName = () => {
+  const userDetails: any = localStorage.getItem('UserDetails')
+  const userDetailsObj: any = JSON.parse(userDetails)
+  return userDetailsObj?.preferred_username
+}
