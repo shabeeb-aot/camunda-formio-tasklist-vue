@@ -9,7 +9,7 @@
     >
       <div v-if="selectedSearchQueries.length">
         <TaskListSearchType/>
-        <div
+        <b-col
           class="cftf-search-item-box mr-2"
           v-for="(query, index) in selectedSearchQueries"
           :key="query.label + index"
@@ -29,42 +29,41 @@
               </b-dropdown-item-button>
             </b-nav-item-dropdown>
           </b-col>
-            <b-col cols="5">
-            <span v-if="query.type === 'variables'"> 
-              <span>: </span>     
+          <b-col cols="5">
+          <span v-if="query.type === 'variables'"> 
+            <span>: </span>     
+            <span
+              v-if="showVariableValue[index] === 'a'"
+              @click="updatevariableinput(index)"
+              title="Property"
+            > ?? </span>
+            <span v-if="showVariableValue[index]==='i'" title="Property">
+              <span>
               <span
-                v-if="showVariableValue[index] === 'a'"
-                @click="updatevariableinput(index)"
-                title="Property"
-              > ??
-              </span>
-              <span v-if="showVariableValue[index]==='i'" title="Property">
-                <span>
-                <span
-                  @click="showVariableValueItem(index)"
-                >
-                  <i class="bi bi-check cft-approve-box"></i>
-                </span>
-                <i class="bi bi-x cft-reject-box" @click="showVariableValueItem(index)"></i
-                ></span>
-                <b-form-input
-                  v-model="searchVariableValue[index]"
-                  v-on:keyup.enter="showVariableValueItem(index)"
-                />
-              </span>
-              </span>
-              <span
-                class="cft-search-cursor"
-                v-if="showVariableValue[index] === 's'&&query.type === 'variables'"
-                @click="updatevariableinput(index)"
+                @click="showVariableValueItem(index)"
               >
-                {{ searchVariableValue[index] }}
+                <i class="bi bi-check cft-approve-box"></i>
               </span>
-            </b-col>
+              <i class="bi bi-x cft-reject-box" @click="showVariableValueItem(index)"></i
+              ></span>
+              <b-form-input
+                v-model="searchVariableValue[index]"
+                v-on:keyup.enter="showVariableValueItem(index)"
+              />
+            </span>
+            </span>
+            <span
+              class="cft-search-cursor"
+              v-if="showVariableValue[index] === 's'&&query.type === 'variables'"
+              @click="updatevariableinput(index)"
+            >
+              {{ searchVariableValue[index] }}
+            </span>
+          </b-col>
         </b-row>
 
         <b-row align-h="end">
-          <b-col cols="3">
+          <b-col cols="2">
           <b-nav-item-dropdown :text=operator[index]>
             <b-dropdown-item-button
             v-for="x in query.compares"
@@ -75,15 +74,13 @@
             </b-dropdown-item-button>
           </b-nav-item-dropdown>
           </b-col>
-          <b-col cols="7">
+          <b-col cols="9">
             <div class="cft-rhs-container">
               <span
                 v-if="showSearchs[index] === 'a'"
                 @click="updatesearchinput(index)"
                 class="cft-search-cursor"
-              >
-                ??</span
-              >
+              >??</span>
               <span v-if="showSearchs[index] === 'i' &&query.type==='date'">
                 <b-form-datepicker
                 size="sm"
@@ -96,7 +93,7 @@
                 </b-form-datepicker>
               </span>
               <span v-if="showSearchs[index] === 's'&& query.type ==='date'" @click="updatesearchinput(index)">
-                {{formatDate(query.name)}}
+                {{formatDate(setDate[index])}}
               </span>
               <span v-if="showSearchs[index] === 'i' && query.type !=='date'">
               <span class="cft-icon-actions">
@@ -126,11 +123,10 @@
             </div>
           </b-col>
         </b-row>
-        </div>
+        </b-col>
       </div>
       <TaskListAddSearchIgnoreCase
         :queryList="queryList"
-        :queryType="queryType"
         :tasklength="tasklength"
         :isVariableTypeInSelectedSearchQuery="isVariableTypeInSelectedSearchQuery"
         :searchListElements="searchListElements"
@@ -184,8 +180,15 @@ export default class TaskListSearch extends Vue {
       searchValueObject(this.selectedSearchQueries[index].key, this.operator[index])
     ];
     this.operator[index] = operator;
-    console.log('entered operator update-> operator value->', operator)
-    this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
+    console.warn('entered operator update-> operator value->', operator)
+    console.warn('value of selected search query', this.selectedSearchQueries[index])
+    console.warn('date value in index->',index, this.searchValueItem[index])
+    if(this.selectedSearchQueries[index].type==='date'){
+      this.setSearchQueryValue(this.setDate[index], this.selectedSearchQueries[index], this.operator[index], index);
+    }
+    else{
+      this.setSearchQueryValue(this.searchValueItem[index], this.selectedSearchQueries[index], this.operator[index], index);
+    }
   }
 
   updatesearchinput(index: number) {
@@ -318,14 +321,21 @@ export default class TaskListSearch extends Vue {
 
   mounted() {
     this.updateTasklistResult();
-    this.$root.$on('call-updateTaskList', (para: any) => {
+    
+    this.$root.$on('call-updateSearchQueryType', (para: any) => {
       this.queryType = para.queryType;
+      console.log(this.queryList);
+      this.updateTasklistResult();
+    })
+
+    this.$root.$on('call-updateTaskList', (para: any) => {
       this.queryList = para.queryList;
       this.updateTasklistResult();
     })
   }
 
   beforeDestroy() {
+    this.$root.$off('call-updateSearchQueryType')
     this.$root.$off('call-updateTaskList');
   }
 }

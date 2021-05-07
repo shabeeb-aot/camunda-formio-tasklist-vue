@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class TaskListSearchType extends Vue {
@@ -21,7 +21,7 @@ export default class TaskListSearchType extends Vue {
 
   changeQueryType() {
     this.queryType==="ALL"? (this.queryType= "ANY") : this.queryType = "ALL"
-    this.$root.$emit('call-updateTaskList', {queryType: this.queryType})
+    this.$root.$emit('call-updateSearchQueryType', {queryType: this.queryType})
   }
 }
 </script>
