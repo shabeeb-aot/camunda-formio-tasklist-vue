@@ -1,13 +1,17 @@
 import moment from "moment";
 
 export const getISODateTime=(date: Date|null)=>{
-  const dateTimeFormat = moment(date).format("YYYY-MM-DD[T]hh:mm:ss.SSSZ");
-  const dateTimeArr = dateTimeFormat.split('+')
-  if(dateTimeArr&&dateTimeArr[1]){
-    const replaceTimezone = dateTimeArr[1].replace(':', '')
-    return dateTimeFormat.replace(dateTimeArr[1], replaceTimezone)
+  if(date){
+    return moment(date).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ');
   }
-  else{
-    return null;
-  }
+}
+
+export const getFormattedDateAndTime = (date: Date)=>{
+
+  return new Date(date).toLocaleDateString('en-us',  {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+
 };
+
+export const getLocalDateTime = (date: any) => {
+  return date?new Date(date.replace(' ','T')+'Z').toLocaleString(): "-";
+}

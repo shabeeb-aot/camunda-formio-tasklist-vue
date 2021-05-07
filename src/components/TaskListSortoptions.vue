@@ -1,7 +1,7 @@
 <template>
     <div v-if="showSortListDropdown" class="cft-sort-items">
         <div
-          v-for="s in sortOptions" :key="s.sortBy"
+          v-for="(s) in sortOptions" :key="s.sortBy"
           @click="addSort(s)"
           class="mb-2 cft-sort-element"
         >

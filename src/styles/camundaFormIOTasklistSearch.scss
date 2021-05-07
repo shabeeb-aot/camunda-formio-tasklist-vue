@@ -1,0 +1,115 @@
+.cft-input-search-filter {
+
+    .cft-filter-container{
+        border: 1px solid #555;
+        border-radius: 3px;
+        width: 100%;
+        padding: 0;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 13px;
+    }
+
+    .cft-filter{
+        width:90%;
+        margin: 5px;
+        border: none;
+        font-style: italic;
+    }
+    
+    
+    .cft-approve-box,.cft-reject-box{
+        background-color: white;
+        border: 1px solid rgb(165, 163, 163);
+        height: 8px;
+        width: 8px;
+        cursor: pointer;
+        color: #212529;
+        }
+    .cft-icon-actions{
+        display: block;
+        float: right;
+    }
+    .cft-rhs-container{
+        // width: 46.5%;
+        display: inline-block;
+        padding-left: 35px;
+        cursor: pointer;
+    }
+    .cft-search-operator{
+        margin-bottom: 0rem;
+        display: inline-block;
+        padding-left: 35px;
+        padding-right: 15px;
+        cursor: pointer;
+    }
+    .cft-operator-dropdown{
+      z-index: 2;
+      margin-left: 35px;
+      width: 15%;
+      background-color: white;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      border: 1px solid #949494;
+      position: absolute;
+    }
+
+    .cftf-search-item-box {
+        font-size: 16px;
+        font-weight: 400;
+        color: #155cb5;
+        // cursor: pointer;
+    }
+
+    .cftf-search-title {
+        padding-left: 10px;
+        cursor: pointer;
+    }
+
+    .cftf-x {
+        padding-left: 4px;
+        cursor: pointer;
+    }
+
+    .cft-variable-box {
+        margin-left: 3.5px;
+        padding-left: 53px;
+        cursor: pointer;
+    }
+
+    .cft-search-variable-input {
+        padding-right: 50px;
+        cursor: pointer;
+    }
+
+    .cft-name-value-container {
+        font-size: 14px;
+        font-weight: 500;
+        margin-left: 5px;
+        display: block;
+        color: #0d0d0e;
+    }
+
+    .cft-search-cursor {
+        cursor: pointer;
+    }
+
+    .cftf-sort-items {
+        margin-left: 30px;
+        border: 1px solid #949494;
+        border-radius: 3%;
+        position: absolute;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        z-index: 2;
+        padding: 5px;
+        width: 13rem;
+    }
+    
+    .cft-search-item-nav {
+        background-color: #fff;
+        font-weight: 400;
+        text-align: left;
+        font-size: 16px;
+    }
+}

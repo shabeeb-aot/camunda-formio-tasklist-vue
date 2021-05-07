@@ -1,4 +1,4 @@
-import {bpmAxios} from '../axios';
+import {bpmAxios} from '../services/axios';
 
 const engine = 'engine-rest'
 const engineExt = 'engine-rest-ext'
@@ -71,6 +71,10 @@ const CamundaRest = {
 
   filterTaskList(bearerToken: string, filterId: string, values: any, CamundaUrl: string) {
     return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/filter/${filterId}/list`, values)
+  },
+
+  filterTaskListPagination(bearerToken: string, filterId: string, values: any, firstResults: number, maxResults: number, CamundaUrl: string) {
+    return bpmAxios(bearerToken, CamundaUrl).post(`/${engine}/filter/${filterId}/list?firstResult=${firstResults}&maxResults=${maxResults}`, values)
   },
 
   formTaskSubmit(bearerToken: string, taskId: string, values: object, CamundaUrl: string) {

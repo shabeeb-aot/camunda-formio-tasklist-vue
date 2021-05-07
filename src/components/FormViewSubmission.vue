@@ -1,6 +1,5 @@
 <template>
     <b-container fluid class="cft-form-submission">
-      <!-- <a :href="homeUrl"><i class="fa fa-chevron-left"></i></a> -->
         <div id='formio'></div>
     </b-container>
 </template>
@@ -23,25 +22,32 @@ export default class FormViewSubmission extends Vue {
   @Prop() private submissionid !: string;
 
   private formUrl = ''
+  private formIOProjectUrl = ''
   private formioUrlLink = ''
-  private readoption = { readOnly: true };
   private fId = ''
   private sId = ''
-  private formioProjectUrl = "https://forms2.aot-technologies.com"
-  private homeUrl = ''
+
+  checkLocalStorageValue(){
+    const formioApiUrl = localStorage.getItem('formioApiUrl')
+
+    if(typeof formioApiUrl!== 'undefined' && formioApiUrl!== null){
+      this.formIOProjectUrl = formioApiUrl;
+    }
+  }
 
   mounted() {
     this.formUrl = window.location.href;
-    this.homeUrl = localStorage.getItem('formsflow.ai.url') || "https://app2.aot-technologies.com"
+    this.checkLocalStorageValue();
 
     const { formioUrl, formId, submissionId } = getFormDetails(
       this.formUrl,
-      localStorage.getItem('formioApiUrl') || this.formioProjectUrl
+      this.formIOProjectUrl
     );
 
     if(formId&& submissionId){
-
-      this.formioUrlLink = formioUrl.replace("http", "https");
+      const a = document.createElement('a');
+      a.href = formioUrl
+      this.formioUrlLink = formioUrl.replace(a.protocol.toString(), "https:");
       this.fId = formId;
       this.sId = submissionId;
     }
@@ -49,9 +55,8 @@ export default class FormViewSubmission extends Vue {
     else {
       this.fId = this.formid;
       this.sId = this.submissionid;
-      this.formioUrlLink = this.formioProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
+      this.formioUrlLink = this.formIOProjectUrl + "/form/" + this.fId + "/submission/" + this.sId;
     }
-
     Formio.createForm(document.getElementById('formio'), this.formioUrlLink, {
       readOnly: true,
     });

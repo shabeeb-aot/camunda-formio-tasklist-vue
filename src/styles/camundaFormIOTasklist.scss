@@ -18,11 +18,9 @@
     width: 100%;
   }
 
-  .cft-filter{
-    width:90%;
-    margin: 5px;
-    border: none;
-    font-style: italic;
+  .cft-task-filter-length {
+    padding: 1px;
+    font-size: 16px;
   }
 
   .cft-filter:focus{
@@ -42,7 +40,7 @@
     padding: 0rem 1.25rem !important;
     border-top: 1px solid #ced4da !important;
    // max-height: 80vh;
-    overflow-y: auto;
+    // overflow-y: auto;
     padding-right: 25px;
     border-right: 2px solid #D0D0D0;
   } 
@@ -50,8 +48,8 @@
   .cft-service-task-details {
     min-height: 80vh;
     // max-height: 80vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // overflow-y: auto;
+    // overflow-x: hidden;
     // height: 100%;
   }
 
@@ -100,7 +98,7 @@
     font-weight: 500;
     font-size: 16px;
     text-align: right;
-    display: flex;
+    // display: flex;
     justify-content: flex-end;
   }
 
@@ -131,6 +129,7 @@
     border: 1px solid #949494;
     border-radius: 3%;
     position: absolute;
+    color: #212529;
     background-color: #fff;
     background-clip: padding-box;
     z-index: 5;
@@ -180,7 +179,8 @@
   {
     font-size: large;
     display: block;
-    position: absolute;
+    // position: absolute;
+    position: fixed;
     cursor: pointer;
     background-color: #f9f9f9;
     min-width: 250px;
@@ -189,6 +189,7 @@
   }
   .cft-list-container {
     margin-top: 5px;
+    // overflow-y: auto;
   }
   
   .cft-task-details-assign{
@@ -330,7 +331,6 @@
 .cft-task-assignee[data-title]:hover:after,
 .cft-process-name[data-title]:hover:after,
 .task-header-title[data-title]:hover:after,
-.cft-application-id[data-title]:hover:after,
 .cft-due-date[data-title]:hover:after,
 .cft-remove-user[data-title]:hover:after {
   font-size: 12px;
@@ -356,12 +356,12 @@
   background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
   background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
 }
-.cft-process-name[data-title]:hover:after,.task-header-title[data-title]:hover:after,
-.cft-application-id[data-title]:hover:after{
-  right: 0;
-  position: relative;
-  height: 26px;
-}
+// .cft-process-name[data-title]:hover:after,.task-header-title[data-title]:hover:after,
+// .cft-application-id[data-title]:hover:after{
+//   right: 0;
+//   position: relative;
+//   height: 26px;
+// }
 .cft-application-id{
   display: block;
   height: auto;
@@ -373,7 +373,7 @@
 .cft-groups[data-title]:hover:after
 {
  
-  width: 20%;
+  width: 25%;
   left: 0rem;
   font-weight: 400;
   font-size: 16px;
@@ -437,5 +437,19 @@
   border-color: none !important;
   box-shadow: none;
 }
-
+.diagram-full-screen {
+  height:  100vh;
+  min-height: 100vh;
+}
+.card{
+  white-space: normal;
+}
+li {
+  list-style-type: none;
+}
+.cft-nav-backgroup, .cft-nav-backgroup:hover
+{
+  background-color: #1a5a96;
+  color: white;
+}
 }
