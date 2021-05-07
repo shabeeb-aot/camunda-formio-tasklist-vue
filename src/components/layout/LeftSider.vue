@@ -205,6 +205,7 @@ resetPaginationStore() {
 beforeDestroy() {
   this.$root.$off('call-pagination')
   this.$root.$off('update-pagination-currentpage')
+  this.$root.$off('update-activeIndex-pagination')
 }
 
 }
