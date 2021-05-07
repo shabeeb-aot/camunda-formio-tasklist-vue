@@ -51,7 +51,9 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Follow-up date"
-                  v-model="setFollowup[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
+                  v-model="setFollowup[
+                  (getFormsFlowTaskCurrentPage-1)*perPage + getFormsFlowactiveIndex
+                  ]"
                   @change="updateFollowUpDate"
                 ></DatePicker>
               </b-col>
@@ -66,7 +68,9 @@
                 <DatePicker
                   type="datetime"
                   placeholder="Set Due Date"
-                  v-model="setDue[getFormsFlowTaskCurrentPage*perPage + getFormsFlowactiveIndex]"
+                  v-model="setDue[
+                  (getFormsFlowTaskCurrentPage-1)*perPage + getFormsFlowactiveIndex
+                  ]"
                   @change="updateDueDate"
                 ></DatePicker>
               </b-col>
@@ -633,8 +637,10 @@ getTaskProcessDiagramDetails(task: any) {
 
   updateFollowUpDate() {
     const referenceobject = this.task;
-    referenceobject['followUp'] = getISODateTime(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
-    if(this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['followUp']){
+    try{
+      referenceobject['followUp'] = getISODateTime(this.setFollowup[
+        (this.getFormsFlowTaskCurrentPage-1)*this.perPage + this.getFormsFlowactiveIndex
+      ]);
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -649,15 +655,17 @@ getTaskProcessDiagramDetails(task: any) {
           console.error("Error", error);
         });
     }
-    else {
+    catch {
       console.warn("Follow date error");
     }
   }
 
   updateDueDate() {
     const referenceobject = this.task;
-    referenceobject['due'] = getISODateTime(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex]);
-    if(this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] && referenceobject['due']){
+    try{
+      referenceobject['due'] = getISODateTime(this.setDue[
+        ((this.getFormsFlowTaskCurrentPage-1)*this.perPage) + this.getFormsFlowactiveIndex
+      ]);
       CamundaRest.updateTasksByID(
         this.token,
         this.task.id,
@@ -671,34 +679,51 @@ getTaskProcessDiagramDetails(task: any) {
           console.error("Error", error);
         });
     }
+    catch {
+      console.warn("Due date error");
+    }
   }
 
   removeDueDate() {
     const referenceobject = this.task;
-    this.setFollowup[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null
-    referenceobject["due"] = null;
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    ).then(() => {
-      this.reloadCurrentTask();
-    })
+    try{
+      this.setFollowup[
+        (this.getFormsFlowTaskCurrentPage-1)*this.perPage + this.getFormsFlowactiveIndex
+      ] = null
+      referenceobject["due"] = null;
+      CamundaRest.updateTasksByID(
+        this.token,
+        this.task.id,
+        this.bpmApiUrl,
+        referenceobject
+      ).then(() => {
+        this.reloadCurrentTask();
+      })
+    }
+    catch {
+      console.warn("Due date error");
+    }
   }
 
   removeFollowupDate() {
     const referenceobject = this.task;
-    referenceobject["followUp"] = null;
-    this.setDue[this.getFormsFlowTaskCurrentPage*this.perPage + this.getFormsFlowactiveIndex] = null;
-    CamundaRest.updateTasksByID(
-      this.token,
-      this.task.id,
-      this.bpmApiUrl,
-      referenceobject
-    ).then(() => {
-      this.reloadCurrentTask();
-    })
+    try{
+      referenceobject["followUp"] = null;
+      this.setDue[
+        (this.getFormsFlowTaskCurrentPage-1)*this.perPage + this.getFormsFlowactiveIndex
+      ] = null;
+      CamundaRest.updateTasksByID(
+        this.token,
+        this.task.id,
+        this.bpmApiUrl,
+        referenceobject
+      ).then(() => {
+        this.reloadCurrentTask();
+      })
+    }
+    catch {
+      console.warn("Follow up date error")
+    }
   }
 
   fetchTaskData(taskId: string) {
@@ -762,7 +787,7 @@ getTaskProcessDiagramDetails(task: any) {
           this.fetchTaskList(this.selectedfilterId, this.payload);
         }
       }
-      if(this.getFormsFlowTaskId && refreshedTaskId===this.getFormsFlowTaskId){
+      if((this.getFormsFlowTaskId) && (refreshedTaskId===this.getFormsFlowTaskId)){
         this.fetchTaskData(this.getFormsFlowTaskId);
         this.reloadCurrentTask();
       } 
@@ -796,7 +821,7 @@ getTaskProcessDiagramDetails(task: any) {
  
  
   updated() {
-    if((this.fulltasks.length)&& (this.taskId2 !== '')){
+    if((this.fulltasks.length) && (this.taskId2 !== '')){
       this.findPassedRouterIndex(this.taskId2, this.fulltasks);
       this.getBPMTaskDetail(this.taskId2);
       this.getTaskFormIODetails(this.taskId2);
