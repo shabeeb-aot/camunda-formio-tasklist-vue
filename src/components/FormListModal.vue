@@ -135,8 +135,7 @@ export default class FormListModal extends Vue{
     {
       this.formNumPages = Math.ceil(response.data.length/this.formperPage);
       this.formList = response.data.splice(
-        ((this.formcurrentPage - 1) * this.formperPage),
-        (this.formcurrentPage * this.formperPage)
+        ((this.formcurrentPage - 1) * this.formperPage), this.formperPage
       );
     });
   }
