@@ -29,7 +29,7 @@
               <span v-if="sortList.length>1"
                 class="cftf-exit-button"
                 title="Remove Sorting" 
-                @click="deleteSort(sort, index)"
+                @click="deleteSort(sort, idx)"
               >
                   <i class="bi bi-x"></i>
               </span>
@@ -78,9 +78,9 @@ import {
   sortingList,
 } from '../../services/utils';
 import FormListModal from '../FormListModal.vue';
-import { Getter, namespace } from 'vuex-class';
 import {Payload} from '../../services/TasklistTypes';
 import TaskSortOptions from '../TaskListSortoptions.vue';
+import { namespace } from 'vuex-class';
 
 const serviceFlowModule = namespace('serviceFlowModule')
 
